@@ -1,0 +1,309 @@
+{
+  "destination": "부산",
+  "total_days": 3,
+  "total_nights": 2,
+  "start_date": "20260529",
+  "end_date": "20260531",
+  "accommodation_recommendation": {
+    "area": "광안리",
+    "reason": "광안대교 뷰 숙소 多, 해운대와 버스 15분 거리, 감천·남포동 이동 편리. 해운대 대비 합리적 가격.",
+    "price_range": "8~20만원/박",
+    "tip": "광안대교 뷰 객실 요청 필수"
+  },
+  "optimization_notes": [
+    "Day 1 도착 후 부산역 인근 점심으로 이동 동선 최소화",
+    "Day 2 서부(감천·흰여울·남포동) 지역 묶음 후 해운대 저녁으로 귀환 — 이동 효율화",
+    "Day 3 서면·센텀 동선으로 부산역 귀환 코스와 자연스럽게 연결",
+    "더베이101 예약 필수 — 여행 전 2주 이상 선예약 권장",
+    "5월 말 주말 해운대 극혼잡 — Day 2 오전 8:30 조기 방문으로 회피"
+  ],
+  "days": [
+    {
+      "day": 1,
+      "date": "20260529",
+      "day_of_week": "금",
+      "theme": "도착 + 광안리 야경 나이트",
+      "weather": "맑음 25도, 강수확률 15%",
+      "couple_highlight": "광안대교 야경을 보며 신선한 회 — 부산 첫날의 완벽한 오프닝",
+      "schedule": [
+        {
+          "time": "08:30",
+          "type": "departure_prep",
+          "item": "서울역 집결",
+          "duration_min": 30,
+          "note": "KTX 탑승 30분 전 도착 권장"
+        },
+        {
+          "time": "09:00",
+          "type": "transport",
+          "item": "KTX 서울 출발 → 부산 (2시간 33분)",
+          "duration_min": 153,
+          "note": "차창 밖 풍경 감상 + 가벼운 이야기. 여행의 시작."
+        },
+        {
+          "time": "11:33",
+          "type": "arrival",
+          "item": "부산역 도착 → 초량동 (도보 10분)",
+          "duration_min": 10,
+          "note": ""
+        },
+        {
+          "time": "12:00",
+          "type": "meal",
+          "item": "점심: 초량밀면 (원조 할매밀면)",
+          "duration_min": 60,
+          "location": "초량동",
+          "estimated_cost": 20000,
+          "note": "부산 첫 한 끼는 향토 밀면. 밀면+공깃밥 조합 추천. 피크 대기 가능."
+        },
+        {
+          "time": "13:30",
+          "type": "transport",
+          "item": "광안리 숙소로 이동 (지하철 or 택시 30분)",
+          "duration_min": 40,
+          "note": "짐 체크인 후 가볍게 옷 갈아입기"
+        },
+        {
+          "time": "15:00",
+          "type": "attraction",
+          "item": "광안리 해변 + 민락수변공원 산책",
+          "duration_min": 120,
+          "location": "광안리",
+          "estimated_cost": 0,
+          "note": "부산 첫 바다 공기. 해변 산책로 2km 왕복. 사진 촬영 타임."
+        },
+        {
+          "time": "17:00",
+          "type": "cafe",
+          "item": "모모스 커피 광안점 — 광안대교 뷰 카페",
+          "duration_min": 90,
+          "location": "광안리",
+          "estimated_cost": 20000,
+          "note": "스페셜티 커피 + 광안대교 뷰. 일몰 전 여유롭게 휴식. 오후 시간대 웨이팅 예상."
+        },
+        {
+          "time": "18:30",
+          "type": "attraction",
+          "item": "광안리 해변 일몰 + 광안대교 야경 감상",
+          "duration_min": 90,
+          "location": "광안리 해변",
+          "estimated_cost": 0,
+          "note": "일몰 약 19:30. 해질 무렵 광안대교 조명 점등. 해변에서 둘이 나란히 앉아 야경 감상 — 이 여행의 첫 번째 하이라이트."
+        },
+        {
+          "time": "20:00",
+          "type": "meal",
+          "item": "저녁: 광안리 횟집거리 (회춘횟집 또는 동급 횟집)",
+          "duration_min": 120,
+          "location": "광안리",
+          "estimated_cost": 100000,
+          "note": "2층 창가 자리 예약 필수. 광안대교 야경 보이는 창가에서 활어회 + 매운탕. 신선도 현지 최고."
+        },
+        {
+          "time": "22:00",
+          "type": "accommodation",
+          "item": "숙소 귀환 + 광안리 야경 마지막 감상",
+          "duration_min": 0,
+          "note": "숙소 돌아가는 길에 해변 마지막 야경 산책."
+        }
+      ],
+      "estimated_daily_cost_per_person": 85000
+    },
+    {
+      "day": 2,
+      "date": "20260530",
+      "day_of_week": "토",
+      "theme": "부산 명소 풀코스 — 서부 문화 + 해운대 야경 디너",
+      "weather": "구름조금 24도, 강수확률 25%",
+      "couple_highlight": "감천마을 인생샷 + 더베이101 야경 디너 — 이 여행의 클라이맥스",
+      "schedule": [
+        {
+          "time": "08:30",
+          "type": "attraction",
+          "item": "해운대 해수욕장 + 동백섬 오전 산책",
+          "duration_min": 90,
+          "location": "해운대",
+          "estimated_cost": 0,
+          "note": "이른 오전이라 한산. 동백섬 누리마루 해안 산책로 도보 30분. 일출 후 바다 분위기 최고. 광안리에서 버스 39번 15분."
+        },
+        {
+          "time": "10:30",
+          "type": "transport",
+          "item": "해운대 → 감천문화마을 (버스+도보 40분)",
+          "duration_min": 40,
+          "note": "대중교통 추천. 주차 불편."
+        },
+        {
+          "time": "11:10",
+          "type": "attraction",
+          "item": "감천문화마을 탐방 + 스탬프 투어",
+          "duration_min": 90,
+          "location": "감천",
+          "estimated_cost": 4000,
+          "note": "입장료 2,000원/인 (스탬프 투어 포함). 좁은 골목 계단길 인생샷 포인트. 오전 방문으로 관광객 적음. 반드시 낮에 방문 (야간 미운영)."
+        },
+        {
+          "time": "12:40",
+          "type": "transport",
+          "item": "감천 → 남포동 (버스 10분)",
+          "duration_min": 15,
+          "note": ""
+        },
+        {
+          "time": "13:00",
+          "type": "meal",
+          "item": "점심: 국제시장 먹거리 투어 (씨앗호떡·어묵·비빔당면)",
+          "duration_min": 90,
+          "location": "남포동",
+          "estimated_cost": 30000,
+          "note": "BIFF 광장 → 국제시장 도보 코스. 씨앗호떡 필수. 한 끼 거리 먹거리로 배 채우기. 가볍고 재미있는 점심."
+        },
+        {
+          "time": "14:30",
+          "type": "transport",
+          "item": "남포동 → 흰여울문화마을 (버스 20분, 영도)",
+          "duration_min": 25,
+          "note": ""
+        },
+        {
+          "time": "15:00",
+          "type": "attraction",
+          "item": "흰여울문화마을 — 절벽 위 바다뷰 골목길",
+          "duration_min": 90,
+          "location": "영도",
+          "estimated_cost": 0,
+          "note": "절벽 위 좁은 골목에서 쪽빛 바다 조망. 영화 <변호인> 촬영지. 골목 카페에서 쉬어가기 좋음. 일몰 전 방문으로 바다 빛이 아름다운 타임."
+        },
+        {
+          "time": "16:30",
+          "type": "attraction",
+          "item": "부산타워 + 용두산공원 (영도에서 버스 15분)",
+          "duration_min": 60,
+          "location": "남포동",
+          "estimated_cost": 24000,
+          "note": "입장료 12,000원/인. 부산 전경 360도 조망. 저녁 황금빛 조망 타임. 운영 20:30까지."
+        },
+        {
+          "time": "17:30",
+          "type": "transport",
+          "item": "남포동 → 해운대 더베이101 이동 (지하철 or 택시 40분)",
+          "duration_min": 45,
+          "note": "예약 시간에 맞게 이동. 금요일 저녁 택시 잡기 어려울 수 있으니 카카오택시 미리 호출."
+        },
+        {
+          "time": "19:00",
+          "type": "meal",
+          "item": "저녁: 더베이101 (해운대 동백섬 야경 디너)",
+          "duration_min": 150,
+          "location": "해운대 동백섬",
+          "estimated_cost": 120000,
+          "note": "예약 필수 (2주 전 이상 권장). 창가/야외 자리 요청. 광안대교+해운대 야경 보이는 루프탑 다이닝. 이 여행 최고의 저녁."
+        },
+        {
+          "time": "21:30",
+          "type": "accommodation",
+          "item": "광안리 숙소 귀환 (버스 or 택시)",
+          "duration_min": 20,
+          "note": ""
+        }
+      ],
+      "estimated_daily_cost_per_person": 140000
+    },
+    {
+      "day": 3,
+      "date": "20260531",
+      "day_of_week": "일",
+      "theme": "여유로운 마무리 — 서면 + 센텀 + 귀환",
+      "weather": "맑음 25도, 강수확률 15%",
+      "couple_highlight": "마지막 아침 바다 산책 — 다음 여행을 기약하며",
+      "schedule": [
+        {
+          "time": "08:00",
+          "type": "attraction",
+          "item": "광안리 해변 아침 산책 + 카페 조식",
+          "duration_min": 90,
+          "location": "광안리",
+          "estimated_cost": 20000,
+          "note": "마지막 부산 바다. 여유롭게 걸으며 이야기. 해변 근처 카페에서 간단한 조식."
+        },
+        {
+          "time": "10:00",
+          "type": "accommodation",
+          "item": "체크아웃 + 짐 프런트 맡기기",
+          "duration_min": 30,
+          "note": "체크아웃 후 짐은 프런트에 맡기고 가볍게 이동."
+        },
+        {
+          "time": "11:00",
+          "type": "transport",
+          "item": "광안리 → 서면 (지하철 2호선 15분)",
+          "duration_min": 20,
+          "note": ""
+        },
+        {
+          "time": "11:30",
+          "type": "meal",
+          "item": "점심: 수변최고돼지국밥 (서면)",
+          "duration_min": 60,
+          "location": "서면",
+          "estimated_cost": 24000,
+          "note": "부산 여행 마지막 향토 식사. 깊고 진한 돼지국밥 육수. 순대·수육 추가 추천."
+        },
+        {
+          "time": "13:00",
+          "type": "transport",
+          "item": "서면 → 센텀시티 (지하철 2호선 10분)",
+          "duration_min": 15,
+          "note": ""
+        },
+        {
+          "time": "13:30",
+          "type": "attraction",
+          "item": "영화의전당 외관 산책 + 센텀시티 기념품 쇼핑",
+          "duration_min": 150,
+          "location": "센텀시티",
+          "estimated_cost": 30000,
+          "note": "세계 최대 캔틸레버 지붕 외관 포토스팟. 신세계 센텀시티에서 부산 기념품. 여유롭게 마무리 쇼핑."
+        },
+        {
+          "time": "16:00",
+          "type": "transport",
+          "item": "센텀시티 → 광안리 숙소 짐 픽업 → 부산역 (지하철 1시간)",
+          "duration_min": 70,
+          "note": "부산역 1호선 방향 환승. 충분한 여유 확보."
+        },
+        {
+          "time": "17:30",
+          "type": "transport",
+          "item": "부산역 도착 + 탑승 준비",
+          "duration_min": 120,
+          "note": "출발 2시간 전 도착. 역 내 기념품숍 마지막 둘러보기. 편의점 간식 구매."
+        },
+        {
+          "time": "19:30",
+          "type": "transport",
+          "item": "KTX 부산 출발 → 서울 (2시간 33분)",
+          "duration_min": 153,
+          "note": "기차에서 부산 여행 사진 정리. 여행 추억 이야기."
+        },
+        {
+          "time": "22:03",
+          "type": "arrival",
+          "item": "서울역 도착",
+          "duration_min": 0,
+          "note": ""
+        }
+      ],
+      "estimated_daily_cost_per_person": 50000
+    }
+  ],
+  "total_estimated_cost_per_person": {
+    "transport": 119600,
+    "accommodation_2nights": 200000,
+    "food": 150000,
+    "attractions": 30000,
+    "misc": 30000,
+    "total": 529600,
+    "note": "숙박비는 광안리 기준 1박 10만원 추정. 더베이101 예산 포함. 실제 비용은 숙소 선택과 식사 수준에 따라 변동."
+  }
+}

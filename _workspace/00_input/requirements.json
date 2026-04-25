@@ -1,0 +1,16 @@
+{
+  "destination": "부산",
+  "departure": "서울",
+  "start_date": "20260529",
+  "end_date": "20260531",
+  "alt_start_date": "20260530",
+  "alt_end_date": "20260601",
+  "passengers": 2,
+  "trip_type": "couple",
+  "budget_per_person": null,
+  "travel_style": ["맛집", "야경", "분위기", "해변"],
+  "accommodation": null,
+  "transport_pref": "auto",
+  "notes": "여자친구와 커플 여행. 로맨틱한 분위기 우선. 금토일(5/29-31) 1순위, 토일월(5/30-6/1) 대안.",
+  "created_at": "2026-04-22T00:00:00"
+}

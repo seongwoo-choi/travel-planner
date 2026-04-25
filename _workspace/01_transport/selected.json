@@ -1,0 +1,22 @@
+{
+  "outbound": {
+    "type": "KTX",
+    "departure_station": "서울",
+    "arrival_station": "부산",
+    "departure_time": "09:00",
+    "arrival_time": "11:33",
+    "price_2pax": 119600,
+    "reason": "서울역 출발로 접근성 우수. 오전 9시 탑승 시 부산 11:33 도착으로 점심부터 첫날 풀 활용 가능."
+  },
+  "return": {
+    "type": "KTX",
+    "departure_station": "부산",
+    "arrival_station": "서울",
+    "departure_time": "19:30",
+    "arrival_time": "22:03",
+    "price_2pax": 119600,
+    "reason": "마지막 날 저녁 식사 후 여유롭게 부산역 이동. 서울 22시 귀환으로 다음날 피로 최소화."
+  },
+  "total_transport_cost_2pax": 239200,
+  "booking_note": "금요일 출발·일요일 귀환 성수기 — 조기 예매 강력 권장. KSKILL_KTX_ID 설정 후 ktx-booking 스킬로 예약 가능."
+}
