@@ -186,7 +186,10 @@ trip-reporter 호출:
 - 입력: `_workspace/01_local/spots.json`
 - 입력: `_workspace/02_itinerary/plan.json`
 - 입력: `_workspace/03_bookings/results.json` (있는 경우)
-- 출력: `_workspace/04_report/travel_plan.md`
+- 출력: `trips/{국가}/{도시}/travel_plan.md`
+  - 예: 부산 → `trips/한국/부산/travel_plan.md`
+  - 목적지 정보는 `requirements.json`의 `destination`(도시)과 `country`(국가, 기본값: 한국) 참조
+  - 디렉토리가 없으면 자동 생성
 
 보고서 형식:
 ```markdown
@@ -231,7 +234,7 @@ plan.json  ←→  selected.json
     ↓ (Phase 3, 사용자 확인 후)
 results.json (예약 결과, 선택적)
     ↓ (Phase 4)
-travel_plan.md
+trips/{국가}/{도시}/travel_plan.md
 ```
 
 ## 에러 핸들링
