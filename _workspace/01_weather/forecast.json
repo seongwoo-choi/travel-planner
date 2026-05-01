@@ -1,39 +1,34 @@
 {
-  "destination": "부산",
-  "forecast": [
+  "destination": "묵호(동해시)",
+  "period": "2026-05-03 ~ 2026-05-04",
+  "daily": [
     {
-      "date": "20260529",
-      "day_of_week": "금",
-      "weather": "맑음",
-      "high_temp": 25,
-      "low_temp": 17,
-      "rain_prob": 15,
-      "outdoor_score": "Good",
-      "note": "야경 감상 최적 — 광안리·해운대 야경 추천"
+      "date": "2026-05-03",
+      "condition": "대체로 맑음 (오전 해무 가능)",
+      "temp_high": 21,
+      "temp_low": 13,
+      "rain_prob": 20,
+      "wind": "북동풍 10km/h",
+      "outdoor_ok": true,
+      "notes": "오전 6~10시 해무 빈발. 등대·전망대는 10시 이후 방문 권장"
     },
     {
-      "date": "20260530",
-      "day_of_week": "토",
-      "weather": "구름조금",
-      "high_temp": 24,
-      "low_temp": 17,
-      "rain_prob": 25,
-      "outdoor_score": "Good",
-      "note": "해변 산책 및 오전 일찍 야외 활동 적합"
-    },
-    {
-      "date": "20260531",
-      "day_of_week": "일",
-      "weather": "맑음",
-      "high_temp": 25,
-      "low_temp": 18,
+      "date": "2026-05-04",
+      "condition": "구름조금~맑음",
+      "temp_high": 22,
+      "temp_low": 14,
       "rain_prob": 15,
-      "outdoor_score": "Good",
-      "note": "귀가 전 오전 해돋이 또는 아침 산책 추천"
+      "wind": "남동풍 8km/h",
+      "outdoor_ok": true,
+      "notes": "맑음. 야외 액티비티 최적"
     }
   ],
-  "summary": "전체 기간 쾌청하고 따뜻한 초여름 날씨. 강수 가능성 낮아 야외 활동 최적.",
-  "couple_note": "금요일 저녁 광안대교 야경 + 민락수변공원 산책, 토요일 해운대 해변 피크닉, 일요일 오전 흰여울문화마을 또는 감천문화마을 방문 추천. 일교차 약 7~8도로 저녁에는 얇은 겉옷 준비 권장.",
-  "source": "평년기후추정",
-  "collected_at": "2026-04-22T00:00:00"
+  "sea_temp": 14,
+  "uv_index": "6~8 (높음)",
+  "general_tips": [
+    "봄철 해무(5월) — 오전 일찍 전망대·등대 방문 시 시야 제한 가능. 오전 10시 이후 방문 권장",
+    "해수온 14°C — 수영 비추천. 해변 산책·드라이브는 쾌적",
+    "일교차 약 8도 — 저녁 바닷바람 대비 겉옷 필수",
+    "자외선 높음 — 선크림 필수"
+  ]
 }

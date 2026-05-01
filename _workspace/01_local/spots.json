@@ -1,234 +1,126 @@
 {
-  "destination": "부산",
-  "travel_style": ["맛집", "야경", "분위기", "해변"],
-  "couple_highlights": [
-    "광안리 해변 + 광안대교 야경 — 부산 커플 여행 하이라이트",
-    "해운대 해수욕장 일몰 산책 후 동백섬 야간 조명",
-    "감천문화마을 낮 방문 (인생샷 스팟, 오후 5시까지 운영 권장)",
-    "흰여울문화마을 — 절벽 위 바다뷰 골목길 산책"
-  ],
+  "destination": "묵호(동해시)",
   "restaurants": [
     {
-      "name": "더베이101",
-      "category": "레스토랑/바",
-      "area": "해운대 동백섬",
-      "meal_type": "저녁",
-      "couple_score": 10,
-      "estimated_cost_per_person": 60000,
-      "atmosphere": "광안대교 야경 + 해운대 뷰, 루프탑 바 겸 다이닝, 부산 커플 1순위",
-      "open_hours": "11:00-02:00 (라스트오더 식사 21:00)",
-      "indoor": true,
-      "reservation_needed": true,
-      "note": "저녁 예약 필수. 창가/야외 자리 요청. 주차 혼잡 — 대중교통 권장"
+      "name": "대우칼국수",
+      "category": "로컬 노포 칼국수",
+      "price_per_person": 9000,
+      "hours": "미확인",
+      "closed_day": "화요일",
+      "must_try": "장칼국수",
+      "notes": "현지인 추천 노포"
     },
     {
-      "name": "초량밀면 (원조 할매밀면)",
-      "category": "밀면/향토음식",
-      "area": "초량",
-      "meal_type": "점심",
-      "couple_score": 7,
-      "estimated_cost_per_person": 10000,
-      "atmosphere": "부산 향토 밀면 원조, 허름하지만 현지인 줄서는 맛집",
-      "open_hours": "10:00-20:00 (재료 소진 시 조기 마감)",
-      "indoor": true,
-      "reservation_needed": false,
-      "note": "밀면+공깃밥 조합 추천. 피크타임(12-13시) 대기 30분 예상"
+      "name": "어향",
+      "category": "생선구이 한식",
+      "price_per_person": 13000,
+      "hours": "미확인",
+      "closed_day": "수요일",
+      "must_try": "고등어/임연수 구이 정식",
+      "notes": "중앙시장 인근"
     },
     {
-      "name": "해운대 암소갈비집",
-      "category": "갈비/구이",
-      "area": "해운대",
-      "meal_type": "저녁",
-      "couple_score": 9,
-      "estimated_cost_per_person": 55000,
-      "atmosphere": "50년 전통 부산 갈비 명가, 조용하고 고급스러운 분위기",
-      "open_hours": "11:30-22:00",
-      "indoor": true,
-      "reservation_needed": true,
-      "note": "주말 저녁 예약 필수. 1인분 갈비+냉면 세트 추천"
+      "name": "덕진호",
+      "category": "대게 전문",
+      "price_per_person": 40000,
+      "hours": "연중무휴",
+      "closed_day": "없음",
+      "must_try": "대게찜",
+      "notes": "묵호항 대게 대표 식당"
     },
     {
-      "name": "광안리 횟집거리 (회춘횟집)",
-      "category": "해산물/횟집",
-      "area": "광안리",
-      "meal_type": "저녁",
-      "couple_score": 9,
-      "estimated_cost_per_person": 50000,
-      "atmosphere": "광안대교 야경 보이는 2층 창가, 신선한 활어회",
-      "open_hours": "12:00-23:00",
-      "indoor": true,
-      "reservation_needed": true,
-      "note": "2층 창가 자리 요청 필수. 광안대교 야경 감상하며 식사 가능"
+      "name": "동북횟집 (묵호물회)",
+      "category": "물회·활어회",
+      "price_per_person": 15000,
+      "hours": "미확인",
+      "closed_day": "월요일",
+      "must_try": "물회, 회덮밥",
+      "notes": "물회 전문"
     },
     {
-      "name": "국제시장 씨앗호떡 + 비프광장",
-      "category": "분식/향토음식",
-      "area": "남포동",
-      "meal_type": "점심",
-      "couple_score": 8,
-      "estimated_cost_per_person": 15000,
-      "atmosphere": "부산 대표 거리 먹거리 투어, 씨앗호떡·어묵·돼지국밥 코스",
-      "open_hours": "10:00-21:00",
-      "indoor": false,
-      "reservation_needed": false,
-      "note": "남포동 BIFF 광장~국제시장 도보 코스로 즐기기 권장"
+      "name": "논골카페",
+      "category": "전망 카페 (협동조합)",
+      "price_per_person": 6000,
+      "hours": "미확인",
+      "closed_day": "비정기",
+      "must_try": "오징어먹물 라떼",
+      "notes": "논골담길 내 등대뷰 카페"
     },
     {
-      "name": "해운대 진짜고기",
-      "category": "돼지갈비/구이",
-      "area": "해운대",
-      "meal_type": "점심",
-      "couple_score": 8,
-      "estimated_cost_per_person": 25000,
-      "atmosphere": "부산식 돼지갈비, 현지인 맛집, 가성비 좋음",
-      "open_hours": "11:30-21:30",
-      "indoor": true,
-      "reservation_needed": false,
-      "note": "점심 피크타임 대기 가능성 있음"
+      "name": "회생각포차",
+      "category": "포차·횟집",
+      "price_per_person": 25000,
+      "hours": "미확인",
+      "closed_day": "월요일",
+      "must_try": "오징어회, 곰치국",
+      "notes": "분위기 좋은 저녁 포차"
     },
     {
-      "name": "수변최고돼지국밥",
-      "category": "돼지국밥/향토음식",
-      "area": "서면",
-      "meal_type": "점심",
-      "couple_score": 7,
-      "estimated_cost_per_person": 12000,
-      "atmosphere": "부산 돼지국밥 명가, 깊고 진한 육수, 현지인 단골 식당",
-      "open_hours": "07:00-21:00",
-      "indoor": true,
-      "reservation_needed": false,
-      "note": "부산 방문 시 필수 향토음식. 순대·수육 추가 추천"
+      "name": "담다",
+      "category": "솥밥 한정식",
+      "price_per_person": 20000,
+      "hours": "미확인",
+      "closed_day": "화요일",
+      "must_try": "전복솥밥, 간장게장 한상",
+      "notes": "고급 한정식"
     }
   ],
-  "attractions": [
+  "activities": [
     {
-      "name": "광안리 해수욕장 + 광안대교",
-      "category": "야경/해변",
-      "area": "광안리",
-      "couple_score": 10,
+      "name": "묵호등대 & 논골담길",
+      "type": "벽화마을 산책",
+      "cost_per_person": 0,
       "duration_hours": 2,
-      "admission": 0,
-      "best_time": "일몰(18:30~)~야간(21:00)",
-      "indoor": false,
-      "note": "광안대교 조명이 일몰 후 점등. 해변 산책 후 횟집거리로 이동하는 코스 추천. 야간에도 24시간 입장 가능"
+      "hours": "상시",
+      "notes": "경사 있음. 편한 신발 필수. 오전 해무 소산 후 방문 권장"
     },
     {
-      "name": "해운대 해수욕장 + 동백섬",
-      "category": "해변/산책",
-      "area": "해운대",
-      "couple_score": 9,
-      "duration_hours": 2,
-      "admission": 0,
-      "best_time": "오전(붐비기 전) 또는 일몰",
-      "indoor": false,
-      "note": "동백섬 누리마루 APEC 하우스까지 해안 산책로 도보 30분. 일몰 명소"
-    },
-    {
-      "name": "감천문화마을",
-      "category": "문화/사진",
-      "area": "감천",
-      "couple_score": 9,
-      "duration_hours": 2,
-      "admission": 2000,
-      "best_time": "오전 10시~오후 4시 (야간 미운영)",
-      "indoor": false,
-      "note": "부산의 마추픽추. 입장료 2,000원(스탬프 투어 포함). 야간 운영 없음 — 반드시 낮에 방문. 주차 불편, 대중교통 권장"
-    },
-    {
-      "name": "흰여울문화마을",
-      "category": "문화/야경/사진",
-      "area": "영도",
-      "couple_score": 9,
+      "name": "도째비골 스카이밸리 & 해랑전망대",
+      "type": "스카이워크·전망대",
+      "cost_per_person": 2000,
       "duration_hours": 1.5,
-      "admission": 0,
-      "best_time": "오후 ~ 일몰",
-      "indoor": false,
-      "note": "절벽 위 골목길에서 바다뷰 감상. 영화 <변호인> 촬영지. 카페 몇 곳 있어 쉬어가기 좋음. 야간은 어두우므로 일몰 전 방문 권장"
+      "hours": "미확인",
+      "notes": "석양 시간대 추천"
     },
     {
-      "name": "부산 타워 + 용두산공원",
-      "category": "야경/전망대",
-      "area": "남포동",
-      "couple_score": 8,
+      "name": "추암촛대바위 & 출렁다리",
+      "type": "해안 명소",
+      "cost_per_person": 0,
+      "duration_hours": 1.5,
+      "hours": "상시",
+      "notes": "묵호 남쪽 5km. 일출 명소. 출렁다리 운영 여부 확인 권장"
+    },
+    {
+      "name": "망상해수욕장",
+      "type": "해변 산책",
+      "cost_per_person": 0,
+      "duration_hours": 1.5,
+      "hours": "상시",
+      "notes": "5월은 공식 해수욕 미개장(7월 개장). 해변 산책·드라이브는 가능"
+    },
+    {
+      "name": "묵호항 방파제 낚시",
+      "type": "체험 낚시",
+      "cost_per_person": 5000,
+      "duration_hours": 3,
+      "hours": "상시",
+      "notes": "장비 필요. 현지 낚시용품점 대여 가능"
+    },
+    {
+      "name": "새천년해안도로 드라이브",
+      "type": "드라이브 코스",
+      "cost_per_person": 0,
       "duration_hours": 1,
-      "admission": 12000,
-      "best_time": "야간",
-      "indoor": true,
-      "note": "부산 전경 360도 조망. 야간 조명 시 야경 명소. 엘리베이터 운행 20:30까지 (운영시간 확인 필요)"
+      "hours": "상시",
+      "notes": "묵호~동해 해안도로. 차창 밖 동해 파노라마"
+    },
+    {
+      "name": "헌화로 해안도로",
+      "type": "드라이브 코스",
+      "cost_per_person": 0,
+      "duration_hours": 1.5,
+      "hours": "상시",
+      "notes": "금진해변→심곡항→정동진. 동해안 최고 드라이브 코스"
     }
-  ],
-  "cafes": [
-    {
-      "name": "카페 아난티 (아난티 코브)",
-      "area": "기장 힐튼 아난티",
-      "couple_score": 10,
-      "view": "동해 바다뷰 통유리 오션뷰",
-      "note": "부산 최고급 바다뷰 카페. 기장 해안가 위치. 음료 1~2만원대. 주차 편리. 사전 예약 불필요하나 주말 웨이팅 가능"
-    },
-    {
-      "name": "모모스 커피 (광안점)",
-      "area": "광안리",
-      "couple_score": 9,
-      "view": "광안대교 뷰",
-      "note": "부산 대표 스페셜티 커피 브랜드. 광안대교 뷰 감상 가능. 디저트 메뉴 다양. 오후 시간대 웨이팅 예상"
-    }
-  ],
-  "indoor_spots": [
-    {
-      "name": "부산현대미술관",
-      "category": "미술관/실내",
-      "area": "을숙도",
-      "couple_score": 8,
-      "admission": 4000,
-      "open_hours": "10:00-18:00 (월요일 휴관)",
-      "note": "현대 미술 전시 + 낙동강 갈대밭 산책 연계 가능. 우천 시 완벽한 대안"
-    },
-    {
-      "name": "부산 영화의전당 (두레라움)",
-      "category": "영화/문화/실내",
-      "area": "센텀시티",
-      "couple_score": 8,
-      "admission": 13000,
-      "open_hours": "상영 시간표에 따라 다름",
-      "note": "부산국제영화제 메인 거점. 세계 최대 캔틸레버 지붕 건물 외관도 포토스팟. 야간 조명 아름다움"
-    },
-    {
-      "name": "신세계 센텀시티 (세계 최대 백화점)",
-      "category": "쇼핑/실내",
-      "area": "센텀시티",
-      "couple_score": 7,
-      "admission": 0,
-      "open_hours": "10:30-20:00",
-      "note": "기네스 기록 세계 최대 백화점. 아이스링크·스파·영화관 포함. 우천 시 하루 종일 즐길 수 있음"
-    }
-  ],
-  "accommodation_areas": [
-    {
-      "area": "해운대",
-      "reason": "해변 도보 접근, 파라다이스·힐튼 등 특급 호텔 집중, 야경 감상 용이",
-      "price_range": "10~30만원/박 (특급 호텔 30만원~)"
-    },
-    {
-      "area": "광안리",
-      "reason": "광안대교 뷰 숙소 다수, 부산 로컬 분위기, 해운대 대비 합리적 가격",
-      "price_range": "8~20만원/박"
-    },
-    {
-      "area": "센텀시티",
-      "reason": "신세계/영화의전당 도보권, 해운대·광안리 접근 20분 내외, 교통 편리",
-      "price_range": "10~25만원/박"
-    }
-  ],
-  "local_tips": [
-    "해운대↔광안리 버스(39번 등) 15분, 도보 40분 — 날씨 좋으면 해안 산책 추천",
-    "감천문화마을은 반드시 낮에 방문 (야간 미운영, 오후 5시 전 도착 권장)",
-    "5월~8월 주말 해운대는 인파 극심 — 오전 8시 전 방문 또는 광안리로 대체",
-    "광안대교 야경은 해질 무렵(오후 7~8시)부터 가장 아름다움 — 광안리 해변에서 감상",
-    "부산 돼지국밥·밀면은 점심에, 횟집/갈비는 저녁에 배분하면 예산·일정 효율적",
-    "기장 아난티 카페는 차량 필수 (대중교통 불편). 렌터카 이용 시 포함 권장",
-    "흰여울문화마을 → 남포동 → 국제시장 → 용두산공원은 반나절 도보 코스로 최적",
-    "부산 대중교통 1일권(4,500원) 활용 시 교통비 절감 가능 (버스+지하철 통합)"
-  ],
-  "data_source": "general-knowledge (blue-ribbon-nearby 스킬 및 naver-blog-research 스킬 실행 권한 없음 — 일반 지식으로 보완)",
-  "collected_at": "2026-04-22T00:00:00"
+  ]
 }
