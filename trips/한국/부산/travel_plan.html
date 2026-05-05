@@ -117,6 +117,39 @@
     .day-header.day1 { background: linear-gradient(135deg, #1a1a2e, #c0392b); }
     .day-header.day2 { background: linear-gradient(135deg, #2d3436, #6c5ce7); }
     .day-header.day3 { background: linear-gradient(135deg, #134e5e, #71b280); }
+    .day-header.planB { background: linear-gradient(135deg, #1a3a5c, #2980b9); }
+    .day-header.planC { background: linear-gradient(135deg, #134e5e, #00b09b); }
+
+    .plan-divider {
+      background: linear-gradient(135deg, #f7fafc, #edf2f7);
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 20px 24px;
+      margin: 36px 0 20px;
+      text-align: center;
+    }
+    .plan-divider h3 { font-size: 20px; font-weight: 800; color: #2d3748; }
+    .plan-divider .plan-desc { font-size: 13px; color: #718096; margin-top: 6px; }
+
+    .plan-guide {
+      background: white; border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      overflow: hidden; margin-bottom: 12px;
+    }
+    .plan-guide-row {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 16px; border-bottom: 1px solid #f0f4f8;
+    }
+    .plan-guide-row:last-child { border-bottom: none; }
+    .plan-badge {
+      font-size: 11px; font-weight: 800; padding: 3px 10px;
+      border-radius: 20px; flex-shrink: 0; min-width: 56px; text-align: center;
+    }
+    .plan-badge.a { background: #fed7d7; color: #c53030; }
+    .plan-badge.b { background: #bee3f8; color: #2b6cb0; }
+    .plan-badge.c { background: #b2f5ea; color: #234e52; }
+    .plan-guide-theme { font-size: 14px; font-weight: 700; flex: 1; }
+    .plan-guide-cond { font-size: 12px; color: #718096; }
     .day-header .day-label { font-size: 12px; font-weight: 700; opacity: 0.8; text-transform: uppercase; letter-spacing: 0.08em; }
     .day-header h2 { font-size: 20px; font-weight: 800; margin-top: 2px; }
     .day-header .day-sub { font-size: 13px; opacity: 0.8; margin-top: 4px; }
@@ -736,6 +769,239 @@
       <div class="hl-medal">🥇</div>
       <div><div class="hl-text">랑데자뷰 — 해운대 내려다보며 마지막 커피</div><div class="hl-sub">Day 3 아침</div></div>
     </div>
+  </div>
+
+  <!-- 플랜 선택 가이드 -->
+  <div class="plan-divider">
+    <h3>🗺️ 플랜 선택 가이드</h3>
+    <div class="plan-desc">KTX·스시코우·더베이101은 세 플랜 공통</div>
+  </div>
+  <div class="plan-guide">
+    <div class="plan-guide-row">
+      <span class="plan-badge a">플랜 A</span>
+      <span class="plan-guide-theme">야경·오마카세·인스타감성</span>
+      <span class="plan-guide-cond">맑은 날 기본</span>
+    </div>
+    <div class="plan-guide-row">
+      <span class="plan-badge b">플랜 B</span>
+      <span class="plan-guide-theme">실내 감성·스파·미식</span>
+      <span class="plan-guide-cond">비 오는 날</span>
+    </div>
+    <div class="plan-guide-row">
+      <span class="plan-badge c">플랜 C</span>
+      <span class="plan-guide-theme">기장 해안카페 드라이브</span>
+      <span class="plan-guide-cond">맑은 날, 느긋하게</span>
+    </div>
+  </div>
+
+  <!-- 플랜 B -->
+  <div class="section">
+    <div class="plan-divider" style="background:linear-gradient(135deg,#ebf8ff,#bee3f8);border-color:#90cdf4;margin-top:8px;">
+      <h3 style="color:#2b6cb0;">☔ 플랜 B — 우천 대비 실내 감성</h3>
+      <div class="plan-desc">비 와도 완벽한 부산 — 스파·전포카페거리·영화의전당·실내 미식</div>
+    </div>
+
+    <div class="day-header planB">
+      <div class="day-label">DAY 1-B · 5월 22일 금요일</div>
+      <h2>전포카페거리 + 스시코우 ☕🍣</h2>
+      <div class="day-sub">부산의 브루클린 카페거리 → 오마카세</div>
+    </div>
+    <div class="card">
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="time-col"><div class="time">13:30</div></div>
+          <div class="dot"></div>
+          <div class="item-content">
+            <div class="item-title">🍜 초량밀면 점심</div>
+            <div class="item-cost">10,000원</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="time-col"><div class="time">15:00</div></div>
+          <div class="dot free"></div>
+          <div class="item-content">
+            <div class="item-title">광안리 체크인</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="time-col"><div class="time">16:00</div></div>
+          <div class="dot highlight"></div>
+          <div class="item-content">
+            <div class="item-title highlight">☕ 전포카페거리 — 로스터리 카페 투어</div>
+            <div class="item-desc">부산의 브루클린. 스페셜티 카페+독립서점 밀집. 지하철 전포역 도보</div>
+            <div class="item-cost">12,000원</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="time-col"><div class="time">20:00</div></div>
+          <div class="dot highlight"></div>
+          <div class="item-content">
+            <div class="item-title highlight">✨ 스시코우 오마카세 ⭐</div>
+            <div class="item-desc">실내 — 비 상관없음. 캐치테이블 예약 필수</div>
+            <div class="item-cost">~80,000원</div>
+          </div>
+        </div>
+      </div>
+      <div class="day-total"><span class="label">Day 1-B 예상 비용</span><span class="amount">약 102,000원/인</span></div>
+    </div>
+
+    <div class="day-header planB" style="margin-top:8px;">
+      <div class="day-label">DAY 2-B · 5월 23일 토요일</div>
+      <h2>스파랜드 + 영화의전당 + 더베이101 🛁🎬</h2>
+      <div class="day-sub">온천 힐링 → 실내 문화 → 야경 다이닝</div>
+    </div>
+    <div class="card">
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="time-col"><div class="time">09:00</div></div>
+          <div class="dot highlight"></div>
+          <div class="item-content">
+            <div class="item-title highlight">🛁 해운대 스파랜드 — 온천+찜질</div>
+            <div class="item-desc">해운대 그랜드 호텔 내. 07:00~22:00. 부산 최대 온천</div>
+            <div class="item-cost">15,000원</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="time-col"><div class="time">12:00</div></div>
+          <div class="dot"></div>
+          <div class="item-content">
+            <div class="item-title">해운대 인근 브런치 카페</div>
+            <div class="item-cost">12,000원</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="time-col"><div class="time">13:00</div></div>
+          <div class="dot"></div>
+          <div class="item-content">
+            <div class="item-title">🍡 국제시장 점심 먹거리 투어</div>
+            <div class="item-desc">씨앗호떡·어묵. 실내 아케이드 구간</div>
+            <div class="item-cost">15,000원</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="time-col"><div class="time">14:30</div></div>
+          <div class="dot"></div>
+          <div class="item-content">
+            <div class="item-title">🎬 영화의전당 — 기획전시 + 외관 포토스팟</div>
+            <div class="item-desc">세계 최대 캔틸레버 지붕</div>
+            <div class="item-cost">~10,000원</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="time-col"><div class="time">16:00</div></div>
+          <div class="dot"></div>
+          <div class="item-content">
+            <div class="item-title">🛍️ 신세계 센텀시티 — 쇼핑+기념품</div>
+            <div class="item-desc">10:30~20:00</div>
+            <div class="item-cost">20,000원</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="time-col"><div class="time">19:00</div></div>
+          <div class="dot highlight"></div>
+          <div class="item-content">
+            <div class="item-title highlight">🍽️ 더베이101 야경 다이닝 ⭐</div>
+            <div class="item-desc">입점 식당 개별 예약 필수</div>
+            <div class="item-cost">60,000원</div>
+          </div>
+        </div>
+      </div>
+      <div class="day-total"><span class="label">Day 2-B 예상 비용</span><span class="amount">약 132,000원/인</span></div>
+    </div>
+
+    <div class="info-box" style="margin-top:8px;">DAY 3-B — 플랜 A와 동일: 랑데자뷰 → 수변최고돼지국밥 → KTX 14:20 귀환</div>
+  </div>
+
+  <!-- 플랜 C -->
+  <div class="section">
+    <div class="plan-divider" style="background:linear-gradient(135deg,#e6fffa,#b2f5ea);border-color:#81e6d9;margin-top:8px;">
+      <h3 style="color:#234e52;">🌊 플랜 C — 기장 해안카페 드라이브</h3>
+      <div class="plan-desc">부산에서 35분 · 파도 위 카페·기장시장·해안열차</div>
+    </div>
+
+    <div class="info-box">DAY 1-C — 플랜 A와 동일: 광안리 도착 후 해변 산책 → 스시코우</div>
+
+    <div class="day-header planC" style="margin-top:8px;">
+      <div class="day-label">DAY 2-C · 5월 23일 토요일</div>
+      <h2>기장 웨이브온 + 죽성교회 + 블루라인 🚂☕</h2>
+      <div class="day-sub">기장 파도 위 카페 → 인생샷 교회 → 해안열차 → 더베이101</div>
+    </div>
+    <div class="card">
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="time-col"><div class="time">08:30</div></div>
+          <div class="dot"></div>
+          <div class="item-content">
+            <div class="item-title">광안리 → 기장 이동 (택시 35분)</div>
+            <div class="item-cost">20,000원</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="time-col"><div class="time">09:00</div></div>
+          <div class="dot highlight"></div>
+          <div class="item-content">
+            <div class="item-title highlight">☕ 웨이브온 (Waveon) ⭐ — 현무암 절벽 루프탑 로스터리</div>
+            <div class="item-desc">09:00~21:00. 인스타 점수 최상. 파도+절벽 배경</div>
+            <div class="item-cost">12,000원</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="time-col"><div class="time">10:30</div></div>
+          <div class="dot"></div>
+          <div class="item-content">
+            <div class="item-title">☕ 오프오 (OFFO) — 코타츠 텐트 이색 오션뷰</div>
+            <div class="item-cost">12,000원</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="time-col"><div class="time">12:00</div></div>
+          <div class="dot"></div>
+          <div class="item-content">
+            <div class="item-title">🦀 기장시장 — 대게·멸치회 점심</div>
+            <div class="item-desc">현지 해산물 시세 당일 확인</div>
+            <div class="item-cost">25,000원</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="time-col"><div class="time">14:00</div></div>
+          <div class="dot"></div>
+          <div class="item-content">
+            <div class="item-title">☕ 메르데쿠르 — 통유리 오션뷰 베이커리</div>
+            <div class="item-cost">12,000원</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="time-col"><div class="time">15:30</div></div>
+          <div class="dot highlight"></div>
+          <div class="item-content">
+            <div class="item-title highlight">📸 죽성드림교회 — 바다 위 작은 교회 인생샷</div>
+            <div class="item-desc">기장 8경. 포토스팟 인기 1위</div>
+            <div class="item-cost free">무료</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="time-col"><div class="time">17:00</div></div>
+          <div class="dot"></div>
+          <div class="item-content">
+            <div class="item-title">🚂 블루라인파크 해안열차 — 해운대↔송정</div>
+            <div class="item-desc">동해선 해안 레일. 사전 예약 권장</div>
+            <div class="item-cost">13,000원</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="time-col"><div class="time">19:00</div></div>
+          <div class="dot highlight"></div>
+          <div class="item-content">
+            <div class="item-title highlight">🍽️ 더베이101 야경 다이닝 ⭐</div>
+            <div class="item-desc">입점 식당 개별 예약 필수</div>
+            <div class="item-cost">60,000원</div>
+          </div>
+        </div>
+      </div>
+      <div class="day-total"><span class="label">Day 2-C 예상 비용</span><span class="amount">약 169,000원/인</span></div>
+    </div>
+
+    <div class="info-box">DAY 3-C — 플랜 A와 동일: 랑데자뷰 → 수변최고돼지국밥 → KTX 14:20 귀환</div>
   </div>
 
 </div>
