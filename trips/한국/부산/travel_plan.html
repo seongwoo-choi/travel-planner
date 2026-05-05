@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>부산 2박3일 커플 여행 플랜</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans KR', sans-serif;
+      background: #f0f4f8;
+      color: #1a202c;
+      line-height: 1.6;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, #1a1a2e 0%, #c0392b 50%, #e74c3c 100%);
+      color: white;
+      padding: 48px 24px 40px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+    .hero h1 { font-size: 28px; font-weight: 800; margin-bottom: 8px; position: relative; }
+    .hero .subtitle { font-size: 15px; opacity: 0.85; position: relative; }
+    .hero .badges { display: flex; gap: 8px; justify-content: center; margin-top: 16px; flex-wrap: wrap; position: relative; }
+    .badge {
+      background: rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .container { max-width: 720px; margin: 0 auto; padding: 0 16px 48px; }
+
+    .section { margin-top: 24px; }
+    .section-title {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #718096;
+      margin-bottom: 12px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.04);
+      margin-bottom: 12px;
+    }
+
+    .overview-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .overview-item {
+      background: white;
+      border-radius: 12px;
+      padding: 14px 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+    .overview-item .label { font-size: 11px; color: #a0aec0; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+    .overview-item .value { font-size: 15px; font-weight: 700; color: #2d3748; margin-top: 2px; }
+
+    .warning {
+      background: #fffbeb;
+      border: 1px solid #f6ad55;
+      border-radius: 12px;
+      padding: 14px 16px;
+      font-size: 14px;
+      color: #744210;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+    .warning .icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+
+    .info-box {
+      background: #ebf8ff;
+      border: 1px solid #bee3f8;
+      border-radius: 12px;
+      padding: 14px 16px;
+      font-size: 14px;
+      color: #2c5282;
+      margin-bottom: 12px;
+    }
+
+    /* KTX */
+    .ktx-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .ktx-card {
+      background: white;
+      border-radius: 12px;
+      padding: 14px 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+      text-align: center;
+    }
+    .ktx-label { font-size: 11px; color: #718096; font-weight: 700; text-transform: uppercase; }
+    .ktx-route { font-size: 16px; font-weight: 800; color: #1a202c; margin: 6px 0 2px; }
+    .ktx-time { font-size: 13px; color: #4a5568; }
+    .ktx-price { font-size: 12px; color: #c53030; font-weight: 700; margin-top: 4px; }
+
+    /* Day Header */
+    .day-header {
+      border-radius: 14px;
+      padding: 18px 20px;
+      margin-bottom: 2px;
+      color: white;
+    }
+    .day-header.day1 { background: linear-gradient(135deg, #1a1a2e, #c0392b); }
+    .day-header.day2 { background: linear-gradient(135deg, #2d3436, #6c5ce7); }
+    .day-header.day3 { background: linear-gradient(135deg, #134e5e, #71b280); }
+    .day-header .day-label { font-size: 12px; font-weight: 700; opacity: 0.8; text-transform: uppercase; letter-spacing: 0.08em; }
+    .day-header h2 { font-size: 20px; font-weight: 800; margin-top: 2px; }
+    .day-header .day-sub { font-size: 13px; opacity: 0.8; margin-top: 4px; }
+
+    /* Timeline */
+    .timeline-item {
+      display: flex;
+      gap: 14px;
+      padding: 14px 0;
+      border-bottom: 1px solid #f0f4f8;
+    }
+    .timeline-item:last-child { border-bottom: none; }
+    .time-col { width: 48px; flex-shrink: 0; }
+    .time { font-size: 12px; font-weight: 700; color: #718096; }
+    .dot { width: 8px; height: 8px; background: #c0392b; border-radius: 50%; margin-top: 6px; flex-shrink: 0; }
+    .dot.highlight { background: #e53e3e; width: 10px; height: 10px; }
+    .dot.free { background: #38a169; }
+    .item-content { flex: 1; }
+    .item-title { font-size: 15px; font-weight: 700; color: #1a202c; }
+    .item-title.highlight { color: #c53030; }
+    .item-desc { font-size: 13px; color: #718096; margin-top: 2px; }
+    .item-cost {
+      font-size: 12px; font-weight: 700; color: #2b6cb0;
+      background: #ebf8ff; border-radius: 6px;
+      padding: 2px 7px; display: inline-block; margin-top: 4px;
+    }
+    .item-cost.free { color: #276749; background: #f0fff4; }
+    .item-cost.warn { color: #744210; background: #fffbeb; }
+    .badge-new {
+      background: #fed7d7; color: #c53030;
+      font-size: 10px; font-weight: 700;
+      padding: 1px 6px; border-radius: 4px;
+      margin-left: 6px; vertical-align: middle;
+    }
+    .badge-warn {
+      background: #fefcbf; color: #744210;
+      font-size: 10px; font-weight: 700;
+      padding: 1px 6px; border-radius: 4px;
+      margin-left: 6px; vertical-align: middle;
+    }
+
+    .day-total {
+      background: #f7fafc; border-radius: 10px;
+      padding: 12px 16px;
+      display: flex; justify-content: space-between; align-items: center;
+      margin-top: 4px;
+    }
+    .day-total .label { font-size: 13px; color: #718096; }
+    .day-total .amount { font-size: 16px; font-weight: 800; color: #2d3748; }
+
+    /* Weather */
+    .weather-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+    .weather-card {
+      background: white; border-radius: 12px; padding: 14px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.07); text-align: center;
+    }
+    .weather-date { font-size: 11px; color: #718096; font-weight: 600; }
+    .weather-icon { font-size: 28px; margin: 6px 0; }
+    .weather-temp { font-size: 16px; font-weight: 800; color: #2d3748; }
+    .weather-rain { font-size: 11px; color: #3182ce; margin-top: 3px; font-weight: 600; }
+
+    /* Checklist */
+    .checklist { display: flex; flex-direction: column; gap: 8px; }
+    .check-item {
+      background: white; border-radius: 12px; padding: 12px 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+      display: flex; gap: 10px; align-items: flex-start;
+    }
+    .check-icon { font-size: 16px; flex-shrink: 0; }
+    .check-text { font-size: 14px; color: #2d3748; }
+    .check-sub { font-size: 12px; color: #718096; margin-top: 1px; }
+
+    /* Verification table */
+    .verify-grid { display: flex; flex-direction: column; gap: 6px; }
+    .verify-item {
+      background: white; border-radius: 10px; padding: 10px 14px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+      display: flex; gap: 10px; align-items: center;
+    }
+    .verify-status { font-size: 16px; flex-shrink: 0; width: 24px; }
+    .verify-name { font-size: 14px; font-weight: 700; flex: 1; }
+    .verify-note { font-size: 12px; color: #718096; }
+
+    /* Photo spots */
+    .spot-grid { display: flex; flex-direction: column; gap: 8px; }
+    .spot-item {
+      background: white; border-radius: 12px; padding: 12px 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+      display: flex; gap: 12px; align-items: flex-start;
+    }
+    .spot-place { font-size: 14px; font-weight: 700; flex: 1; }
+    .spot-shot { font-size: 12px; color: #718096; margin-top: 2px; }
+    .spot-time-tag {
+      font-size: 11px; background: #faf5ff; color: #6b46c1;
+      border-radius: 6px; padding: 2px 7px; font-weight: 600; flex-shrink: 0;
+    }
+
+    /* Budget */
+    .budget-row {
+      display: flex; justify-content: space-between;
+      padding: 11px 0; border-bottom: 1px solid #f0f4f8; font-size: 14px;
+    }
+    .budget-row:last-child { border-bottom: none; font-weight: 800; font-size: 16px; }
+    .budget-row .bl { color: #4a5568; }
+    .budget-row .br { color: #2d3748; font-weight: 600; }
+    .budget-row:last-child .br { color: #c0392b; }
+
+    /* Highlights */
+    .highlight-item {
+      background: white; border-radius: 12px; padding: 14px 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+      display: flex; gap: 12px; align-items: center; margin-bottom: 10px;
+    }
+    .hl-medal { font-size: 22px; flex-shrink: 0; }
+    .hl-text { font-size: 14px; font-weight: 600; }
+    .hl-sub { font-size: 12px; color: #718096; margin-top: 1px; }
+
+    @media (max-width: 480px) {
+      .hero h1 { font-size: 22px; }
+      .weather-grid { grid-template-columns: 1fr 1fr 1fr; }
+      .ktx-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>🌉 부산 2박3일 커플 여행</h1>
+  <div class="subtitle">2026년 5월 29일(금) ~ 5월 31일(일)</div>
+  <div class="badges">
+    <span class="badge">💑 커플 2명</span>
+    <span class="badge">🚄 KTX</span>
+    <span class="badge">🍣 오마카세</span>
+    <span class="badge">🌃 야경</span>
+    <span class="badge">📸 인스타감성</span>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- 여행 개요 -->
+  <div class="section">
+    <div class="section-title">여행 개요</div>
+    <div class="overview-grid">
+      <div class="overview-item">
+        <div class="label">베이스캠프</div>
+        <div class="value">광안리 숙소</div>
+      </div>
+      <div class="overview-item">
+        <div class="label">1인 예상 경비</div>
+        <div class="value">~550,000원</div>
+      </div>
+      <div class="overview-item">
+        <div class="label">교통</div>
+        <div class="value">KTX 왕복</div>
+      </div>
+      <div class="overview-item">
+        <div class="label">테마</div>
+        <div class="value">야경·오마카세·해변</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- KTX -->
+  <div class="section">
+    <div class="section-title">교통편</div>
+    <div class="ktx-grid">
+      <div class="ktx-card">
+        <div class="ktx-label">출발</div>
+        <div class="ktx-route">서울 → 부산</div>
+        <div class="ktx-time">09:00 → 11:33</div>
+        <div class="ktx-price">2인 119,600원</div>
+      </div>
+      <div class="ktx-card">
+        <div class="ktx-label">귀환</div>
+        <div class="ktx-route">부산 → 서울</div>
+        <div class="ktx-time">19:30 → 22:03</div>
+        <div class="ktx-price">2인 119,600원</div>
+      </div>
+    </div>
+    <div class="warning" style="margin-top:10px;">
+      <div class="icon">⚠️</div>
+      <div>금요일 출발·일요일 귀환 성수기 — <strong>지금 바로 예약 필수</strong></div>
+    </div>
+  </div>
+
+  <!-- 날씨 -->
+  <div class="section">
+    <div class="section-title">날씨 예보</div>
+    <div class="weather-grid">
+      <div class="weather-card">
+        <div class="weather-date">5/29 (금)</div>
+        <div class="weather-icon">☀️</div>
+        <div class="weather-temp">25° / 17°</div>
+        <div class="weather-rain">강수 15%</div>
+      </div>
+      <div class="weather-card">
+        <div class="weather-date">5/30 (토)</div>
+        <div class="weather-icon">🌤️</div>
+        <div class="weather-temp">24° / 17°</div>
+        <div class="weather-rain">강수 25%</div>
+      </div>
+      <div class="weather-card">
+        <div class="weather-date">5/31 (일)</div>
+        <div class="weather-icon">☀️</div>
+        <div class="weather-temp">25° / 18°</div>
+        <div class="weather-rain">강수 15%</div>
+      </div>
+    </div>
+    <div style="font-size:13px; color:#718096; margin-top:8px; padding: 0 4px;">일교차 약 8도 — 저녁에는 얇은 겉옷 필수</div>
+  </div>
+
+  <!-- DAY 1 -->
+  <div class="section">
+    <div class="section-title">상세 일정</div>
+    <div class="day-header day1">
+      <div class="day-label">DAY 1 · 5월 29일 금요일</div>
+      <h2>광안대교 오마카세 나이트 🌉🍣</h2>
+      <div class="day-sub">도착 후 밀면 → 광안대교 야경 → 인생 오마카세</div>
+    </div>
+    <div class="card">
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="time-col"><div class="time">08:30</div></div>
+          <div class="dot"></div>
+          <div class="item-content">
+            <div class="item-title">서울역 집결 🚄</div>
+            <div class="item-desc">KTX 30분 전 도착</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="time-col"><div class="time">09:00</div></div>
+          <div class="dot"></div>
+          <div class="item-content">
+            <div class="item-title">KTX 서울 출발</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="time-col"><div class="time">11:33</div></div>
+          <div class="dot"></div>
+          <div class="item-content">
+            <div class="item-title">부산역 도착</div>
+            <div class="item-desc">초량동 도보 10분</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="time-col"><div class="time">12:00</div></div>
+          <div class="dot"></div>
+          <div class="item-content">
+            <div class="item-title">🍜 점심: 초량밀면</div>
+            <div class="item-desc">부산 첫 끼. 피크타임 대기 가능. 네이버지도에서 정확한 상호 확인</div>
+            <div class="item-cost">10,000원</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="time-col"><div class="time">13:30</div></div>
+          <div class="dot free"></div>
+          <div class="item-content">
+            <div class="item-title">광안리 숙소 체크인</div>
+            <div class="item-desc">광안대교 뷰 객실 요청</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="time-col"><div class="time">14:30</div></div>
+          <div class="dot free"></div>
+          <div class="item-content">
+            <div class="item-title">🏖️ 광안리 해변 + 민락수변공원 산책</div>
+            <div class="item-desc">첫 부산 공기. 2km 해변 산책로</div>
+            <div class="item-cost free">무료</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="time-col"><div class="time">16:30</div></div>
+          <div class="dot"></div>
+          <div class="item-content">
+            <div class="item-title">☕ 모모스 커피 도모헌점</div>
+            <div class="item-desc">스페셜티 커피 + 광안대교 조망. 월요일 휴무</div>
+            <div class="item-cost">10,000원</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="time-col"><div class="time">18:00</div></div>
+          <div class="dot free"></div>
+          <div class="item-content">
+            <div class="item-title">🌅 광안리 해변 일몰 + 광안대교 야경 산책</div>
+            <div class="item-desc">일몰 약 19:30. 이 여행의 첫 번째 하이라이트</div>
+            <div class="item-cost free">무료</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="time-col"><div class="time">19:00</div></div>
+          <div class="dot highlight"></div>
+          <div class="item-content">
+            <div class="item-title highlight">✨ 저녁: 스시코우 ⭐</div>
+            <div class="item-desc">광안리 민락동 오마카세. 목요일 휴무 (금요일 영업). 캐치테이블 예약 필수</div>
+            <div class="item-cost">~80,000원</div>
+          </div>
+        </div>
+      </div>
+      <div class="day-total">
+        <span class="label">Day 1 예상 비용</span>
+        <span class="amount">약 100,000원/인</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- DAY 2 -->
+  <div class="section">
+    <div class="day-header day2">
+      <div class="day-label">DAY 2 · 5월 30일 토요일</div>
+      <h2>영도 감성 투어 + 더베이101 🏘️🌃</h2>
+      <div class="day-sub">해운대 → 감천·영도 투어 → 황령산 야경 → 더베이101</div>
+    </div>
+    <div class="card">
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="time-col"><div class="time">08:30</div></div>
+          <div class="dot free"></div>
+          <div class="item-content">
+            <div class="item-title">🌊 해운대 해수욕장 + 동백섬 아침 산책</div>
+            <div class="item-desc">5월 비개장 기간. 해변 산책 24시간 자유 개방</div>
+            <div class="item-cost free">무료</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="time-col"><div class="time">10:30</div></div>
+          <div class="dot"></div>
+          <div class="item-content">
+            <div class="item-title">해운대 → 감천문화마을 (버스 40분)</div>
+            <div class="item-cost">1,500원</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="time-col"><div class="time">11:10</div></div>
+          <div class="dot"></div>
+          <div class="item-content">
+            <div class="item-title">📸 감천문화마을 스탬프 투어</div>
+            <div class="item-desc">마을 입장 무료. 스탬프 지도 2,000원. 09:00~18:00</div>
+            <div class="item-cost">2,000원</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="time-col"><div class="time">13:00</div></div>
+          <div class="dot"></div>
+          <div class="item-content">
+            <div class="item-title">🍡 점심: 국제시장 먹거리 투어</div>
+            <div class="item-desc">씨앗호떡·어묵·비빔당면. BIFF광장~국제시장 코스. 토요일 정상 영업</div>
+            <div class="item-cost">15,000원</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="time-col"><div class="time">14:45</div></div>
+          <div class="dot"></div>
+          <div class="item-content">
+            <div class="item-title">🏘️ 흰여울문화마을 <span class="badge-warn">공사 주의</span></div>
+            <div class="item-desc">절영해안산책로 공사 통제 중. 골목·카페는 접근 가능</div>
+            <div class="item-cost free">무료</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="time-col"><div class="time">15:15</div></div>
+          <div class="dot"></div>
+          <div class="item-content">
+            <div class="item-title">☕ 해빙모먼트 <span class="badge-new">신규</span></div>
+            <div class="item-desc">절영로 196. 루프탑 파노라마 바다뷰. 수요일 휴무, 토요일 10:00~20:00</div>
+            <div class="item-cost">7,000원</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="time-col"><div class="time">16:00</div></div>
+          <div class="dot highlight"></div>
+          <div class="item-content">
+            <div class="item-title highlight">🦶 족욕카페 뷰 — 커플 족욕 <span class="badge-new">신규</span></div>
+            <div class="item-desc">흰여울길 152. 예약 필수: 0507-1443-3461 (선결제)</div>
+            <div class="item-cost">15,000원</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="time-col"><div class="time">17:30</div></div>
+          <div class="dot"></div>
+          <div class="item-content">
+            <div class="item-title">🌆 황령산 전망대 <span class="badge-warn">요확인</span></div>
+            <div class="item-desc">부산 360도 야경. 공사 착공 여부 방문 전 확인 필수. 대안: 부산타워·더베이101 루프탑</div>
+            <div class="item-cost free">무료</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="time-col"><div class="time">19:00</div></div>
+          <div class="dot highlight"></div>
+          <div class="item-content">
+            <div class="item-title highlight">🍽️ 저녁: 더베이101 ⭐</div>
+            <div class="item-desc">해운대 동백섬 야경 루프탑 다이닝. 입점 식당 개별 예약 필수 (thebay101.com)</div>
+            <div class="item-cost">60,000원</div>
+          </div>
+        </div>
+      </div>
+      <div class="day-total">
+        <span class="label">Day 2 예상 비용</span>
+        <span class="amount">약 135,000원/인</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- DAY 3 -->
+  <div class="section">
+    <div class="day-header day3">
+      <div class="day-label">DAY 3 · 5월 31일 일요일</div>
+      <h2>달맞이 뷰 카페 + 여유로운 귀환 ☀️🚄</h2>
+      <div class="day-sub">달맞이 고개 마지막 커피 — 서두르지 않는 여행의 끝</div>
+    </div>
+    <div class="card">
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="time-col"><div class="time">08:00</div></div>
+          <div class="dot free"></div>
+          <div class="item-content">
+            <div class="item-title">🌊 광안리 해변 마지막 아침 산책</div>
+            <div class="item-cost free">무료</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="time-col"><div class="time">09:30</div></div>
+          <div class="dot"></div>
+          <div class="item-content">
+            <div class="item-title">체크아웃 + 짐 프런트 맡기기</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="time-col"><div class="time">10:15</div></div>
+          <div class="dot highlight"></div>
+          <div class="item-content">
+            <div class="item-title highlight">☕ 랑데자뷰 — 달맞이 고개 5층 파노라마 카페 <span class="badge-new">신규</span></div>
+            <div class="item-desc">해운대 전체가 내려다보이는 뷰. 매일 09:30~23:20 영업</div>
+            <div class="item-cost">9,000원</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="time-col"><div class="time">12:00</div></div>
+          <div class="dot"></div>
+          <div class="item-content">
+            <div class="item-title">🍖 점심: 수변최고돼지국밥 <span class="badge-warn">요확인</span></div>
+            <div class="item-desc">일요일 영업 확인: 051-810-3941. 대안: 민락본점 24시간</div>
+            <div class="item-cost">12,000원</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="time-col"><div class="time">13:30</div></div>
+          <div class="dot"></div>
+          <div class="item-content">
+            <div class="item-title">🎬 영화의전당 외관 포토스팟 + 신세계 센텀시티</div>
+            <div class="item-desc">세계 최대 캔틸레버 지붕. 기념품·쇼핑. 10:30~20:00</div>
+            <div class="item-cost">20,000원</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="time-col"><div class="time">17:30</div></div>
+          <div class="dot"></div>
+          <div class="item-content">
+            <div class="item-title">부산역 도착 + 마지막 간식</div>
+            <div class="item-cost">10,000원</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="time-col"><div class="time">19:30</div></div>
+          <div class="dot highlight"></div>
+          <div class="item-content">
+            <div class="item-title">🚄 KTX 부산 출발 → 22:03 서울 도착</div>
+            <div class="item-desc">기차에서 사진 정리 + 여행 추억 이야기</div>
+          </div>
+        </div>
+      </div>
+      <div class="day-total">
+        <span class="label">Day 3 예상 비용</span>
+        <span class="amount">약 58,000원/인</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 예약 체크리스트 -->
+  <div class="section">
+    <div class="section-title">📋 예약 체크리스트</div>
+    <div class="checklist">
+      <div class="check-item">
+        <div class="check-icon">🚄</div>
+        <div>
+          <div class="check-text"><strong>KTX 왕복</strong> — 서울 09:00 / 부산 19:30</div>
+          <div class="check-sub">성수기 조기 발권 필수</div>
+        </div>
+      </div>
+      <div class="check-item">
+        <div class="check-icon">🏨</div>
+        <div>
+          <div class="check-text"><strong>광안리 숙소</strong> — 광안대교 뷰 객실, 2박</div>
+        </div>
+      </div>
+      <div class="check-item">
+        <div class="check-icon">🍣</div>
+        <div>
+          <div class="check-text"><strong>스시코우</strong> — Day 1 저녁</div>
+          <div class="check-sub">catchtable.co.kr/sushikou · 목요일 휴무 확인</div>
+        </div>
+      </div>
+      <div class="check-item">
+        <div class="check-icon">🍽️</div>
+        <div>
+          <div class="check-text"><strong>더베이101</strong> — Day 2 저녁 19:00</div>
+          <div class="check-sub">thebay101.com 입점 식당 개별 예약</div>
+        </div>
+      </div>
+      <div class="check-item">
+        <div class="check-icon">🦶</div>
+        <div>
+          <div class="check-text"><strong>족욕카페 뷰</strong> — Day 2 오후 16:00</div>
+          <div class="check-sub">전화 예약 필수: 0507-1443-3461 (선결제)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 실현 가능성 검증 -->
+  <div class="section">
+    <div class="section-title">✅ 실현 가능성 검증 결과</div>
+    <div class="verify-grid">
+      <div class="verify-item"><div class="verify-status">✅</div><div class="verify-name">초량밀면</div><div class="verify-note">네이버지도 상호 확인 권장</div></div>
+      <div class="verify-item"><div class="verify-status">✅</div><div class="verify-name">모모스커피 도모헌점</div><div class="verify-note">월요일 휴무</div></div>
+      <div class="verify-item"><div class="verify-status">✅</div><div class="verify-name">스시코우</div><div class="verify-note">목요일 휴무 · 캐치테이블 예약</div></div>
+      <div class="verify-item"><div class="verify-status">✅</div><div class="verify-name">해운대·동백섬</div><div class="verify-note">5월 비개장, 산책은 가능</div></div>
+      <div class="verify-item"><div class="verify-status">✅</div><div class="verify-name">감천문화마을</div><div class="verify-note">입장 무료, 스탬프 지도 2,000원</div></div>
+      <div class="verify-item"><div class="verify-status">✅</div><div class="verify-name">국제시장</div><div class="verify-note">토요일 정상 영업</div></div>
+      <div class="verify-item"><div class="verify-status">⚠️</div><div class="verify-name">흰여울문화마을</div><div class="verify-note">해안산책로 공사 중 · 골목 카페 가능</div></div>
+      <div class="verify-item"><div class="verify-status">✅</div><div class="verify-name">해빙모먼트</div><div class="verify-note">수요일 휴무 · 토요일 영업</div></div>
+      <div class="verify-item"><div class="verify-status">✅</div><div class="verify-name">족욕카페 뷰</div><div class="verify-note">예약제 · 주말 09:00~20:00</div></div>
+      <div class="verify-item"><div class="verify-status">⚠️</div><div class="verify-name">황령산 전망대</div><div class="verify-note">공사 착공 예정 · 방문 전 확인</div></div>
+      <div class="verify-item"><div class="verify-status">✅</div><div class="verify-name">더베이101</div><div class="verify-note">08:00~24:00 · 식당 개별 예약</div></div>
+      <div class="verify-item"><div class="verify-status">✅</div><div class="verify-name">랑데자뷰</div><div class="verify-note">매일 09:30~23:20</div></div>
+      <div class="verify-item"><div class="verify-status">⚠️</div><div class="verify-name">수변최고돼지국밥</div><div class="verify-note">일요일 영업 전화 확인 (051-810-3941)</div></div>
+      <div class="verify-item"><div class="verify-status">✅</div><div class="verify-name">영화의전당·센텀시티</div><div class="verify-note">정상 운영</div></div>
+    </div>
+  </div>
+
+  <!-- 포토스팟 -->
+  <div class="section">
+    <div class="section-title">📸 인스타 포토스팟</div>
+    <div class="spot-grid">
+      <div class="spot-item">
+        <div style="flex:1;">
+          <div class="spot-place">광안리 해변</div>
+          <div class="spot-shot">광안대교 야경 + 파도 리플렉션</div>
+        </div>
+        <div class="spot-time-tag">일몰 후 19:30~</div>
+      </div>
+      <div class="spot-item">
+        <div style="flex:1;">
+          <div class="spot-place">감천문화마을</div>
+          <div class="spot-shot">파스텔 골목 계단 위에서 내려다보기</div>
+        </div>
+        <div class="spot-time-tag">오전 10~11시</div>
+      </div>
+      <div class="spot-item">
+        <div style="flex:1;">
+          <div class="spot-place">해빙모먼트 (영도)</div>
+          <div class="spot-shot">루프탑에서 절영해안 절벽 + 바다 광각</div>
+        </div>
+        <div class="spot-time-tag">오후 2~4시</div>
+      </div>
+      <div class="spot-item">
+        <div style="flex:1;">
+          <div class="spot-place">족욕카페 뷰</div>
+          <div class="spot-shot">오션뷰 창가에서 족욕 커플 컷</div>
+        </div>
+        <div class="spot-time-tag">오후</div>
+      </div>
+      <div class="spot-item">
+        <div style="flex:1;">
+          <div class="spot-place">더베이101</div>
+          <div class="spot-shot">야경 테이블 + 해운대 야경</div>
+        </div>
+        <div class="spot-time-tag">저녁 19~21시</div>
+      </div>
+      <div class="spot-item">
+        <div style="flex:1;">
+          <div class="spot-place">랑데자뷰</div>
+          <div class="spot-shot">5층 테라스에서 해운대 전경</div>
+        </div>
+        <div class="spot-time-tag">오전 10~11시</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 예산 -->
+  <div class="section">
+    <div class="section-title">💰 예산 요약 (1인 기준)</div>
+    <div class="card">
+      <div class="budget-row"><span class="bl">교통 (KTX 왕복)</span><span class="br">119,600원</span></div>
+      <div class="budget-row"><span class="bl">숙박 (2박, 광안리)</span><span class="br">~200,000원</span></div>
+      <div class="budget-row"><span class="bl">식비 (3일)</span><span class="br">~150,000원</span></div>
+      <div class="budget-row"><span class="bl">입장료·카페·기타</span><span class="br">~80,000원</span></div>
+      <div class="budget-row"><span class="bl">합계</span><span class="br">~550,000원</span></div>
+      <div style="font-size:12px; color:#a0aec0; margin-top:10px;">스시코우 오마카세 포함 기준. 오마카세 제외 시 약 47만원.</div>
+    </div>
+  </div>
+
+  <!-- 커플 하이라이트 -->
+  <div class="section">
+    <div class="section-title">💑 커플 하이라이트</div>
+    <div class="highlight-item">
+      <div class="hl-medal">🥇</div>
+      <div><div class="hl-text">스시코우 — 광안리 오마카세 후 야경 산책</div><div class="hl-sub">Day 1 클라이맥스</div></div>
+    </div>
+    <div class="highlight-item">
+      <div class="hl-medal">🥇</div>
+      <div><div class="hl-text">족욕카페 뷰 — 바다 보며 둘이서 족욕</div><div class="hl-sub">Day 2 영도</div></div>
+    </div>
+    <div class="highlight-item">
+      <div class="hl-medal">🥇</div>
+      <div><div class="hl-text">더베이101 — 해운대 야경 파인다이닝</div><div class="hl-sub">Day 2 클라이맥스</div></div>
+    </div>
+    <div class="highlight-item">
+      <div class="hl-medal">🥇</div>
+      <div><div class="hl-text">랑데자뷰 — 해운대 내려다보며 마지막 커피</div><div class="hl-sub">Day 3 아침</div></div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
