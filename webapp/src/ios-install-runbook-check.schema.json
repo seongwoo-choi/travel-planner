@@ -1,0 +1,135 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://travel-planner.local/schemas/ios-install-runbook-check.schema.json",
+  "title": "Travel Planner iOS install runbook check result",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "ok",
+    "status",
+    "summary",
+    "inputPath",
+    "deploymentMode",
+    "recommendedInstallUrl",
+    "recommendedShortInstallUrl",
+    "protectedRecommendedInstallUrlTemplate",
+    "protectedRecommendedShortInstallUrlTemplate",
+    "protectedInstallAccessKeyPlaceholder",
+    "protectedInstallAccessKeyLocalCompositionOnly",
+    "protectedInstallAccessKeyStoresEnteredKey",
+    "protectedInstallAccessKeySendsEnteredKeyToServer",
+    "protectedInstallAccessKeyClearsTemporaryInputAfterCopy",
+    "installReadinessSource",
+    "installReadinessHttps",
+    "installReadinessSameWifiRequired",
+    "installReadinessSafariRequired",
+    "installReadinessSummary",
+    "nextStepUrl",
+    "nextStepTextUrl",
+    "proofSaveHash",
+    "proofSaveTargetId",
+    "proofSaveUrl",
+    "postInstallAppHomeUrl",
+    "postInstallNewPlanUrl",
+    "nextActionFinalGateCommand",
+    "phaseCount",
+    "issues"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "ok": {
+      "type": "boolean"
+    },
+    "status": {
+      "enum": ["ready", "blocked", "error"]
+    },
+    "summary": {
+      "type": "string"
+    },
+    "inputPath": {
+      "type": "string"
+    },
+    "deploymentMode": {
+      "type": "string"
+    },
+    "recommendedInstallUrl": {
+      "type": "string"
+    },
+    "recommendedShortInstallUrl": {
+      "type": "string"
+    },
+    "protectedRecommendedInstallUrlTemplate": {
+      "type": "string"
+    },
+    "protectedRecommendedShortInstallUrlTemplate": {
+      "type": "string"
+    },
+    "protectedInstallAccessKeyPlaceholder": {
+      "type": "string"
+    },
+    "protectedInstallAccessKeyLocalCompositionOnly": {
+      "type": "boolean"
+    },
+    "protectedInstallAccessKeyStoresEnteredKey": {
+      "type": "boolean"
+    },
+    "protectedInstallAccessKeySendsEnteredKeyToServer": {
+      "type": "boolean"
+    },
+    "protectedInstallAccessKeyClearsTemporaryInputAfterCopy": {
+      "type": "boolean"
+    },
+    "installReadinessSource": {
+      "enum": ["configured-public-https", "same-wifi-lan", "current-https-origin", "current-origin", ""]
+    },
+    "installReadinessHttps": {
+      "type": "boolean"
+    },
+    "installReadinessSameWifiRequired": {
+      "type": "boolean"
+    },
+    "installReadinessSafariRequired": {
+      "type": "boolean"
+    },
+    "installReadinessSummary": {
+      "type": "string"
+    },
+    "nextStepUrl": {
+      "type": "string"
+    },
+    "nextStepTextUrl": {
+      "type": "string"
+    },
+    "proofSaveHash": {
+      "const": "#iosInstallProofSaveButton"
+    },
+    "proofSaveTargetId": {
+      "const": "iosInstallProofSaveButton"
+    },
+    "proofSaveUrl": {
+      "type": "string"
+    },
+    "postInstallAppHomeUrl": {
+      "type": "string"
+    },
+    "postInstallNewPlanUrl": {
+      "type": "string"
+    },
+    "nextActionFinalGateCommand": {
+      "type": "string"
+    },
+    "phaseCount": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "issues": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "additionalProperties": false
+}

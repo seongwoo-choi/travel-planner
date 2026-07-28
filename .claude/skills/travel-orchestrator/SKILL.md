@@ -186,10 +186,11 @@ trip-reporter 호출:
 - 입력: `_workspace/01_local/spots.json`
 - 입력: `_workspace/02_itinerary/plan.json`
 - 입력: `_workspace/03_bookings/results.json` (있는 경우)
-- 출력: `trips/{국가}/{도시}/travel_plan.md`
-  - 예: 부산 → `trips/한국/부산/travel_plan.md`
+- 출력: `trips/{국가}/{도시}/travel_plan.md` + `.html` + `.pdf` (**일정표는 항상 3종 산출**, 2026-06-07 사용자 표준)
+  - 예: 부산 → `trips/한국/부산/travel_plan.{md,html,pdf}`
   - 목적지 정보는 `requirements.json`의 `destination`(도시)과 `country`(국가, 기본값: 한국) 참조
   - 디렉토리가 없으면 자동 생성
+  - HTML→PDF 변환 방법은 trip-reporter 에이전트의 "일정표 3종 산출 방법" 참조 (Chrome 헤드리스)
 
 보고서 형식:
 ```markdown

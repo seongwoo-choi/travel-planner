@@ -1,0 +1,365 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://travel-planner.local/schemas/ios-install-check.schema.json",
+  "title": "Travel Planner iOS install check result",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "ok",
+    "status",
+    "summary",
+    "readinessMode",
+    "handoffReady",
+    "envPath",
+    "envSource",
+    "envLoaded",
+    "envError",
+    "origin",
+    "allowHttp",
+    "followRecommended",
+    "requireHandoffReady",
+    "requireLaunchProof",
+    "requireInstallQr",
+    "requireInstallRunbook",
+    "issues"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "ok": {
+      "type": "boolean"
+    },
+    "status": {
+      "enum": [
+        "ready",
+        "blocked",
+        "error"
+      ]
+    },
+    "summary": {
+      "type": "string"
+    },
+    "readinessMode": {
+      "enum": [
+        "stable-https",
+        "local-http-check",
+        "not-ready",
+        "error"
+      ]
+    },
+    "handoffReady": {
+      "type": "boolean"
+    },
+    "envPath": {
+      "type": "string"
+    },
+    "envSource": {
+      "enum": [
+        "default",
+        "arg"
+      ]
+    },
+    "envLoaded": {
+      "type": "boolean"
+    },
+    "envError": {
+      "type": "string"
+    },
+    "origin": {
+      "type": "string"
+    },
+    "allowHttp": {
+      "type": "boolean"
+    },
+    "followRecommended": {
+      "type": "boolean"
+    },
+    "requireHandoffReady": {
+      "type": "boolean"
+    },
+    "requireLaunchProof": {
+      "type": "boolean"
+    },
+    "requireInstallQr": {
+      "type": "boolean"
+    },
+    "installQrTarget": {
+      "type": "string"
+    },
+    "requireInstallRunbook": {
+      "type": "boolean"
+    },
+    "followRecommendedOrigin": {
+      "type": "string"
+    },
+    "launchProofOrigin": {
+      "type": "string"
+    },
+    "timeoutMs": {
+      "type": "number"
+    },
+    "launchProofOk": {
+      "type": "boolean"
+    },
+    "launchProofStatus": {
+      "type": "string"
+    },
+    "launchProofSummary": {
+      "type": "string"
+    },
+    "launchProofCapturedAt": {
+      "type": "string"
+    },
+    "launchProofSavedAt": {
+      "type": "string"
+    },
+    "installQrSvgUrl": {
+      "type": "string"
+    },
+    "installQrTargetUrl": {
+      "type": "string"
+    },
+    "installRunbookUrl": {
+      "type": "string"
+    },
+    "installRunbookJsonUrl": {
+      "type": "string"
+    },
+    "installSessionUrl": {
+      "type": "string"
+    },
+    "installSessionQrUrl": {
+      "type": "string"
+    },
+    "protectedRecommendedInstallUrlTemplate": {
+      "type": "string"
+    },
+    "protectedRecommendedShortInstallUrlTemplate": {
+      "type": "string"
+    },
+    "installReadinessSource": {
+      "enum": [
+        "configured-public-https",
+        "same-wifi-lan",
+        "current-https-origin",
+        "current-origin",
+        ""
+      ]
+    },
+    "installReadinessHttps": {
+      "type": "boolean"
+    },
+    "installReadinessSameWifiRequired": {
+      "type": "boolean"
+    },
+    "installReadinessSafariRequired": {
+      "type": "boolean"
+    },
+    "installReadinessSummary": {
+      "type": "string"
+    },
+    "protectedInstallAccessKeyPlaceholder": {
+      "type": "string"
+    },
+    "protectedInstallAccessKeyLocalCompositionOnly": {
+      "type": "boolean"
+    },
+    "protectedInstallAccessKeyStoresEnteredKey": {
+      "type": "boolean"
+    },
+    "protectedInstallAccessKeySendsEnteredKeyToServer": {
+      "type": "boolean"
+    },
+    "protectedInstallAccessKeyClearsTemporaryInputAfterCopy": {
+      "type": "boolean"
+    },
+    "nextActionPhoneFirstField": {
+      "type": "string"
+    },
+    "nextActionFinalGateCommand": {
+      "type": "string"
+    },
+    "nextActionFinalGateTerminalCommand": {
+      "type": "string"
+    },
+    "nextActionFinalGatePrerequisite": {
+      "type": "string"
+    },
+    "installRunbookFetchOrigin": {
+      "type": "string"
+    },
+    "installRunbookFetchUrl": {
+      "type": "string"
+    },
+    "installRunbookFetchOk": {
+      "type": "boolean"
+    },
+    "installRunbookFetchStatus": {
+      "type": "string"
+    },
+    "installRunbookFetchSummary": {
+      "type": "string"
+    },
+    "installRunbookFetchHttpStatus": {
+      "type": "number"
+    },
+    "installRunbookFetchContentType": {
+      "type": "string"
+    },
+    "installRunbookJsonFetchUrl": {
+      "type": "string"
+    },
+    "installRunbookJsonFetchOk": {
+      "type": "boolean"
+    },
+    "installRunbookJsonFetchStatus": {
+      "type": "string"
+    },
+    "installRunbookJsonFetchSummary": {
+      "type": "string"
+    },
+    "installRunbookJsonFetchHttpStatus": {
+      "type": "number"
+    },
+    "installRunbookJsonFetchContentType": {
+      "type": "string"
+    },
+    "installHandoffFetchUrl": {
+      "type": "string"
+    },
+    "installHandoffFetchOk": {
+      "type": "boolean"
+    },
+    "installHandoffFetchStatus": {
+      "type": "string"
+    },
+    "installHandoffFetchSummary": {
+      "type": "string"
+    },
+    "installHandoffFetchHttpStatus": {
+      "type": "number"
+    },
+    "installHandoffFetchContentType": {
+      "type": "string"
+    },
+    "installQrFetchOrigin": {
+      "type": "string"
+    },
+    "installQrFetchUrl": {
+      "type": "string"
+    },
+    "installQrFetchTargetUrl": {
+      "type": "string"
+    },
+    "installQrFetchOk": {
+      "type": "boolean"
+    },
+    "installQrFetchStatus": {
+      "type": "string"
+    },
+    "installQrFetchSummary": {
+      "type": "string"
+    },
+    "installQrFetchHttpStatus": {
+      "type": "number"
+    },
+    "installQrFetchContentType": {
+      "type": "string"
+    },
+    "installQrTargetParamFetchUrl": {
+      "type": "string"
+    },
+    "installQrTargetParamFetchTargetUrl": {
+      "type": "string"
+    },
+    "installQrTargetParamFetchOk": {
+      "type": "boolean"
+    },
+    "installQrTargetParamFetchStatus": {
+      "type": "string"
+    },
+    "installQrTargetParamFetchSummary": {
+      "type": "string"
+    },
+    "installQrTargetParamFetchHttpStatus": {
+      "type": "number"
+    },
+    "installQrTargetParamFetchContentType": {
+      "type": "string"
+    },
+    "installSessionQrFetchUrl": {
+      "type": "string"
+    },
+    "installSessionQrFetchTargetUrl": {
+      "type": "string"
+    },
+    "installSessionQrFetchOk": {
+      "type": "boolean"
+    },
+    "installSessionQrFetchStatus": {
+      "type": "string"
+    },
+    "installSessionQrFetchSummary": {
+      "type": "string"
+    },
+    "installSessionQrFetchHttpStatus": {
+      "type": "number"
+    },
+    "installSessionQrFetchContentType": {
+      "type": "string"
+    },
+    "installSessionQrTargetParamFetchUrl": {
+      "type": "string"
+    },
+    "installSessionQrTargetParamFetchTargetUrl": {
+      "type": "string"
+    },
+    "installSessionQrTargetParamFetchOk": {
+      "type": "boolean"
+    },
+    "installSessionQrTargetParamFetchStatus": {
+      "type": "string"
+    },
+    "installSessionQrTargetParamFetchSummary": {
+      "type": "string"
+    },
+    "installSessionQrTargetParamFetchHttpStatus": {
+      "type": "number"
+    },
+    "installSessionQrTargetParamFetchContentType": {
+      "type": "string"
+    },
+    "recommendedInstallUrl": {
+      "type": "string"
+    },
+    "proofSaveHash": {
+      "type": "string"
+    },
+    "proofSaveTargetId": {
+      "type": "string"
+    },
+    "proofSaveUrl": {
+      "type": "string"
+    },
+    "configuredPublicOrigin": {
+      "type": "string"
+    },
+    "configuredPublicOriginIsHttps": {
+      "type": "boolean"
+    },
+    "deploymentRecommendation": {
+      "type": "string"
+    },
+    "error": {
+      "type": "string"
+    },
+    "issues": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "additionalProperties": false
+}

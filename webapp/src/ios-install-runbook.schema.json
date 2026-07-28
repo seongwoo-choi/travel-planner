@@ -1,0 +1,296 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://travel-planner.local/schemas/ios-install-runbook.schema.json",
+  "title": "Travel Planner iOS install runbook",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "generatedAt",
+    "port",
+    "deploymentMode",
+    "publicOrigin",
+    "publicOriginIsHttps",
+    "localOrigin",
+    "lanOrigins",
+    "recommendedInstallUrl",
+    "recommendedShortInstallUrl",
+    "protectedRecommendedInstallUrlTemplate",
+    "protectedRecommendedShortInstallUrlTemplate",
+    "protectedInstallAccessKeyHandling",
+    "installReadinessSummary",
+    "nextStepUrl",
+    "nextStepTextUrl",
+    "proofSaveHash",
+    "proofSaveTargetId",
+    "proofSaveUrl",
+    "postInstallAppHomeUrl",
+    "postInstallNewPlanUrl",
+    "appShellRecoveryUrl",
+    "appShellRecovery",
+    "installInfoUrl",
+    "handoffNoteUrl",
+    "proofSummaryUrl",
+    "nextActionContract",
+    "phases"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "generatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "port": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "deploymentMode": {
+      "enum": [
+        "stable-https",
+        "public-origin-not-https",
+        "local-same-wifi-rehearsal"
+      ]
+    },
+    "publicOrigin": {
+      "type": "string"
+    },
+    "publicOriginIsHttps": {
+      "type": "boolean"
+    },
+    "localOrigin": {
+      "type": "string",
+      "format": "uri"
+    },
+    "lanOrigins": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "format": "uri"
+      }
+    },
+    "recommendedInstallUrl": {
+      "type": "string",
+      "format": "uri"
+    },
+    "recommendedShortInstallUrl": {
+      "type": "string",
+      "format": "uri"
+    },
+    "protectedRecommendedInstallUrlTemplate": {
+      "type": "string",
+      "format": "uri"
+    },
+    "protectedRecommendedShortInstallUrlTemplate": {
+      "type": "string",
+      "format": "uri"
+    },
+    "protectedInstallAccessKeyHandling": {
+      "type": "object",
+      "required": [
+        "placeholder",
+        "localCompositionOnly",
+        "storesEnteredKey",
+        "sendsEnteredKeyToServer",
+        "clearsTemporaryInputAfterCopy"
+      ],
+      "properties": {
+        "placeholder": {
+          "const": "YOUR_TRAVEL_ACCESS_KEY"
+        },
+        "localCompositionOnly": {
+          "const": true
+        },
+        "storesEnteredKey": {
+          "const": false
+        },
+        "sendsEnteredKeyToServer": {
+          "const": false
+        },
+        "clearsTemporaryInputAfterCopy": {
+          "const": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "installReadinessSummary": {
+      "type": "object",
+      "required": [
+        "recommendedUrlSource",
+        "recommendedUrlIsHttps",
+        "sameWifiRequired",
+        "safariRequired",
+        "summary"
+      ],
+      "properties": {
+        "recommendedUrlSource": {
+          "enum": [
+            "configured-public-https",
+            "same-wifi-lan",
+            "current-https-origin",
+            "current-origin"
+          ]
+        },
+        "recommendedUrlIsHttps": {
+          "type": "boolean"
+        },
+        "sameWifiRequired": {
+          "type": "boolean"
+        },
+        "safariRequired": {
+          "const": true
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "nextStepUrl": {
+      "type": "string",
+      "format": "uri"
+    },
+    "nextStepTextUrl": {
+      "type": "string",
+      "format": "uri"
+    },
+    "proofSaveUrl": {
+      "type": "string",
+      "format": "uri"
+    },
+    "postInstallAppHomeUrl": {
+      "type": "string",
+      "format": "uri"
+    },
+    "postInstallNewPlanUrl": {
+      "type": "string",
+      "format": "uri"
+    },
+    "appShellRecoveryUrl": {
+      "type": "string",
+      "format": "uri"
+    },
+    "appShellRecovery": {
+      "type": "object",
+      "required": [
+        "url",
+        "triggerField",
+        "triggerValue",
+        "sequence"
+      ],
+      "properties": {
+        "url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "triggerField": {
+          "const": "appShellUpdateNeeded"
+        },
+        "triggerValue": {
+          "const": true
+        },
+        "sequence": {
+          "type": "array",
+          "minItems": 5,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "installInfoUrl": {
+      "type": "string",
+      "format": "uri"
+    },
+    "handoffNoteUrl": {
+      "type": "string",
+      "format": "uri"
+    },
+    "proofSummaryUrl": {
+      "type": "string",
+      "format": "uri"
+    },
+    "nextActionContract": {
+      "type": "object",
+      "required": [
+        "phoneFirstField",
+        "nextCommandLabelField",
+        "nextCommandPrerequisiteField",
+        "finalGateCommand",
+        "finalGateTerminalCommand"
+      ],
+      "properties": {
+        "phoneFirstField": {
+          "const": "phoneFirst"
+        },
+        "nextCommandLabelField": {
+          "const": "nextCommandLabel"
+        },
+        "nextCommandPrerequisiteField": {
+          "const": "nextCommandPrerequisite"
+        },
+        "finalGateCommand": {
+          "const": "npm run ios:install:evidence:after-phone:final"
+        },
+        "finalGateTerminalCommand": {
+          "const": "test -d webapp && cd webapp; npm run ios:install:evidence:after-phone:final"
+        }
+      },
+      "additionalProperties": false
+    },
+    "phases": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "goal",
+          "commands",
+          "phoneSteps"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "goal": {
+            "type": "string"
+          },
+          "commands": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "terminalCommands": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "phoneSteps": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "proofSaveHash": {
+      "const": "#iosInstallProofSaveButton"
+    },
+    "proofSaveTargetId": {
+      "const": "iosInstallProofSaveButton"
+    }
+  },
+  "additionalProperties": false
+}

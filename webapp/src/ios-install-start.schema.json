@@ -1,0 +1,156 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://travel-planner.local/schemas/ios-install-start.schema.json",
+  "title": "Travel Planner iPhone install start guide",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "readiness",
+    "warning",
+    "recommendedShortInstallUrl",
+    "recommendedInstallUrl",
+    "sessionQrUrl",
+    "nextActionBoardUrl",
+    "proofSaveHash",
+    "proofSaveTargetId",
+    "proofSaveUrl",
+    "postInstallAppHomeUrl",
+    "postInstallNewPlanUrl",
+    "commands",
+    "appHomeFirstPlanUrl",
+    "steps"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "readiness": {
+      "type": "string",
+      "enum": [
+        "ready-for-iphone-handoff",
+        "same-wifi-rehearsal"
+      ]
+    },
+    "warning": {
+      "type": "string"
+    },
+    "recommendedShortInstallUrl": {
+      "type": "string"
+    },
+    "recommendedInstallUrl": {
+      "type": "string"
+    },
+    "sessionQrUrl": {
+      "type": "string"
+    },
+    "nextActionBoardUrl": {
+      "type": "string"
+    },
+    "proofSaveUrl": {
+      "type": "string"
+    },
+    "postInstallAppHomeUrl": {
+      "type": "string"
+    },
+    "postInstallNewPlanUrl": {
+      "type": "string"
+    },
+    "commands": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "beforePhone",
+        "beforePhoneFinal",
+        "beforePhoneFinalThenNext",
+        "handoffEvidence",
+        "sessionEvidence",
+        "handoffSessionEvidence",
+        "afterPhoneThenAll",
+        "afterPhoneThenAllFinal"
+      ],
+      "properties": {
+        "beforePhone": {
+          "type": "string"
+        },
+        "beforePhoneFinal": {
+          "type": "string"
+        },
+        "beforePhoneFinalThenNext": {
+          "type": "string"
+        },
+        "handoffEvidence": {
+          "type": "string"
+        },
+        "sessionEvidence": {
+          "type": "string"
+        },
+        "handoffSessionEvidence": {
+          "type": "string"
+        },
+        "afterPhoneThenAll": {
+          "type": "string"
+        },
+        "afterPhoneThenAllFinal": {
+          "type": "string"
+        }
+      }
+    },
+    "appHomeFirstPlanUrl": {
+      "type": "string"
+    },
+    "steps": {
+      "type": "array",
+      "minItems": 8,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "owner",
+          "action"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "enum": [
+              "before-phone",
+              "before-phone-final",
+              "before-phone-final-next",
+              "open-iphone",
+              "save-proof",
+              "after-phone",
+              "after-phone-final",
+              "first-plan"
+            ]
+          },
+          "owner": {
+            "type": "string",
+            "enum": [
+              "mac",
+              "iphone"
+            ]
+          },
+          "action": {
+            "type": "string"
+          },
+          "command": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "qrUrl": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "proofSaveHash": {
+      "const": "#iosInstallProofSaveButton"
+    },
+    "proofSaveTargetId": {
+      "const": "iosInstallProofSaveButton"
+    }
+  }
+}

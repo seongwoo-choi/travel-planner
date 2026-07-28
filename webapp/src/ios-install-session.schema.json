@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://travel-planner.local/schemas/ios-install-session.schema.json",
+  "title": "Travel Planner iOS install session",
+  "type": "object",
+  "required": ["schemaVersion", "generatedAt", "status", "install", "nextAction", "commands", "evidence", "completionRule"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "generatedAt": { "type": "string", "format": "date-time" },
+    "status": { "enum": ["in-progress", "complete"] },
+    "install": {
+      "type": "object",
+      "required": [
+        "url",
+        "shortUrl",
+        "qrUrl",
+        "sessionUrl",
+        "sessionQrUrl",
+        "nextActionScanUrl",
+        "nextActionTextUrl",
+        "nextActionQrUrl",
+        "proofSaveHash",
+        "proofSaveTargetId",
+        "proofSaveUrl",
+        "postInstallAppHomeUrl",
+        "postInstallNewPlanUrl",
+        "appShellRecoveryUrl",
+        "appShellRecovery"
+      ],
+      "properties": {
+        "url": { "type": "string", "format": "uri" },
+        "shortUrl": { "type": "string", "format": "uri" },
+        "qrUrl": { "type": "string", "format": "uri" },
+        "sessionUrl": { "type": "string", "format": "uri" },
+        "sessionQrUrl": { "type": "string", "format": "uri" },
+        "nextActionScanUrl": { "type": "string", "format": "uri" },
+        "nextActionTextUrl": { "type": "string", "format": "uri" },
+        "nextActionQrUrl": { "type": "string", "format": "uri" },
+        "proofSaveHash": { "const": "#iosInstallProofSaveButton" },
+        "proofSaveTargetId": { "const": "iosInstallProofSaveButton" },
+        "proofSaveUrl": { "type": "string", "format": "uri" },
+        "postInstallAppHomeUrl": { "type": "string", "format": "uri" },
+        "postInstallNewPlanUrl": { "type": "string", "format": "uri" },
+        "appShellRecoveryUrl": { "type": "string", "format": "uri" },
+        "appShellRecovery": {
+          "type": "object",
+          "required": ["url", "triggerField", "triggerValue", "sequence"],
+          "properties": {
+            "url": { "type": "string", "format": "uri" },
+            "triggerField": { "const": "appShellUpdateNeeded" },
+            "triggerValue": { "const": true },
+            "sequence": {
+              "type": "array",
+              "minItems": 5,
+              "items": { "type": "string", "minLength": 1 }
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": true
+    },
+    "nextAction": { "type": "object" },
+    "commands": {
+      "type": "object",
+      "required": ["beforePhone", "handoffEvidence", "handoffEvidenceTerminal", "sessionEvidence", "sessionEvidenceTerminal", "handoffSessionEvidence", "handoffSessionEvidenceTerminal", "afterPhoneThenAllFinal"],
+      "properties": {
+        "beforePhone": { "type": "string" },
+        "handoffEvidence": { "const": "npm run ios:install:handoff:evidence" },
+        "handoffEvidenceTerminal": { "const": "test -d webapp && cd webapp; npm run ios:install:handoff:evidence" },
+        "sessionEvidence": { "const": "npm run ios:install:session:evidence" },
+        "sessionEvidenceTerminal": { "const": "test -d webapp && cd webapp; npm run ios:install:session:evidence" },
+        "handoffSessionEvidence": { "const": "npm run ios:install:handoff-session:evidence" },
+        "handoffSessionEvidenceTerminal": { "const": "test -d webapp && cd webapp; npm run ios:install:handoff-session:evidence" },
+        "afterPhoneThenAllFinal": { "const": "npm run ios:install:evidence:after-phone:final" }
+      },
+      "additionalProperties": true
+    },
+    "evidence": {
+      "type": "object",
+      "required": ["launchProofAppShellUpdateNeeded", "finalGateReady"],
+      "properties": {
+        "launchProofAppShellUpdateNeeded": { "type": "boolean" },
+        "finalGateReady": { "type": "boolean" }
+      },
+      "additionalProperties": true
+    },
+    "completionRule": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,178 @@
+import { buildIosEvidenceFreshnessSchema } from "./ios-evidence-freshness.js";
+
+function buildReportSchema() {
+  return {
+    type: "object",
+    additionalProperties: false,
+    required: [
+      "label",
+      "path",
+      "state",
+      "ok",
+      "summary",
+    ],
+    properties: {
+      label: { type: "string" },
+      path: { type: "string" },
+      state: {
+        type: "string",
+        enum: [
+          "missing",
+          "ok",
+          "present",
+          "invalid-json",
+        ],
+      },
+      ok: { type: "boolean" },
+      status: { type: "string" },
+      readinessMode: { type: "string" },
+      handoffReady: { type: "boolean" },
+      launchProofOk: { type: "boolean" },
+      proofSaveHash: { type: "string" },
+      proofSaveTargetId: { type: "string" },
+      proofSaveUrl: { type: "string" },
+      saved: { type: "boolean" },
+      standalone: { type: "boolean" },
+      capturedAt: { type: "string" },
+      savedAt: { type: "string" },
+      summary: { type: "string" },
+      displayMode: { type: "string" },
+      appModeState: { type: "string" },
+      appModeTitle: { type: "string" },
+      appModeDetail: { type: "string" },
+    },
+  };
+}
+
+export function buildIosInstallSummarySchema() {
+  return {
+    $schema: "https://json-schema.org/draft/2020-12/schema",
+    $id: "https://travel-planner.local/schemas/ios-install-summary.schema.json",
+    $comment: "Generated schema snapshot; source of truth: webapp/src/ios-install-summary-schemas.js.",
+    title: "Travel Planner iPhone install completion summary",
+    type: "object",
+    additionalProperties: false,
+    required: [
+      "schemaVersion",
+      "generatedAt",
+      "status",
+      "runbookReady",
+      "strictReady",
+      "launchProofSaved",
+      "launchProofReady",
+      "launchProofAppModeReady",
+      "proofReady",
+      "proofSaveHash",
+      "proofSaveTargetId",
+      "proofSaveUrl",
+      "nextStep",
+      "finalEvidenceCommand",
+      "iosEvidenceFreshness",
+      "reports",
+    ],
+    properties: {
+      schemaVersion: { const: 1 },
+      generatedAt: { type: "string", format: "date-time" },
+      status: {
+        type: "string",
+        enum: [
+          "complete",
+          "incomplete",
+        ],
+      },
+      runbookReady: { type: "boolean" },
+      strictReady: { type: "boolean" },
+      launchProofSaved: { type: "boolean" },
+      launchProofReady: { type: "boolean" },
+      proofReady: { type: "boolean" },
+      proofSaveHash: { const: "#iosInstallProofSaveButton" },
+      proofSaveTargetId: { const: "iosInstallProofSaveButton" },
+      proofSaveUrl: { type: "string" },
+      nextStep: { type: "string" },
+      finalEvidenceCommand: { const: "npm run ios:install:evidence:after-phone:final" },
+      iosEvidenceFreshness: { $ref: "#/$defs/iosEvidenceFreshness" },
+      reports: {
+        type: "object",
+        additionalProperties: false,
+        required: [
+          "runbook",
+          "strict",
+          "launchProof",
+          "launchProofCheck",
+          "proof",
+        ],
+        properties: {
+          runbook: { $ref: "#/$defs/report" },
+          strict: { $ref: "#/$defs/report" },
+          launchProof: { $ref: "#/$defs/report" },
+          launchProofCheck: { $ref: "#/$defs/report" },
+          proof: { $ref: "#/$defs/report" },
+        },
+      },
+      launchProofAppModeReady: { type: "boolean" },
+    },
+    $defs: {
+      iosEvidenceFreshness: buildIosEvidenceFreshnessSchema(),
+      report: buildReportSchema(),
+    },
+  };
+}
+
+export function buildIosInstallSummaryCheckSchema() {
+  return {
+    $schema: "https://json-schema.org/draft/2020-12/schema",
+    $id: "https://travel-planner.local/schemas/ios-install-summary-check.schema.json",
+    $comment: "Generated schema snapshot; source of truth: webapp/src/ios-install-summary-schemas.js.",
+    title: "Travel Planner iPhone install completion summary check result",
+    type: "object",
+    additionalProperties: false,
+    required: [
+      "schemaVersion",
+      "ok",
+      "status",
+      "summary",
+      "inputPath",
+      "summaryGeneratedAt",
+      "proofSaveHash",
+      "proofSaveTargetId",
+      "proofSaveUrl",
+      "expectedFinalEvidenceCommand",
+      "finalEvidenceCommand",
+      "iosEvidenceFreshness",
+      "issues",
+    ],
+    properties: {
+      schemaVersion: { const: 1 },
+      ok: { type: "boolean" },
+      status: {
+        type: "string",
+        enum: [
+          "ready",
+          "invalid",
+          "missing",
+          "invalid-json",
+        ],
+      },
+      summary: { type: "string" },
+      inputPath: { type: "string" },
+      summaryGeneratedAt: { type: "string" },
+      summaryStatus: { type: "string" },
+      nextStep: { type: "string" },
+      proofSaveHash: { const: "#iosInstallProofSaveButton" },
+      proofSaveTargetId: { const: "iosInstallProofSaveButton" },
+      proofSaveUrl: { type: "string" },
+      expectedFinalEvidenceCommand: { const: "npm run ios:install:evidence:after-phone:final" },
+      finalEvidenceCommand: { type: "string" },
+      iosEvidenceFreshness: buildIosEvidenceFreshnessSchema({
+        minimumStaleAfterHours: 0,
+        staleAfterEnvVarSchema: { type: "string" },
+      }),
+      issues: {
+        type: "array",
+        items: { type: "string" },
+      },
+      launchProofAppModeReady: { type: "boolean" },
+      launchProofAppModeState: { type: "string" },
+    },
+  };
+}

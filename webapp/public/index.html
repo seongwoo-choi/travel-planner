@@ -1,0 +1,565 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#0f766e" />
+    <meta name="color-scheme" content="light" />
+    <meta name="application-name" content="Travel Planner" />
+    <meta name="description" content="Travel Planner에서 여행 요구사항을 입력하고 iPhone 홈 화면 앱처럼 새 여행 플랜을 만들며 proof, Mac final gate, 첫 플랜 생성, 완료 상태 review까지 이어갑니다." />
+    <meta property="og:site_name" content="Travel Planner" />
+    <meta property="og:title" content="Travel Planner" />
+    <meta property="og:description" content="iPhone 홈 화면에서 바로 여행 플랜을 만들고 설치 proof, Mac final gate, 첫 플랜 생성, 완료 상태 review를 이어갑니다." />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="ko_KR" />
+    <meta property="og:image" content="/icon-512.png" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="512" />
+    <meta property="og:image:height" content="512" />
+    <meta property="og:image:alt" content="Travel Planner iPhone 홈 화면 앱 아이콘" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Travel Planner" />
+    <meta name="twitter:description" content="iPhone 홈 화면에서 바로 여행 플랜을 만들고 설치 proof, Mac final gate, 첫 플랜 생성, 완료 상태 review를 이어갑니다." />
+    <meta name="twitter:image" content="/icon-512.png" />
+    <meta name="twitter:image:alt" content="Travel Planner iPhone 홈 화면 앱 아이콘" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <!-- iOS Home Screen metadata: https://developer.apple.com/library/archive/documentation/AppleApplications/Reference/SafariWebContent/ConfiguringWebApplications/ConfiguringWebApplications.html -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Travel" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="format-detection" content="telephone=no" />
+    <title>Travel Planner Web</title>
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <main class="container">
+      <h1>여행 플래너</h1>
+      <p>몇박몇일, 동행, 국내/해외 입력 후 자동으로 여행 계획을 생성합니다.</p>
+
+      <section id="iosInstallCard" class="card install-card" aria-labelledby="iosInstallTitle">
+        <div class="install-card-header">
+          <div>
+            <p class="eyebrow">iOS 설치</p>
+            <h2 id="iosInstallTitle">iPhone 홈 화면에 설치</h2>
+          </div>
+          <span id="iosInstallBadge" class="install-badge">Safari</span>
+        </div>
+        <p id="iosInstallStatus" class="install-status" role="status" aria-live="polite">설치 상태를 확인하는 중입니다.</p>
+        <div id="iosInstallModeCallout" class="install-mode-callout" data-state="checking" role="status" aria-live="polite">
+          <strong>앱 모드 확인 중</strong>
+          <span>iPhone Safari 또는 홈 화면 Travel 아이콘 실행 상태를 확인합니다.</span>
+          <small class="install-mode-visual-hint">주소창이 보이면 Safari 탭입니다. 홈 화면 설치가 끝난 뒤에는 주소창 없는 Travel 앱 화면으로 다시 열어야 합니다.</small>
+          <div class="install-mode-self-check-actions" aria-label="앱 모드 자가진단 다음 행동">
+            <a class="install-link" href="/install.html#iosInstallFastPathTitle">주소창이 보이면 설치 루트로</a>
+            <a class="install-link" href="#iosInstallProofSaveButton">주소창이 없으면 proof 저장</a>
+            <a class="install-link" href="/ios-install-status">완료 상태 확인</a>
+          </div>
+        </div>
+        <ol class="install-journey" data-ios-install-journey aria-label="iPhone 홈 화면 설치 현재 단계">
+          <li data-ios-install-journey-step="url"><a href="/install.html#iosInstallOpenUrlCard"><strong>1. URL</strong><span>iPhone에서 열 주소 확인</span></a></li>
+          <li data-ios-install-journey-step="safari"><a href="/install.html#iosInstallFastPathTitle"><strong>2. Safari</strong><span>Safari 공유 시트 열기</span></a></li>
+          <li data-ios-install-journey-step="home"><a href="/install.html#iosInstallFastPathTitle"><strong>3. 홈 화면</strong><span>홈 화면에 추가</span></a></li>
+          <li data-ios-install-journey-step="travel"><a href="#iosHomeDock"><strong>4. Travel</strong><span>Travel 아이콘 실행</span></a></li>
+        </ol>
+        <p class="install-journey-status" data-ios-install-journey-status role="status" aria-live="polite">현재 설치 단계를 확인하는 중입니다.</p>
+        <a class="install-link install-journey-status-link" data-ios-install-journey-status-link href="/install.html#iosInstallOpenUrlCard">다음 행동 보기</a>
+        <div class="install-quickstart-links" aria-label="iPhone 설치 quickstart">
+          <a class="install-link" href="/api/ios-install-quickstart.txt">quickstart 열기</a>
+          <a class="install-link" href="/api/ios-install-quickstart">quickstart JSON</a>
+        </div>
+        <section id="iosStandaloneNextAction" class="install-standalone-next-action" aria-labelledby="iosStandaloneNextActionTitle" hidden>
+          <strong id="iosStandaloneNextActionTitle">Travel 앱에서 바로 하기</strong>
+          <p>설치가 끝났습니다. 이제 새 여행 플랜을 만들거나 완료 상태를 확인하세요.</p>
+          <div id="iosStandaloneSuccessCheck" class="install-standalone-success-check" aria-label="홈 화면 실행 성공 체크" data-value-free="true">
+            <strong>설치 성공 체크</strong>
+            <ul>
+              <li data-ios-standalone-success-check-item="address-bar-free" data-ios-standalone-success-check-target="#iosInstallModeCallout"><span>주소창 없음</span><small>Safari 주소창이 사라진 Travel 앱 화면이면 홈 화면 실행 성공입니다.</small><a class="install-standalone-success-check-link" href="#iosInstallModeCallout">모드 확인</a></li>
+              <li data-ios-standalone-success-check-item="proof-save" data-ios-standalone-success-check-target="#iosInstallProofSaveButton"><span>Proof 저장</span><small>설치 증거 저장을 눌러 이 iPhone 실행을 남깁니다.</small><a class="install-standalone-success-check-link" href="#iosInstallProofSaveButton">proof 저장으로</a></li>
+              <li data-ios-standalone-success-check-item="mac-final-gate" data-ios-standalone-success-check-target="/ios-install-status"><span>Mac final gate</span><small>Mac에서 최종 gate를 실행해 proof archive와 readiness를 확정합니다.</small><a class="install-standalone-success-check-link" href="/ios-install-status">gate 확인</a></li>
+              <li data-ios-standalone-success-check-item="first-plan" data-ios-standalone-success-check-target="#planForm"><span>첫 플랜 생성</span><small>새 여행 플랜을 하나 만들면 설치 후 실사용 루프까지 확인됩니다.</small><a class="install-standalone-success-check-link" href="#planForm">첫 플랜으로</a></li>
+              <li data-ios-standalone-success-check-item="status-review" data-ios-standalone-success-check-target="/ios-install-status"><span>완료 상태 review</span><small>완료 상태 페이지에서 남은 gate가 없는지 마지막으로 확인합니다.</small><a class="install-standalone-success-check-link" href="/ios-install-status">완료 상태로</a></li>
+            </ul>
+          </div>
+          <nav class="install-standalone-first-run-rail" aria-label="Travel 앱 첫 실행 1분 루틴">
+            <span>첫 실행 1분 루틴</span>
+            <a href="#iosInstallFirstRun">1. 설치 체크</a>
+            <a href="#iosInstallProofSaveButton">2. Proof 저장</a>
+            <a href="#planForm">3. 첫 플랜</a>
+            <a class="install-standalone-first-run-final" href="/ios-install-status" aria-describedby="iosStandaloneCompletionRule" title="proof, Mac final gate, 첫 플랜, 남은 gate 상태를 확인합니다.">4. 완료 확인</a>
+          </nav>
+          <p id="iosStandaloneCompletionRule" class="install-standalone-completion-rule">완료 기준: Travel 아이콘 실행 proof 저장, Mac final gate 통과, 첫 플랜 생성, 완료 상태 페이지의 남은 gate 없음.</p>
+          <div class="install-standalone-next-action-links">
+            <a id="iosStandaloneNewPlanLink" class="install-link" href="#planForm" aria-describedby="iosStandaloneNextActionStatus">새 플랜 시작</a>
+            <a id="iosStandaloneCompletionStatusLink" class="install-link" href="/ios-install-status" aria-describedby="iosStandaloneNextActionStatus">완료 상태 확인</a>
+          </div>
+          <p id="iosStandaloneNextActionStatus" class="install-standalone-next-action-status" role="status" aria-live="polite"></p>
+        </section>
+        <button id="iosInstallModeCopyButton" type="button" class="secondary" title="현재 iPhone 설치 실행 모드 상태만 복사합니다. 입력 내용과 LLM 비밀값은 제외합니다." aria-label="현재 iPhone 설치 실행 모드 상태 복사" aria-describedby="iosInstallModeHandoffHint">모드 상태 복사</button>
+        <button id="iosInstallModeShareButton" type="button" class="secondary" title="현재 iPhone 설치 실행 모드 상태만 공유합니다. 입력 내용과 LLM 비밀값은 제외합니다." aria-label="현재 iPhone 설치 실행 모드 상태 공유" aria-describedby="iosInstallModeHandoffHint">모드 상태 공유</button>
+        <a id="iosInstallModeSmsLink" class="install-link" href="#" title="현재 iPhone 설치 실행 모드 상태를 짧은 문자 요약으로 보냅니다. 입력 내용과 LLM 비밀값은 제외합니다." aria-label="현재 iPhone 설치 실행 모드 짧은 문자 요약 보내기" aria-describedby="iosInstallModeHandoffHint">모드 문자(짧게)</a>
+        <a id="iosInstallModeMailLink" class="install-link" href="#" title="현재 iPhone 설치 실행 모드 상태를 상세 메일 evidence로 보냅니다. 입력 내용과 LLM 비밀값은 제외합니다." aria-label="현재 iPhone 설치 실행 모드 상세 메일 evidence 보내기" aria-describedby="iosInstallModeHandoffHint">모드 메일(상세)</a>
+        <p id="iosInstallModeHandoffHint" class="hint">문자는 짧은 앱 모드 요약만 보내고, 메일은 상세 evidence를 보냅니다. 입력 내용과 LLM 비밀값은 제외됩니다.</p>
+        <div id="iosInstallUrlHint" class="install-url-hint">
+          <span id="iosInstallUrlLabel">iPhone에서 열 주소</span>
+          <input id="iosInstallUrlInput" class="install-url-input" type="url" readonly value="">
+        </div>
+        <div id="iosInstallShortUrlHint" class="install-url-hint install-short-url-hint">
+          <span id="iosInstallShortUrlLabel">iPhone 입력용 짧은 주소</span>
+          <input id="iosInstallShortUrlInput" class="install-url-input" type="url" readonly value="">
+          <div id="iosInstallShortUrlParts" class="install-short-url-parts" aria-label="iPhone에 직접 입력할 주소 구성">
+            <span id="iosInstallShortUrlHost"></span>
+            <strong id="iosInstallShortUrlPath"></strong>
+          </div>
+          <p id="iosInstallShortUrlDecision" class="install-short-url-decision"></p>
+          <div id="iosInstallShortUrlAlternates" class="install-short-url-alternates" hidden></div>
+          <button id="iosInstallCopyShortUrlButton" type="button" class="secondary">짧은 주소 복사</button>
+          <button id="iosInstallCopyQrTargetCommandButton" type="button" class="secondary">선택 QR evidence 명령 복사</button>
+          <button id="iosInstallResetShortUrlButton" type="button" class="secondary" hidden>추천 주소로 되돌리기</button>
+        </div>
+        <div id="iosInstallQr" class="install-qr" hidden>
+          <div>
+            <strong>iPhone 카메라로 열기</strong>
+            <span>카메라로 스캔하면 Safari 설치 주소를 바로 열 수 있습니다.</span>
+            <p id="iosInstallQrTargetSummary" class="install-qr-target-summary"></p>
+            <button id="iosInstallQrTargetCopyButton" type="button" class="secondary install-qr-target-copy">QR target 복사</button>
+            <p class="install-qr-target-copy-hint">복사한 target은 iPhone Safari 주소창에 붙여넣은 뒤 공유 버튼 &gt; 홈 화면에 추가로 이어가세요.</p>
+            <a id="iosInstallQrLink" class="install-link" href="/api/install-qr.svg" target="_blank" rel="noreferrer">QR 크게 보기</a>
+          </div>
+          <img id="iosInstallQrImage" alt="iPhone Safari 설치 주소 QR 코드" width="168" height="168">
+        </div>
+        <p id="iosInstallDeploymentHint" class="install-deployment-hint"></p>
+        <div id="iosSafariHint" class="install-safari-hint" hidden>
+          <strong>Safari에서 다시 열어주세요.</strong>
+          <span>현재 브라우저에서는 홈 화면 추가가 보이지 않을 수 있습니다. 설치 주소를 복사한 뒤 Safari 주소창에 붙여넣으세요.</span>
+          <ol class="install-safari-recovery">
+            <li>아래 버튼으로 설치 주소를 복사합니다.</li>
+            <li>iPhone Safari를 열고 주소창에 붙여넣습니다.</li>
+            <li>공유 버튼 &gt; 홈 화면에 추가로 설치를 이어갑니다.</li>
+          </ol>
+          <button id="iosSafariCopyUrlButton" type="button" class="secondary">Safari 주소 복사</button>
+        </div>
+        <details id="iosDeployChecklist" class="install-deploy-checklist">
+          <summary>HTTPS 배포 체크리스트</summary>
+          <ul>
+            <li id="iosDeployHttpsCheck">HTTPS 설치 주소를 준비합니다.</li>
+            <li>iPhone Safari에서 <strong>/install.html</strong> 주소를 엽니다.</li>
+            <li>홈 화면에 추가 후 Travel 아이콘으로 실행합니다.</li>
+            <li>새 버전 안내가 보이면 <strong>새 버전 적용</strong>을 누릅니다.</li>
+          </ul>
+        </details>
+        <details class="install-deploy-checklist">
+          <summary>Mac evidence 명령 2단계</summary>
+          <ul>
+            <li>iPhone에서 열기 전: <code>npm run ios:install:evidence:before-phone</code> <button type="button" class="secondary" data-ios-install-command="test -d webapp && cd webapp; npm run ios:install:evidence:before-phone" data-ios-install-command-label="설치 전">설치 전 명령 복사</button></li>
+            <li>Travel 아이콘 실행 후 <strong>설치 증거 저장</strong>까지 끝난 뒤: <code>npm run ios:install:finish</code> <button type="button" class="secondary" title="Mac 터미널에서 실행할 최종 evidence archive/gate 명령을 복사합니다." aria-label="Mac 터미널에서 실행할 최종 evidence archive gate 명령 복사" data-ios-install-command="test -d webapp && cd webapp; npm run ios:install:finish" data-ios-install-command-label="finish">최종 명령 복사</button></li>
+          </ul>
+        </details>
+        <ul id="iosInstallReadiness" class="install-readiness" aria-label="iOS 설치 준비 상태"></ul>
+        <section id="iosInstallNextAction" class="install-next-action" aria-labelledby="iosInstallNextActionTitle">
+          <div class="install-next-action-header">
+            <strong id="iosInstallNextActionTitle">현재 다음 행동</strong>
+            <span id="iosInstallNextActionBadge">확인 전</span>
+          </div>
+          <p id="iosInstallNextActionSummary">저장된 evidence를 읽어 다음 Mac/iPhone 행동을 확인합니다.</p>
+          <div id="iosInstallNextActionQueue" class="install-next-action-queue" hidden aria-label="현재 다음 행동 순서">
+            <div class="install-next-action-step" data-role="phone">
+              <span>지금 iPhone에서</span>
+              <strong id="iosInstallNextActionPhone">설치 URL을 열고 홈 화면에 추가합니다.</strong>
+            </div>
+            <div class="install-next-action-step" data-role="mac">
+              <span>그 다음 Mac에서</span>
+              <strong id="iosInstallNextActionMac">evidence 명령을 실행합니다.</strong>
+            </div>
+          </div>
+          <div id="iosInstallSessionCheck" class="install-session-check" data-state="unknown" role="status" aria-live="polite" hidden>
+            <strong id="iosInstallSessionCheckTitle">세션 복구 evidence 확인 전</strong>
+            <span id="iosInstallSessionCheckDetail">iPhone 설치 전 session recovery 계약을 확인합니다.</span>
+            <button id="iosInstallSessionCheckCopyButton" type="button" class="secondary" hidden>세션 evidence 명령 복사</button>
+            <button id="iosInstallSessionCheckScriptCopyButton" type="button" class="secondary" hidden>npm script 복사</button>
+          </div>
+          <code id="iosInstallNextActionCommand" hidden></code>
+          <div id="iosInstallNextActionLinks" class="install-next-action-links" hidden>
+            <a id="iosInstallNextActionInstallLink" class="install-link" href="/install.html">설치 URL 열기</a>
+            <a id="iosInstallNextActionShortLink" class="install-link" href="/i">짧은 URL 열기</a>
+            <a id="iosInstallNextActionQrLink" class="install-link" href="/api/install-qr.svg" target="_blank" rel="noreferrer">QR 보기</a>
+            <a id="iosInstallNextActionProofLink" class="install-link" href="/install.html#iosInstallProofSaveButton">증거 저장으로 이동</a>
+            <a id="iosInstallNextActionSessionLink" class="install-link" href="/api/ios-install-session.txt">세션 요약</a>
+            <a id="iosInstallNextActionSessionQrLink" class="install-link" href="/api/ios-install-session-qr.svg" target="_blank" rel="noreferrer">세션 QR</a>
+            <a id="iosInstallNextActionScanLink" class="install-link" href="/ios-next" target="_blank" rel="noreferrer">다음 액션 스캔 보드</a>
+          </div>
+          <div class="install-next-action-buttons">
+            <button id="iosInstallNextActionCopyButton" type="button" class="secondary" hidden>다음 명령 복사</button>
+            <button id="iosInstallNextActionProofButton" type="button" class="secondary" hidden>설치 증거 저장 위치로 이동</button>
+            <button id="iosInstallNextActionRefreshButton" type="button" class="secondary">다음 행동 새로고침</button>
+          </div>
+        </section>
+        <section id="iosInstallCompletion" class="install-completion" aria-labelledby="iosInstallCompletionTitle" aria-describedby="iosInstallCompletionSummary iosInstallCompletionCriteria">
+          <div class="install-completion-header">
+            <strong id="iosInstallCompletionTitle">설치 완료 판정</strong>
+            <span id="iosInstallCompletionProgress">0/6 완료</span>
+          </div>
+          <p id="iosInstallCompletionSummary">iPhone 설치와 Mac evidence gate를 함께 확인합니다.</p>
+          <p id="iosInstallCompletionCriteria" class="hint">실제 완료는 홈 화면 Travel 아이콘 실행 proof 저장, Mac final gate 통과, 첫 플랜 생성 후 <a href="/ios-install-status">완료 상태 페이지</a>에서 남은 gate가 없는지 확인하는 것으로 판정합니다.</p>
+          <button id="iosInstallCompletionRefreshButton" type="button" class="secondary">최종 gate 결과 새로고침</button>
+          <button type="button" class="secondary" title="Mac 터미널에서 실행할 최종 evidence archive/gate 명령을 복사합니다." aria-label="Mac 터미널에서 실행할 최종 evidence archive gate 명령 복사" data-ios-install-command="test -d webapp && cd webapp; npm run ios:install:finish" data-ios-install-command-label="finish">최종 gate 명령 복사</button>
+        <div class="install-next-action-links">
+          <a id="iosInstallCompletionSessionLink" class="install-link" href="/api/ios-install-session.txt">세션 요약 다시 열기</a>
+          <a id="iosInstallCompletionSessionQrLink" class="install-link" href="/api/ios-install-session-qr.svg" target="_blank" rel="noreferrer">세션 QR 다시 열기</a>
+          <a id="iosInstallCompletionNextActionScanLink" class="install-link" href="/ios-next" target="_blank" rel="noreferrer">다음 액션 스캔 보드</a>
+        </div>
+
+          <div id="iosInstallAppModeProofStatus" class="install-app-mode-proof-status" data-state="todo">
+            <strong>홈 화면 앱 proof 확인 전</strong>
+            <span>Travel 아이콘으로 실행한 뒤 proof를 저장하면 appModeState=standalone 여부가 여기에 표시됩니다.</span>
+            <div class="install-app-mode-proof-actions">
+              <button id="iosInstallAppModeProofGateButton" type="button" class="secondary">최종 gate 명령 복사</button>
+              <button id="iosInstallAppModeProofRetryButton" type="button" class="secondary">proof 다시 저장 위치</button>
+              <button id="iosInstallAppModeProofRefreshButton" type="button" class="secondary">app-mode 상태 새로고침</button>
+              <button id="iosInstallCompletionStatusCopyButton" type="button" class="secondary">완료 상태 복사</button>
+              <button id="iosInstallCompletionStatusShareButton" type="button" class="secondary" hidden>완료 상태 공유</button>
+              <a id="iosInstallCompletionStatusSmsLink" class="install-link" href="#">완료 상태 문자</a>
+              <a id="iosInstallCompletionStatusMailLink" class="install-link" href="#">완료 상태 메일</a>
+              <a id="iosInstallCompletionStatusLink" class="install-link" href="/ios-install-status" target="_blank" rel="noreferrer">완료 상태 페이지</a>
+            </div>
+          </div>
+          <ul id="iosInstallCompletionList" class="install-completion-list"></ul>
+        </section>
+        <div id="iosInstallSavedProof" class="install-saved-proof" hidden>
+          <strong>최근 설치 증거</strong>
+          <p id="iosInstallSavedProofMessage">저장된 홈 화면 실행 증거를 확인하는 중입니다.</p>
+          <span id="iosInstallSavedProofMeta" class="install-saved-proof-meta"></span>
+          <div class="install-proof-actions">
+            <button id="iosInstallSavedProofRefreshButton" type="button" class="secondary">최근 증거 새로고침</button>
+            <a id="iosInstallSavedProofSummaryLink" class="install-link" href="/api/ios-launch-proof.txt">최근 증거 요약</a>
+          </div>
+        </div>
+        <div id="iosInstallProof" class="install-proof" hidden>
+          <strong>홈 화면 실행 증거</strong>
+          <p>Travel 아이콘으로 실행한 뒤 이 내용을 복사하면 설치 완료를 확인할 수 있습니다.</p>
+          <p>서버 저장이 막히면 저장 버튼이 증거 JSON을 복사하거나 프롬프트로 보여줍니다. 그 JSON을 Mac의 <code>webapp/reports/ios-launch-proof.json</code>에 저장한 뒤 최종 evidence 명령을 실행하세요.</p>
+          <textarea id="iosInstallProofText" class="install-proof-text" readonly rows="7"></textarea>
+          <div class="install-proof-actions">
+            <button id="iosInstallProofCopyButton" type="button" class="secondary">설치 증거 복사</button>
+            <button id="iosInstallProofShareButton" type="button" class="secondary" hidden>설치 증거 공유</button>
+            <button id="iosInstallProofSaveButton" type="button" class="secondary">설치 증거 저장</button>
+            <a id="iosInstallProofSummaryLink" class="install-link" href="/api/ios-launch-proof.txt">저장 증거 확인</a>
+            <a class="install-link" href="/ios-launch-proof.schema.json">증거 schema 보기</a>
+          </div>
+          <div id="iosInstallAfterPhone" class="install-after-phone" hidden>
+            <strong>마지막 Mac evidence</strong>
+          <p>설치 증거 저장이 끝났습니다. Mac 터미널에서 최종 evidence archive/gate 명령을 실행하세요.</p>
+          <code>npm run ios:install:finish</code>
+          <button id="iosInstallAfterPhoneCopyButton" type="button" class="secondary" title="Mac 터미널에서 실행할 최종 evidence archive/gate 명령을 복사합니다." aria-label="Mac 터미널에서 실행할 최종 evidence archive gate 명령 복사">최종 evidence 명령 복사</button>
+          <div class="install-after-phone-links">
+            <a class="install-link" href="/api/ios-launch-proof.txt" data-ios-proof-summary-link="true">최근 저장 증거 요약</a>
+            <a class="install-link" href="#iosInstallSavedProof">최근 설치 증거로 이동</a>
+            <a class="install-link" href="#iosInstallCompletion">설치 완료 판정으로 이동</a>
+          </div>
+        </div>
+        </div>
+        <div id="iosInstallFirstRun" class="install-first-run" hidden>
+          <div class="install-first-run-header">
+            <strong>설치 후 첫 실행 체크</strong>
+            <span id="iosInstallFirstRunProgress">0/4 완료</span>
+          </div>
+          <p>이 iPhone에서 앱처럼 쓸 준비가 끝났는지 차근차근 확인합니다.</p>
+          <ul id="iosInstallFirstRunList" class="install-first-run-list"></ul>
+        </div>
+        <ol class="install-steps">
+          <li>iPhone Safari에서 이 웹앱 주소를 엽니다.</li>
+          <li>공유 버튼을 누르고 <strong>홈 화면에 추가</strong>를 선택합니다.</li>
+          <li><strong>추가</strong>를 누르면 홈 화면의 Travel 아이콘으로 실행할 수 있습니다.</li>
+        </ol>
+        <div class="install-actions">
+          <button id="iosInstallCopyUrlButton" type="button" class="secondary">현재 주소 복사</button>
+          <button id="iosInstallShareButton" type="button" class="secondary" hidden>iPhone으로 공유</button>
+          <a id="iosInstallSmsLink" class="install-link" href="#">문자로 보내기</a>
+          <a id="iosInstallMailLink" class="install-link" href="#">메일로 보내기</a>
+          <a class="install-link" href="/install.html#iosInstallFastPathTitle" title="iPhone 1분 설치 루트로 이동합니다." aria-label="iPhone 1분 설치 루트 열기">1분 설치</a>
+          <button id="iosInstallHandoffCopyButton" type="button" class="secondary">설치 안내 복사</button>
+          <a class="install-link" href="/api/ios-install-handoff.txt">설치 안내 묶음</a>
+          <a class="install-link" href="/api/ios-install-runbook.txt">설치 Runbook</a>
+          <button type="button" class="secondary" data-ios-install-url-copy="/api/ios-install-runbook.txt" data-ios-install-url-label="Runbook">Runbook 링크 복사</button>
+          <a class="install-link" href="/api/ios-install-runbook">설치 Runbook JSON</a>
+          <button type="button" class="secondary" data-ios-install-url-copy="/api/ios-install-runbook" data-ios-install-url-label="Runbook JSON">JSON 링크 복사</button>
+          <a class="install-link" href="/api/install-info.txt">설치 정보 확인</a>
+          <a class="install-link" href="/manifest.webmanifest">설치 설정 보기</a>
+        </div>
+        <p class="hint">홈 화면에서 실행하면 Safari 주소창 없이 독립 앱처럼 열리고, 기본 화면 파일은 service worker 캐시로 다시 열 수 있습니다.</p>
+      </section>
+
+      <section id="iosHomeDock" class="card ios-home-dock" aria-labelledby="iosHomeDockTitle" hidden>
+        <div>
+          <p class="eyebrow">Home Screen</p>
+          <h2 id="iosHomeDockTitle">iPhone 빠른 실행</h2>
+          <p>홈 화면 앱으로 열었을 때 자주 쓰는 시작점을 한곳에 모았습니다.</p>
+        </div>
+        <div class="ios-home-dock-status">
+          <a id="iosHomeDockProgress" href="#iosInstallFirstRun" title="iPhone 첫 실행 체크 목록으로 이동합니다." aria-label="iPhone 첫 실행 체크 목록 열기">설치 체크 0/4 완료</a>
+          <a id="iosHomeDockSnapshotStatus" href="#planList" title="오프라인 snapshot을 만들거나 확인할 여행 목록으로 이동합니다." aria-label="오프라인 snapshot 확인 위치 열기">오프라인 snapshot: 홈 0개 · 상세 0개</a>
+          <a id="iosHomeDockDraftStatus" href="#planForm" title="이 iPhone 브라우저에 저장된 새 플랜 draft 상태를 확인합니다. 입력 내용과 LLM 비밀값은 표시하지 않습니다." aria-label="이 iPhone 브라우저의 새 플랜 draft 상태 확인">새 플랜 초안: 확인 중</a>
+          <a id="iosHomeDockProofStatus" href="#iosInstallProofSaveButton" title="Home Screen 실행 proof 저장 위치로 이동합니다." aria-label="Home Screen 실행 proof 저장 위치 열기">설치 증거 저장 전</a>
+          <a id="iosHomeDockFinalGateStatus" href="/ios-install-status" title="Home Screen proof, Mac final gate, 첫 플랜 생성, 완료 상태 review 기준으로 iPhone 설치 완료 상태를 확인합니다." aria-label="Home Screen proof, Mac final gate, 첫 플랜 생성, 완료 상태 review 기준이 담긴 iPhone 설치 완료 상태 페이지 열기">Mac final gate 확인 전</a>
+          <span id="iosHomeDockShellVersion" title="현재 설치된 앱 shell cache 버전입니다." aria-label="현재 설치된 앱 shell cache 버전">앱 shell 확인 중</span>
+          <span id="iosHomeDockDisplayModeStatus" title="현재 Travel 실행 표시 모드입니다." aria-label="현재 Travel 실행 표시 모드">실행 모드 확인 중</span>
+        </div>
+        <div id="iosHomeDockNextStep" class="ios-home-dock-next-step" data-state="todo" role="button" tabindex="0">다음 단계 확인 중</div>
+        <p id="iosHomeDockProofNudge" class="ios-home-dock-proof-nudge">Travel 아이콘으로 처음 열었다면 먼저 <strong>설치 증거 저장으로 이동</strong>을 눌러 홈 화면 실행 proof를 남기세요.</p>
+        <div id="iosHomeDockShellUpdateNudge" class="ios-home-dock-shell-update-nudge" data-state="hidden" hidden>
+          <strong>새 앱 shell이 있습니다.</strong>
+          <p id="iosHomeDockShellUpdateDetail">앱 업데이트 확인을 눌러 새 Travel shell을 적용하세요.</p>
+          <button id="iosHomeDockShellUpdateCheckButton" type="button" class="secondary" title="앱 업데이트 확인 버튼으로 이동합니다." aria-label="앱 업데이트 확인 버튼으로 이동">업데이트 확인으로 이동</button>
+        </div>
+        <div id="iosHomeDockFinalGateNudge" class="ios-home-dock-final-gate-nudge" hidden>
+          <strong>홈 화면 실행 proof가 저장됐습니다.</strong>
+          <p>이제 Mac에서 최종 evidence archive/gate를 실행해 설치 완료를 확정하세요.</p>
+          <button type="button" class="secondary" title="Mac 터미널에서 실행할 최종 evidence archive/gate 명령을 복사합니다." aria-label="Mac 터미널에서 실행할 최종 evidence archive gate 명령 복사" data-ios-install-command="test -d webapp && cd webapp; npm run ios:install:finish" data-ios-install-command-label="finish">최종 gate 명령 복사</button>
+          <a id="iosHomeDockFinalGateProofSummaryLink" class="install-link" href="/api/ios-launch-proof.txt">최근 저장 증거 요약</a>
+          <a class="install-link" href="#iosInstallCompletion">설치 완료 판정으로 이동</a>
+        </div>
+        <div id="iosHomeDockPlanStarter" class="ios-home-dock-plan-starter" data-state="waiting">
+          <div>
+            <strong id="iosHomeDockPlanStarterTitle">첫 여행 플랜 시작 전</strong>
+            <p id="iosHomeDockPlanStarterDetail">먼저 설치 증거를 저장하면 바로 새 일정 입력 폼으로 이어갈 수 있습니다.</p>
+          </div>
+          <div class="ios-home-dock-plan-starter-actions">
+            <a id="iosHomeDockPlanStarterLink" class="install-link" href="#iosInstallProofSaveButton">설치 증거 먼저 저장</a>
+            <button id="iosHomeDockPlanStarterSampleButton" type="button" class="secondary" hidden>예시로 빠르게 채우기</button>
+          </div>
+        </div>
+        <div id="iosHomeDockLatestPlans" class="ios-home-dock-latest" hidden></div>
+        <div class="ios-home-dock-actions" role="group" aria-label="iPhone 빠른 실행 동작">
+          <span class="ios-home-dock-action-group-label" role="heading" aria-level="3">앱 사용</span>
+          <a class="install-link" href="#planForm">새 플랜 만들기</a>
+          <a id="iosHomeDockDraftResumeLink" class="install-link" href="#planForm" title="새 플랜 draft 입력 폼으로 이동합니다." aria-label="새 플랜 draft 입력 폼으로 이동">초안 이어쓰기</a>
+          <button id="iosHomeDockDraftStatusCopyButton" type="button" class="secondary" title="이 iPhone 브라우저의 새 플랜 draft 상태만 복사합니다. 입력 내용과 LLM 비밀값은 제외합니다." aria-label="새 플랜 draft 상태 비밀값 제외 복사">초안 상태 복사</button>
+          <button id="iosHomeDockDraftStatusShareButton" type="button" class="secondary" title="이 iPhone 브라우저의 새 플랜 draft 상태만 공유합니다. 입력 내용과 LLM 비밀값은 제외합니다." aria-label="새 플랜 draft 상태 비밀값 제외 공유">초안 상태 공유</button>
+          <a id="iosHomeDockDraftStatusSmsLink" class="install-link" href="#" title="이 iPhone 브라우저의 새 플랜 draft 상태만 문자로 보냅니다. 입력 내용과 LLM 비밀값은 제외합니다." aria-label="새 플랜 draft 상태 비밀값 제외 문자로 보내기">초안 상태 문자</a>
+          <a id="iosHomeDockDraftStatusMailLink" class="install-link" href="#" title="이 iPhone 브라우저의 새 플랜 draft 상태만 메일로 보냅니다. 입력 내용과 LLM 비밀값은 제외합니다." aria-label="새 플랜 draft 상태 비밀값 제외 메일로 보내기">초안 상태 메일</a>
+          <a class="install-link" href="#planList">최근 여행 보기</a>
+          <a id="iosHomeDockLastRouteLink" class="install-link" href="#" title="이 iPhone 홈 화면 앱에서 마지막으로 저장한 위치로 돌아갑니다." aria-label="마지막 위치 이어가기" hidden>마지막 위치 이어가기</a>
+          <button id="iosHomeDockLastRouteClearButton" type="button" class="secondary" title="이 iPhone에 저장된 마지막 위치 링크만 지웁니다. draft와 LLM 비밀값은 건드리지 않습니다." aria-label="마지막 위치 이어가기 지우기" hidden>마지막 위치 지우기</button>
+          <a class="install-link" href="#iosInstallFirstRun">설치 체크</a>
+          <span class="ios-home-dock-action-group-label" role="heading" aria-level="3">설치 마무리</span>
+          <button id="iosHomeDockProofButton" type="button" class="secondary">설치 증거 저장으로 이동</button>
+          <a class="install-link" href="/api/ios-launch-proof.txt">최근 증거</a>
+          <button id="iosHomeDockFinalGateCopyButton" type="button" class="secondary" title="Mac 터미널에 붙여넣을 최종 evidence archive/gate 명령을 복사합니다." aria-label="Mac 최종 evidence archive gate 명령 복사" hidden>최종 gate 복사</button>
+          <button id="iosHomeDockFinalGateShareButton" type="button" class="secondary" title="Mac으로 보낼 최종 evidence archive/gate 명령과 완료 상태 페이지를 iOS 공유 시트로 보냅니다." aria-label="Mac 최종 evidence archive gate 명령 공유" hidden>최종 gate 공유</button>
+          <a id="iosHomeDockFinalGateSmsLink" class="install-link" href="#" title="Mac에서 실행할 최종 gate 명령과 완료 상태 페이지를 문자로 보냅니다." aria-label="Mac 최종 gate 명령 문자로 보내기" hidden>최종 gate 문자</a>
+          <a id="iosHomeDockFinalGateMailLink" class="install-link" href="#" title="Mac에서 실행할 최종 gate 명령과 완료 상태 페이지를 메일로 보냅니다." aria-label="Mac 최종 gate 명령 메일로 보내기" hidden>최종 gate 메일</a>
+          <span class="ios-home-dock-action-group-label" role="heading" aria-level="3">완료 상태</span>
+          <button id="iosHomeDockCompletionStatusCopyButton" type="button" class="secondary" title="Home Screen proof, Mac final gate, 첫 플랜 생성, 완료 상태 review 기준이 담긴 설치 완료 상태를 복사합니다." aria-label="Home Screen proof, Mac final gate, 첫 플랜 생성, 완료 상태 review 기준이 담긴 iPhone 설치 완료 상태 복사">완료 상태 복사</button>
+          <button id="iosHomeDockCompletionStatusShareButton" type="button" class="secondary" title="Home Screen proof, Mac final gate, 첫 플랜 생성, 완료 상태 review 기준이 담긴 설치 완료 상태를 iOS 공유 시트로 보냅니다." aria-label="Home Screen proof, Mac final gate, 첫 플랜 생성, 완료 상태 review 기준이 담긴 iPhone 설치 완료 상태 공유" hidden>완료 상태 공유</button>
+          <a id="iosHomeDockCompletionStatusSmsLink" class="install-link" href="#" title="완료 상태 URL과 최종 gate 명령을 문자로 보내 Home Screen proof, Mac final gate, 첫 플랜 생성, 완료 상태 review 기준을 확인합니다." aria-label="Home Screen proof, Mac final gate, 첫 플랜 생성, 완료 상태 review 기준이 담긴 iPhone 설치 완료 상태 문자로 보내기">완료 상태 문자</a>
+          <a id="iosHomeDockCompletionStatusMailLink" class="install-link" href="#" title="완료 상태 URL과 최종 gate 명령을 메일로 보내 Home Screen proof, Mac final gate, 첫 플랜 생성, 완료 상태 review 기준을 확인합니다." aria-label="Home Screen proof, Mac final gate, 첫 플랜 생성, 완료 상태 review 기준이 담긴 iPhone 설치 완료 상태 메일로 보내기">완료 상태 메일</a>
+          <a class="install-link" href="/ios-install-status" target="_blank" rel="noreferrer" title="Home Screen proof, Mac final gate, 첫 플랜 생성, 완료 상태 review 기준을 보여주는 완료 상태 페이지를 엽니다." aria-label="Home Screen proof, Mac final gate, 첫 플랜 생성, 완료 상태 review 기준이 담긴 iPhone 설치 완료 상태 페이지 열기">완료 상태 페이지</a>
+          <span class="ios-home-dock-action-group-label" role="heading" aria-level="3">관리</span>
+          <button id="iosHomeDockRefreshButton" type="button" class="secondary">상태 새로고침</button>
+          <button id="iosHomeDockAppUpdateButton" type="button" class="secondary" title="설치된 Home Screen 앱의 service worker 업데이트를 확인합니다." aria-label="설치된 iPhone 앱 업데이트 확인">앱 업데이트 확인</button>
+          <button id="iosHomeDockShellVersionCopyButton" type="button" class="secondary" title="현재 앱 shell cache 버전과 service worker 상태를 복사합니다." aria-label="현재 iPhone 앱 shell 버전 복사">shell 버전 복사</button>
+          <button id="iosHomeDockDiagnosticsButton" type="button" class="secondary">iPhone 진단 복사</button>
+          <button id="iosHomeDockOfflineReadButton" type="button" class="secondary">오프라인 확인 완료</button>
+          <button id="iosHomeDockSnapshotClearButton" type="button" class="secondary">오프라인 snapshot 정리</button>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>서버 상태</h2>
+        <div id="serverStatus" class="status-grid">
+          <span>상태를 불러오는 중입니다.</span>
+        </div>
+        <div id="shareSetupGuide" class="share-guide hidden"></div>
+      </section>
+
+      <section class="card">
+        <h2>새 일정 생성</h2>
+        <form id="planForm" class="grid" aria-describedby="newPlanDraftPrivacyHint">
+          <label>
+            목적지
+            <input name="destination" placeholder="예: 삿포로, 부산" required autocomplete="address-level2" autocapitalize="words" enterkeyhint="next" />
+          </label>
+          <label>
+            출발지
+            <input name="departure" placeholder="예: 서울" value="서울" autocomplete="address-level2" autocapitalize="words" enterkeyhint="next" />
+          </label>
+          <label>
+            나라
+            <input name="country" placeholder="해외일 경우 국가명" autocomplete="country-name" autocapitalize="words" enterkeyhint="next" />
+          </label>
+          <label>
+            국내/해외
+            <select name="scope">
+              <option value="domestic">국내</option>
+              <option value="international">해외</option>
+            </select>
+          </label>
+          <label>
+            동행
+            <select name="companions">
+              <option>커플</option>
+              <option>친구</option>
+              <option>가족</option>
+              <option>혼자</option>
+            </select>
+          </label>
+          <label>
+            인원
+            <input type="number" name="travelers" value="2" min="1" inputmode="numeric" enterkeyhint="next" />
+          </label>
+          <label>
+            출발일
+            <input type="date" name="startDate" />
+          </label>
+          <label>
+            몇 박
+            <input type="number" name="nights" value="2" min="1" inputmode="numeric" enterkeyhint="next" />
+          </label>
+          <label>
+            여행 스타일
+            <input name="tripType" placeholder="맛집,자연,인스타,쇼핑" autocomplete="off" autocapitalize="none" enterkeyhint="next" />
+          </label>
+          <label>
+            숙박 선호
+            <select name="accommodation">
+              <option value="">미지정</option>
+              <option>호텔</option>
+              <option>게스트하우스</option>
+              <option>펜션</option>
+              <option>리조트</option>
+            </select>
+          </label>
+          <label>
+            교통 선호
+            <select name="transportPref">
+              <option value="auto">자동 선택</option>
+              <option value="KTX">KTX</option>
+              <option value="SRT">SRT</option>
+              <option value="bus">버스</option>
+              <option value="car">자차</option>
+              <option value="flight">항공</option>
+            </select>
+          </label>
+          <label>
+            1인 예산
+            <input name="budgetPerPerson" type="number" placeholder="예: 80000" inputmode="numeric" enterkeyhint="next" />
+          </label>
+          <label class="full">
+            꼭 가고 싶은 곳
+            <textarea name="highlights" rows="2" placeholder="예: 오타루,해운대" autocomplete="off" autocapitalize="words" enterkeyhint="next"></textarea>
+          </label>
+          <label class="full">
+            추가 요청
+            <textarea name="notes" rows="3" placeholder="예: 아이들 동행이라 이동은 짧게" autocomplete="off" autocapitalize="sentences" enterkeyhint="done"></textarea>
+          </label>
+          <fieldset class="full byok-panel">
+            <legend>LLM 인증/실행 옵션</legend>
+            <p class="hint">ChatGPT/Claude 로그인은 이 웹앱에 API 호출 권한을 넘겨주지 않습니다. 공식 콘솔에서 API key를 발급한 뒤, 이 요청에만 임시로 사용할 수 있습니다.</p>
+            <ol class="byok-flow">
+              <li><strong>서버 기본 설정</strong>: 운영자 `.env` 키로 실행되어 운영자 계정에 과금됩니다.</li>
+              <li><strong>다른 사람에게 공유</strong>: 사용자가 자신의 API key를 요청 1회용으로 넣어야 그 사용자 계정으로 과금됩니다.</li>
+              <li><strong>OAuth 로그인</strong>: 현재 일반 OpenAI/Anthropic API 호출 권한을 웹앱에 위임하는 공개 흐름으로 쓰지 않습니다.</li>
+            </ol>
+            <p id="byokPolicyMessage" class="byok-policy hidden"></p>
+            <div class="byok-links">
+              <a href="https://platform.openai.com/api-keys" target="_blank" rel="noreferrer">OpenAI API key 발급</a>
+              <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noreferrer">Anthropic API key 발급</a>
+            </div>
+            <div class="grid">
+              <label>
+                실행 방식
+                <select name="llmProvider">
+                  <option value="server">서버 기본 설정</option>
+                  <option value="openai">OpenAI API key</option>
+                  <option value="anthropic">Anthropic API key</option>
+                </select>
+              </label>
+              <label>
+                API key
+                <input name="llmApiKey" type="password" autocomplete="off" autocapitalize="none" spellcheck="false" data-1p-ignore="true" data-bwignore="true" data-lpignore="true" placeholder="요청 1회용, 저장 안 함" />
+              </label>
+              <label>
+                모델
+                <input name="llmModel" autocomplete="off" placeholder="비우면 기본 모델" />
+              </label>
+            </div>
+          </fieldset>
+          <button>계획 생성</button>
+          <p id="planFormMessage" class="form-message hidden"></p>
+          <div id="newPlanShortcutHintGroup" class="new-plan-shortcut-hint-group" role="group" aria-label="새 플랜 shortcut 도착 안내와 입력 링크, 초안 상태, 설치/닫기 handoff" aria-describedby="newPlanShortcutHint newPlanShortcutInputLinkLabel newPlanShortcutDraftStatusLabel newPlanShortcutInstallDismissLabel newPlanDraftPrivacyHint" hidden>
+            <p id="newPlanShortcutHint" class="form-message hidden" role="status" aria-live="polite" aria-atomic="true"></p>
+            <span id="newPlanShortcutInputLinkLabel" class="new-plan-shortcut-action-label" role="heading" aria-level="3">입력 링크</span>
+            <button id="newPlanShortcutHintFormUrlCopyButton" type="button" class="secondary" title="새 플랜 입력 폼 링크만 복사합니다. draft 값과 LLM 비밀값은 포함하지 않습니다." aria-label="새 플랜 입력 폼 링크만 복사" aria-describedby="newPlanShortcutInputLinkLabel newPlanShortcutHint newPlanDraftPrivacyHint" hidden>폼 링크 복사</button>
+            <button id="newPlanShortcutHintFormUrlShareButton" type="button" class="secondary" title="새 플랜 입력 폼 링크만 공유합니다. draft 값과 LLM 비밀값은 포함하지 않습니다." aria-label="새 플랜 입력 폼 링크만 공유" aria-describedby="newPlanShortcutInputLinkLabel newPlanShortcutHint newPlanDraftPrivacyHint" hidden>폼 링크 공유</button>
+            <a id="newPlanShortcutHintFormUrlSmsLink" class="install-link" href="#" title="새 플랜 입력 폼 링크만 문자로 보냅니다. draft 값과 LLM 비밀값은 포함하지 않습니다." aria-label="새 플랜 입력 폼 링크만 문자로 보내기" aria-describedby="newPlanShortcutInputLinkLabel newPlanShortcutHint newPlanDraftPrivacyHint" hidden>폼 링크 문자</a>
+            <a id="newPlanShortcutHintFormUrlMailLink" class="install-link" href="#" title="새 플랜 입력 폼 링크만 메일로 보냅니다. draft 값과 LLM 비밀값은 포함하지 않습니다." aria-label="새 플랜 입력 폼 링크만 메일로 보내기" aria-describedby="newPlanShortcutInputLinkLabel newPlanShortcutHint newPlanDraftPrivacyHint" hidden>폼 링크 메일</a>
+            <span id="newPlanShortcutDraftStatusLabel" class="new-plan-shortcut-action-label" role="heading" aria-level="3">초안 상태</span>
+            <button id="newPlanShortcutHintDraftStatusCopyButton" type="button" class="secondary" title="새 플랜 shortcut 도착 상태에서 이 iPhone 브라우저의 draft 상태만 복사합니다. 입력 내용과 LLM 비밀값은 제외합니다." aria-label="새 플랜 shortcut 도착 상태의 draft 상태 비밀값 제외 복사" aria-describedby="newPlanShortcutDraftStatusLabel newPlanShortcutHint newPlanDraftPrivacyHint" hidden>초안 상태 복사</button>
+            <button id="newPlanShortcutHintDraftStatusShareButton" type="button" class="secondary" title="새 플랜 shortcut 도착 상태에서 이 iPhone 브라우저의 draft 상태만 공유합니다. 입력 내용과 LLM 비밀값은 제외합니다." aria-label="새 플랜 shortcut 도착 상태의 draft 상태 비밀값 제외 공유" aria-describedby="newPlanShortcutDraftStatusLabel newPlanShortcutHint newPlanDraftPrivacyHint" hidden>초안 상태 공유</button>
+            <a id="newPlanShortcutHintDraftStatusSmsLink" class="install-link" href="#" title="새 플랜 shortcut 도착 상태에서 이 iPhone 브라우저의 draft 상태만 문자로 보냅니다. 입력 내용과 LLM 비밀값은 제외합니다." aria-label="새 플랜 shortcut 도착 상태의 draft 상태 비밀값 제외 문자로 보내기" aria-describedby="newPlanShortcutDraftStatusLabel newPlanShortcutHint newPlanDraftPrivacyHint" hidden>초안 상태 문자</a>
+            <a id="newPlanShortcutHintDraftStatusMailLink" class="install-link" href="#" title="새 플랜 shortcut 도착 상태에서 이 iPhone 브라우저의 draft 상태만 메일로 보냅니다. 입력 내용과 LLM 비밀값은 제외합니다." aria-label="새 플랜 shortcut 도착 상태의 draft 상태 비밀값 제외 메일로 보내기" aria-describedby="newPlanShortcutDraftStatusLabel newPlanShortcutHint newPlanDraftPrivacyHint" hidden>초안 상태 메일</a>
+            <span id="newPlanShortcutInstallDismissLabel" class="new-plan-shortcut-action-label" role="heading" aria-level="3">설치/닫기</span>
+            <a id="newPlanShortcutHintInstallGuideLink" class="install-link" href="/install.html#iosInstallFastPathTitle" title="iPhone 홈 화면 설치 가이드의 1분 설치 루트로 돌아갑니다. draft 값과 LLM 비밀값은 포함하지 않습니다." aria-label="iPhone 홈 화면 설치 가이드 1분 설치 루트로 돌아가기" aria-describedby="newPlanShortcutInstallDismissLabel newPlanShortcutHint newPlanDraftPrivacyHint" hidden>1분 설치</a>
+            <a id="newPlanShortcutHintInstallStatusLink" class="install-link" href="/ios-install-status" title="Home Screen proof, Mac final gate, 첫 플랜 생성, 완료 상태 review 기준을 확인합니다." aria-label="Home Screen proof, Mac final gate, 첫 플랜 생성, 완료 상태 review 기준이 담긴 iPhone 설치 완료 상태 페이지 열기" aria-describedby="newPlanShortcutInstallDismissLabel newPlanShortcutHint newPlanDraftPrivacyHint" hidden>설치 완료 상태</a>
+            <button id="newPlanShortcutHintDismissButton" type="button" class="secondary" title="새 플랜 shortcut 도착 안내만 닫습니다. 저장된 초안과 현재 입력값은 유지합니다." aria-label="새 플랜 shortcut 도착 안내만 닫기. 저장된 초안과 현재 입력값은 유지" aria-describedby="newPlanShortcutInstallDismissLabel newPlanShortcutHint newPlanDraftPrivacyHint" hidden>도착 안내 닫기</button>
+          </div>
+          <p id="newPlanDraftPrivacyHint" class="form-message">입력 초안은 현재 기기 브라우저에만 자동 저장됩니다. LLM API key, provider, model 값은 초안에 저장하지 않습니다.</p>
+          <p id="newPlanDraftStatus" class="form-message hidden" role="status" aria-live="polite" aria-atomic="true"></p>
+          <div id="newPlanDraftActions" class="new-plan-draft-actions" role="group" aria-label="현재 기기 브라우저 새 여행 플랜 draft 복사, 공유, 붙여넣기 handoff" aria-describedby="newPlanDraftPrivacyHint newPlanDraftStatus">
+            <button id="newPlanDraftClearButton" type="button" class="secondary" title="현재 입력값은 유지하고 이 기기 브라우저에 저장된 새 여행 플랜 초안만 삭제합니다." aria-label="이 기기 브라우저의 새 여행 플랜 저장 초안만 삭제" aria-describedby="newPlanDraftStatus" hidden>저장된 초안 삭제</button>
+            <button id="newPlanDraftCopyButton" type="button" class="secondary" title="현재 새 여행 플랜 입력 초안을 비밀값 없이 텍스트로 복사합니다." aria-label="현재 새 여행 플랜 입력 초안 비밀값 제외 텍스트 복사" aria-describedby="newPlanDraftPrivacyHint newPlanDraftStatus">초안 복사</button>
+            <button id="newPlanDraftShareButton" type="button" class="secondary" title="현재 새 여행 플랜 입력 초안을 비밀값 없이 iOS 공유 시트로 보냅니다." aria-label="현재 새 여행 플랜 입력 초안 비밀값 제외 공유" aria-describedby="newPlanDraftPrivacyHint newPlanDraftStatus">초안 공유</button>
+            <button id="newPlanDraftImportButton" type="button" class="secondary" title="복사해 둔 새 여행 플랜 초안 텍스트를 클립보드에서 먼저 읽고, 막히면 수동 붙여넣기 prompt로 현재 폼에 적용합니다. 비밀값은 가져오지 않습니다." aria-label="복사한 새 여행 플랜 초안 클립보드 우선 비밀값 제외 붙여넣기" aria-describedby="newPlanDraftPrivacyHint newPlanDraftStatus">초안 붙여넣기</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="card">
+        <h2>저장된 플랜</h2>
+        <p class="hint">고정한 플랜은 목록에서 표시됩니다. `고도화 후보`는 품질 확인 또는 미점검 플랜을 우선순위 순서로 모으고, `긴급 후보`는 우선도 80 이상 플랜만 모읍니다. `품질 확인`은 보강할 항목이 남은 플랜을 확인 항목이 많은 순으로, `품질 미점검`은 자동 품질 점검이 아직 없는 플랜을 보여주고, `품질 악화`와 `품질 개선`은 직전 버전 대비 확인 항목이 늘거나 줄어든 플랜을 보여줍니다. 고도화 후보에서는 단건 TODO와 상위 후보 3/5/10개 TODO를 복사할 수 있습니다. 상세 화면에서 고정하거나 해제할 수 있습니다.</p>
+        <p class="hint">빠른 품질 필터:
+          <button type="button" class="secondary inline-action" data-status-filter-shortcut="quality-action">고도화 후보</button>
+          <button type="button" class="secondary inline-action" data-status-filter-shortcut="quality-urgent">긴급 후보</button>
+          <button type="button" class="secondary inline-action" data-status-filter-shortcut="quality">품질 확인</button>
+          <button type="button" class="secondary inline-action" data-status-filter-shortcut="quality-ok">품질 OK</button>
+          <button type="button" class="secondary inline-action" data-status-filter-shortcut="quality-unaudited">품질 미점검</button>
+          <button type="button" class="secondary inline-action" data-status-filter-shortcut="quality-regression">품질 악화</button>
+          <button type="button" class="secondary inline-action" data-status-filter-shortcut="quality-improved">품질 개선</button>
+        </p>
+        <div id="qualitySummary" class="quality-summary" aria-live="polite">
+          <span>품질 요약을 불러오는 중입니다.</span>
+        </div>
+        <div id="tripMissionBoard" class="mission-board" aria-live="polite">
+          <span>여행 미션 보드를 불러오는 중입니다.</span>
+        </div>
+        <form id="searchForm" class="search-row">
+          <input id="searchInput" name="q" type="search" placeholder="목적지, 동행, 메모로 검색" autocomplete="off" autocapitalize="none" enterkeyhint="search" />
+          <select id="statusFilter" name="filter">
+            <option value="all">전체</option>
+            <option value="pinned">고정</option>
+            <option value="quality-action">고도화 후보</option>
+            <option value="quality-urgent">긴급 후보</option>
+            <option value="quality">품질 확인</option>
+            <option value="quality-ok">품질 OK</option>
+            <option value="quality-unaudited">품질 미점검</option>
+            <option value="quality-regression">품질 악화</option>
+            <option value="quality-improved">품질 개선</option>
+            <option value="upcoming">예정</option>
+            <option value="active">여행 중</option>
+            <option value="completed">완료</option>
+          </select>
+          <button id="planFormSubmitButton" type="submit" title="입력한 조건으로 새 여행 플랜을 만듭니다." aria-label="새 여행 플랜 만들기">플랜 만들기</button>
+          <button id="clearSearchButton" type="button" class="secondary">전체</button>
+          <button id="backupButton" type="button" class="secondary">백업 다운로드</button>
+        </form>
+        <ul id="planList"></ul>
+      </section>
+    </main>
+    <script src="/auth.js"></script>
+    <script src="/app.js"></script>
+    <script src="/pwa.js"></script>
+  </body>
+</html>

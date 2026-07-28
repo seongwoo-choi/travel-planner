@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://travel-planner.local/schemas/ios-install-handoff-check.schema.json",
+  "title": "Travel Planner iOS install handoff check result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "ok",
+    "status",
+    "inputPath",
+    "proofSaveHash",
+    "proofSaveTargetId",
+    "proofSaveUrl",
+    "postInstallAppHomeUrl",
+    "postInstallNewPlanUrl",
+    "handoffSessionEvidenceCommand",
+    "handoffSessionEvidenceTerminalCommand",
+    "issues"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "ok": {
+      "type": "boolean"
+    },
+    "status": {
+      "enum": ["ready", "blocked", "error"]
+    },
+    "inputPath": {
+      "type": "string"
+    },
+    "proofSaveHash": {
+      "const": "#iosInstallProofSaveButton"
+    },
+    "proofSaveTargetId": {
+      "const": "iosInstallProofSaveButton"
+    },
+    "proofSaveUrl": {
+      "type": "string"
+    },
+    "postInstallAppHomeUrl": {
+      "type": "string"
+    },
+    "postInstallNewPlanUrl": {
+      "type": "string"
+    },
+    "handoffSessionEvidenceCommand": {
+      "const": "npm run ios:install:handoff-session:evidence"
+    },
+    "handoffSessionEvidenceTerminalCommand": {
+      "const": "test -d webapp && cd webapp; npm run ios:install:handoff-session:evidence"
+    },
+    "issues": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

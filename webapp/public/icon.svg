@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Travel Planner">
+  <rect width="512" height="512" rx="112" fill="#0f766e"/>
+  <path d="M106 320 404 116c18-12 39 9 27 27L227 441c-10 15-34 8-34-10v-86h-86c-18 0-25-24-1-25Z" fill="#f8fafc"/>
+  <path d="M192 320 310 202l-55 145c-3 8-15 7-17-2l-10-45-36 20Z" fill="#f59e0b"/>
+</svg>
