@@ -20,11 +20,12 @@ import {
 } from "discord.js";
 import { answerPlanQuestion, generatePlan } from "./llm.js";
 import { configuredIdentityAllowed } from "./discord-access-policy.js";
-import { createGoogleGroundedPlanGenerator } from "./planner/grounded-plan-generator.js";
+import { assertGoogleGroundedPlanReady, createGoogleGroundedPlanGenerator } from "./planner/grounded-plan-generator.js";
 import { renderGroundedTripPlan } from "./planner/grounded-plan-output.js";
 import {
-  checkStoredGroundedPlan,
+  diagnoseStoredGroundedPlan,
   moveStoredGroundedPlace,
+  refreshStoredGroundedPlan,
   replaceStoredGroundedPlace,
   replanStoredGroundedPlan,
 } from "./planner/grounded-plan-actions.js";
@@ -1710,18 +1711,53 @@ async function persistGroundedResult(plan, result, feedback) {
   }, feedback, DB_PATH, { expectedVersion: plan.latestVersion });
 }
 
+export const DISCORD_MESSAGE_LIMIT = 2000;
+
+const DIAGNOSIS_LINES_PER_SECTION = 8;
+
+// A section always reports its full count, so the cap trims what is shown and never what is known.
+function diagnosisSection(title, entries, render) {
+  if (entries.length === 0) return [];
+  const shown = entries.slice(0, DIAGNOSIS_LINES_PER_SECTION).map(render);
+  const dropped = entries.length - shown.length;
+  return [title, ...shown, ...(dropped > 0 ? [`- 외 ${dropped}건`] : [])];
+}
+
+function evidenceIssueLine(issue) {
+  const subject = [issue.subject, issue.direction, issue.placeId].filter(Boolean).join(" ");
+  const detail = issue.message
+    || [subject, issue.status, issue.expiresAt].filter(Boolean).join(" · ")
+    || subject;
+  return `- [${issue.code}] ${detail}${issue.refreshAfter ? ` · 재조회 가능: ${issue.refreshAfter}` : ""}`;
+}
+
+// The stored plan is settled only when the hard constraints, the evidence and the saved readiness
+// all say so, so a clean conflict check is never reported on its own: "충돌 없음" beside stale or
+// unverified evidence reads as a plan that is done when it is still waiting on a provider.
+export function formatStoredPlanDiagnosis(planId, diagnosis) {
+  const lines = [
+    `플랜 #${planId} 점검`,
+    diagnosis.hardConstraintsOk ? "하드 제약: 충돌 없음" : `하드 제약: ${diagnosis.hardIssues.length}건`,
+    ...diagnosisSection("", diagnosis.hardConstraintsOk ? [] : diagnosis.hardIssues, (issue) =>
+      `- [${issue.code}] ${issue.date || "날짜 미상"} ${issue.activityId || ""}`.trim()
+    ).filter(Boolean),
+    diagnosis.ready ? "근거·준비: 준비 완료" : `근거·준비: 확인 필요: ${diagnosis.evidenceIssues.length}건`,
+    ...diagnosisSection("", diagnosis.evidenceIssues, evidenceIssueLine).filter(Boolean),
+    ...diagnosisSection("만료된 근거", diagnosis.staleSources, (stale) =>
+      `- ${stale.subject} · ${stale.source} · ${stale.expiresAt}`
+    ),
+  ];
+  const text = lines.join("\n");
+  return text.length <= DISCORD_MESSAGE_LIMIT ? text : `${text.slice(0, DISCORD_MESSAGE_LIMIT - 1)}…`;
+}
+
 async function handleGroundedCheck(interaction) {
   await interaction.deferReply({ ephemeral: true });
   const planId = interaction.options.getInteger("plan_id", true);
   const plan = await loadOwnedGroundedPlan(interaction, planId);
   if (!plan) return;
-  const validation = checkStoredGroundedPlan(plan);
-  const issueLines = validation.issues.slice(0, 10).map((issue) =>
-    `- [${issue.code}] ${issue.date || "날짜 미상"} ${issue.activityId || ""}`.trim()
-  );
-  await interaction.editReply(validation.ok
-    ? `플랜 #${planId}: 저장된 근거 기준 충돌이 없습니다.`
-    : `플랜 #${planId}: ${validation.issues.length}건의 충돌이 있습니다.\n${issueLines.join("\n")}`);
+  const diagnosis = diagnoseStoredGroundedPlan(plan);
+  await interaction.editReply(formatStoredPlanDiagnosis(planId, diagnosis));
 }
 
 async function handleGroundedReplace(interaction) {
@@ -1764,14 +1800,9 @@ async function handleGroundedRefresh(interaction) {
   const plan = await loadOwnedGroundedPlan(interaction, planId);
   if (!plan) return;
   const generation = await createGoogleGroundedPlanGenerator().generate(plan);
-  const refreshedPlan = structuredClone(plan);
-  const revisionIndex = refreshedPlan.revisions.length - 1;
-  refreshedPlan.revisions[revisionIndex] = {
-    ...refreshedPlan.revisions[revisionIndex],
-    groundedPlan: generation.groundedPlan,
-    evidence: generation.evidence,
-  };
-  const result = await replanStoredGroundedPlan(refreshedPlan);
+  // Rejects when a stored constraint cannot be reapplied to the refreshed evidence, so a revision
+  // that dropped what the traveller asked for never reaches persistence.
+  const result = await refreshStoredGroundedPlan(plan, generation);
   const updated = await persistGroundedResult(plan, result, "refresh grounded provider evidence");
   await interaction.editReply(planReply(updated, { notice: "장소·날씨·이동시간 근거를 다시 수집해 재계획했습니다." }));
 }
@@ -6975,8 +7006,9 @@ async function handleInteraction(interaction) {
   }
 }
 
-async function main() {
+export async function main() {
   const token = requiredEnv("DISCORD_BOT_TOKEN");
+  assertGoogleGroundedPlanReady();
   const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
   client.once("ready", async () => {

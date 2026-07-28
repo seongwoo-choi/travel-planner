@@ -117,6 +117,137 @@ test("Distance Matrix collector records the major leg from departure to destinat
   });
 });
 
+test("Distance Matrix collector exposes the outbound major leg and omits the return it never requested", async () => {
+  const trip = {
+    ...TRIP,
+    departure: "Seoul Station",
+    destination: "Busan",
+    destinationLatitude: 35.1796,
+    destinationLongitude: 129.0756,
+  };
+  const { fetchImpl } = stubFetch((url) => {
+    const origins = new URL(url).searchParams.get("origins");
+    return matrixBody(url, { seconds: origins === "Seoul Station" ? 10_800 : 600 });
+  });
+
+  const snapshot = await createGoogleDistanceMatrixCollector({ apiKey: "test-key", fetchImpl }).collect(trip, PLACES);
+
+  assert.deepEqual(snapshot.localTransport, { mode: "transit", status: "verified", confidence: "high" });
+  assert.deepEqual(snapshot.majorTransport.outbound, {
+    direction: "outbound",
+    status: "verified",
+    origin: "Seoul Station",
+    destination: "Busan",
+    mode: "transit",
+    durationMinutes: 180,
+  });
+  assert.equal(
+    snapshot.majorTransport.inbound,
+    undefined,
+    "a return nobody requested is left out, not reported as an unavailable leg"
+  );
+});
+
+test("Distance Matrix collector reports both flight directions without a departure text or destination coordinates", async () => {
+  const trip = { ...TRIP, destination: "", majorTransportMode: "flight", localTravelMode: "driving" };
+  const { fetchImpl, calls } = stubFetch((url) => matrixBody(url));
+
+  const snapshot = await createGoogleDistanceMatrixCollector({
+    apiKey: "test-key",
+    fetchImpl,
+    mode: "driving",
+  }).collect(trip, PLACES);
+
+  assert.equal(calls.length, 1, "the air leg must never become a textual Distance Matrix request");
+  assert.equal(snapshot.majorLeg, undefined, "a flight is not a Distance Matrix leg");
+  for (const direction of ["outbound", "inbound"]) {
+    const segment = snapshot.majorTransport[direction];
+    assert.equal(segment.direction, direction);
+    assert.equal(segment.mode, "flight");
+    assert.equal(segment.status, "unavailable");
+    assert.equal(segment.durationMinutes, undefined);
+    assert.match(segment.reason, /flight schedule/);
+    assert.ok(segment.origin && segment.destination, "a missing endpoint is labelled, never left blank");
+  }
+  assert.notEqual(
+    snapshot.majorTransport.outbound.origin,
+    snapshot.majorTransport.outbound.destination,
+    "two unknown endpoints must not collapse into one label"
+  );
+});
+
+test("Distance Matrix collector redacts the request URL from a major leg failure reason", async () => {
+  const trip = {
+    ...TRIP,
+    departure: "Seoul Station",
+    destination: "Busan",
+    destinationLatitude: 35.1796,
+    destinationLongitude: 129.0756,
+  };
+  const fetchImpl = async (url) => {
+    if (new URL(url).searchParams.get("origins") === "Seoul Station") {
+      throw new Error(`fetch failed for ${url}`);
+    }
+    return { ok: true, status: 200, json: async () => matrixBody(String(url)) };
+  };
+
+  const snapshot = await createGoogleDistanceMatrixCollector({
+    apiKey: "super-secret-key",
+    fetchImpl,
+  }).collect(trip, PLACES);
+
+  assert.equal(snapshot.majorLeg.status, "unavailable");
+  assert.match(snapshot.majorLeg.reason, /fetch failed/);
+  assert.ok(!snapshot.majorLeg.reason.includes("super-secret-key"), "the API key must never be persisted in a reason");
+  assert.ok(!snapshot.majorLeg.reason.includes("?"), "the whole query string is dropped, not just the key");
+});
+
+test("Distance Matrix collector never routes a flight and never asks for a local transit matrix", async () => {
+  const trip = {
+    ...TRIP,
+    departure: "서울",
+    destination: "후쿠오카",
+    destinationLatitude: 33.5902,
+    destinationLongitude: 130.4017,
+    transportPref: "flight",
+    majorTransportMode: "flight",
+    localTravelMode: "driving",
+  };
+  const { fetchImpl, calls } = stubFetch((url) => matrixBody(url));
+
+  const snapshot = await createGoogleDistanceMatrixCollector({
+    apiKey: "test-key",
+    fetchImpl,
+    mode: "driving",
+  }).collect(trip, PLACES);
+
+  assert.equal(calls.length, 1, "only the local matrix may be requested for a flight trip");
+  for (const call of calls) {
+    const params = new URL(call.url).searchParams;
+    assert.equal(params.get("mode"), "driving");
+    assert.ok(!params.get("origins").includes("서울"), "the textual origin must never be routed");
+  }
+  assert.deepEqual(snapshot.localTransport, { mode: "driving", status: "verified", confidence: "high" });
+  assert.equal(snapshot.majorLeg, undefined, "a flight is not a Distance Matrix leg");
+  for (const direction of ["outbound", "inbound"]) {
+    const segment = snapshot.majorTransport[direction];
+    assert.equal(segment.direction, direction);
+    assert.equal(segment.mode, "flight");
+    assert.equal(segment.status, "unavailable");
+    assert.equal(segment.durationMinutes, undefined, "an unverified flight has no duration");
+    assert.match(segment.reason, /flight schedule/);
+    assert.match(segment.reason, /not configured/);
+  }
+  assert.deepEqual(
+    [snapshot.majorTransport.outbound.origin, snapshot.majorTransport.outbound.destination],
+    ["서울", "후쿠오카"]
+  );
+  assert.deepEqual(
+    [snapshot.majorTransport.inbound.origin, snapshot.majorTransport.inbound.destination],
+    ["후쿠오카", "서울"]
+  );
+});
+
 test("Distance Matrix collector splits large location sets into bounded requests", async () => {
   const places = Array.from({ length: 19 }, (_, index) => ({
     id: `place-${index}`,

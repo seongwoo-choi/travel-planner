@@ -8,6 +8,8 @@
     "dev": "node server.js",
     "start": "node server.js",
     "test": "node --test test/*.test.js",
+    "bench:planner": "node test/planner-benchmark.js",
+    "dogfood:phu-quoc": "node test/phu-quoc-dogfood.js",
     "storage:migrate:sqlite": "node src/migrate-plans-to-sqlite.js",
     "health:metadata": "node src/health-metadata-check.js",
     "health:api": "node src/health-api-check.js",

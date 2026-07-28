@@ -15,6 +15,10 @@
   - Open-Meteo 날씨, Google Places 영업시간, Google Distance Matrix 이동시간만 일정 근거로 사용
   - `GOOGLE_MAPS_API_KEY`와 Geocoding API, Places API (New), Distance Matrix API 활성화 필요
   - 당일치기부터 30박 31일까지 지원하며, 영업시간·이동시간·날씨·필수 장소 제약을 검증한 뒤 원본 `TripPlan`과 evidence를 함께 저장
+  - 검증된 영업시간 장소만 배치하고, zone/category별 후보·유형별 체류시간·선호 시간대·식사/휴식 break를 deterministic planner가 적용
+  - 항공 등 주요 교통과 현지 이동을 분리하며, 미확인 항공편·예보 범위 밖 날씨·stale evidence는 `/check`와 확인 작업에 명시
+  - `/replace`, `/move`, `/replan`, `/refresh`는 저장된 사용자 제약을 재적용하며, 갱신 근거에서 제약을 충족할 수 없으면 revision 저장 전에 거부
+  - planner search는 50개 후보·31일 범위에서 bounded approximate search로 동작하며 diagnostics에 beam 한계를 공개
   - grounded revision의 근거를 잃는 LLM 자유형 고도화는 차단하며, 변경 조건을 반영한 신규 `/plan` 또는 `/quick` 생성을 안내
 - 오케스트레이션 기준: `.claude/skills/travel-orchestrator/SKILL.md`
   - 요구사항 수집, 날씨/교통/현지 정보 체크, 일정 최적화, 예약 준비, 품질 점검, 보고서 형식 반영
@@ -27,6 +31,14 @@ npm run storage:migrate:sqlite
 ```
 
 성공 후 `TRAVEL_DB_PATH=data/plans.sqlite`를 설정합니다. 설정하지 않아도 `data/plans.sqlite`가 존재하면 서버와 Discord 봇이 SQLite를 우선 사용합니다.
+
+grounded planner의 bounded benchmark와 오프라인 푸꾸옥 fixture dogfood는 다음처럼 실행합니다. dogfood 결과는 live Google/Open-Meteo 검증이 아닙니다.
+
+```bash
+cd webapp
+npm run bench:planner
+npm run dogfood:phu-quoc
+```
 
 - 핵심 API
   - `GET /api/plans`

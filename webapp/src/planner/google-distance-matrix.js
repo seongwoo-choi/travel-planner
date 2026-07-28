@@ -20,6 +20,26 @@ function locationId(value, fieldName) {
   return id;
 }
 
+// An airline leg has no route in this integration: nothing here reads a schedule or an airport, so
+// the only honest evidence is that there is none. It must never be inferred from the user's text.
+const FLIGHT_EVIDENCE_MISSING =
+  "verified flight schedule and airport evidence is not configured, so the air leg cannot be grounded";
+// An air leg is reported even when the trip carries no departure text: dropping it would read as
+// "no major transport needed". The endpoint is labelled as missing rather than guessed.
+const UNKNOWN_ORIGIN = "unspecified departure";
+const UNKNOWN_DESTINATION = "unspecified destination";
+
+function unavailableSegment(direction, mode, origin, destination, reason) {
+  return { direction, status: "unavailable", origin, destination, mode, reason };
+}
+
+// A failure message may carry the request that produced it, and that request carries the API key.
+// The path is enough to identify the call, so the whole query string is dropped before the reason
+// is persisted or rendered.
+function redactUrls(message) {
+  return String(message).replace(/https?:\/\/\S+/g, (url) => url.split("?")[0]);
+}
+
 function chunk(items, size) {
   const chunks = [];
   for (let index = 0; index < items.length; index += size) chunks.push(items.slice(index, index + size));
@@ -168,13 +188,24 @@ export function createGoogleDistanceMatrixCollector({
           });
       }
       let majorLeg;
+      let majorTransport;
       const origin = String(trip?.departure || "").trim();
       const destination = String(trip?.destination || "").trim();
-      if (origin && destination && trip?.destinationLatitude !== undefined && trip?.destinationLongitude !== undefined) {
+      // The major leg is its own question: `mode` only ever described the local matrix, so a flight
+      // trip must not inherit it, and a road router must never be handed an airline leg.
+      const majorMode = trip?.majorTransportMode || (trip?.transportPref === "flight" ? "flight" : mode);
+      if (majorMode === "flight") {
+        // Nothing here routes an airline, so the air leg needs neither a departure text nor
+        // destination coordinates to be reported: both directions are simply ungrounded.
+        const from = origin || UNKNOWN_ORIGIN;
+        const to = destination || UNKNOWN_DESTINATION;
+        majorTransport = {
+          outbound: unavailableSegment("outbound", "flight", from, to, FLIGHT_EVIDENCE_MISSING),
+          inbound: unavailableSegment("inbound", "flight", to, from, FLIGHT_EVIDENCE_MISSING),
+        };
+      } else if (origin && destination && trip?.destinationLatitude !== undefined && trip?.destinationLongitude !== undefined) {
         if (origin.includes("|")) {
-          majorLeg = { status: "unavailable", origin, destination, mode, reason: "departure must not contain |" };
-        } else if (trip.transportPref === "flight") {
-          majorLeg = { status: "unavailable", origin, destination, mode: "flight", reason: "air travel is not supported by Distance Matrix" };
+          majorLeg = { status: "unavailable", origin, destination, mode: majorMode, reason: "departure must not contain |" };
         } else {
           const majorUrl = new URL(endpoint);
           majorUrl.searchParams.set("origins", origin);
@@ -182,7 +213,7 @@ export function createGoogleDistanceMatrixCollector({
             "destinations",
             `${finiteCoordinate(trip.destinationLatitude, "trip.destinationLatitude", 90)},${finiteCoordinate(trip.destinationLongitude, "trip.destinationLongitude", 180)}`
           );
-          majorUrl.searchParams.set("mode", mode);
+          majorUrl.searchParams.set("mode", majorMode);
           majorUrl.searchParams.set("language", language);
           majorUrl.searchParams.set("departure_time", String(departureTime));
           majorUrl.searchParams.set("key", key);
@@ -195,11 +226,20 @@ export function createGoogleDistanceMatrixCollector({
             if (body?.status !== "OK" || element?.status !== "OK" || !Number.isFinite(seconds) || seconds < 0) {
               throw new Error(`route unavailable: ${element?.status || body?.status || "unknown"}`);
             }
-            majorLeg = { status: "verified", origin, destination, mode, durationMinutes: Math.round(seconds / 60) };
+            majorLeg = { status: "verified", origin, destination, mode: majorMode, durationMinutes: Math.round(seconds / 60) };
           } catch (error) {
-            majorLeg = { status: "unavailable", origin, destination, mode, reason: String(error?.message || error) };
+            majorLeg = {
+              status: "unavailable",
+              origin,
+              destination,
+              mode: majorMode,
+              reason: redactUrls(error?.message || error),
+            };
           }
         }
+        // Only the outbound moment is modelled. The return was never requested, so it is left out
+        // entirely rather than reported as an unavailable leg nobody asked for.
+        majorTransport = { outbound: { direction: "outbound", ...majorLeg } };
       }
       const fetchedAt = now();
 
@@ -212,7 +252,9 @@ export function createGoogleDistanceMatrixCollector({
         confidence: "high",
         mode,
         matrix,
+        localTransport: { mode, status: "verified", confidence: "high" },
         majorLeg,
+        majorTransport,
       };
     },
   };
