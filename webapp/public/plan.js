@@ -14,197 +14,6 @@ function escapeText(value) {
   });
 }
 
-const PLAN_DETAIL_SNAPSHOT_PREFIX = "travel-planner:plan-detail-snapshot:v1:";
-const IOS_HOME_DOCK_LAST_ROUTE_STORAGE = "travelPlannerIosHomeDockLastRoute:v1";
-
-function planDetailSnapshotKey(id = planId) {
-  return `${PLAN_DETAIL_SNAPSHOT_PREFIX}${encodeURIComponent(String(id || ""))}`;
-}
-
-function parsePlanDetailSnapshot(value) {
-  if (!value) return null;
-  try {
-    const snapshot = JSON.parse(value);
-    if (snapshot?.schemaVersion !== 1 || !snapshot.plan || typeof snapshot.plan !== "object") return null;
-    return snapshot;
-  } catch {
-    return null;
-  }
-}
-
-function readPlanDetailSnapshot(id = planId) {
-  try {
-    return parsePlanDetailSnapshot(localStorage.getItem(planDetailSnapshotKey(id)));
-  } catch {
-    return null;
-  }
-}
-
-function writePlanDetailSnapshot(plan) {
-  if (!plan || typeof plan !== "object") return;
-  const id = plan.id || planId;
-  const snapshot = {
-    schemaVersion: 1,
-    savedAt: new Date().toISOString(),
-    plan,
-  };
-  try {
-    localStorage.setItem(planDetailSnapshotKey(id), JSON.stringify(snapshot));
-    return snapshot;
-  } catch {
-    // Best-effort iOS Home Screen cache. Quota/private-mode failures should not block live use.
-  }
-}
-
-function markIosFirstRunChecklistItem(itemId) {
-  try {
-    const key = "travelPlannerIosFirstRunChecklist:v1";
-    const state = JSON.parse(window.localStorage.getItem(key) || "{}");
-    state[itemId] = true;
-    state.updatedAt = new Date().toISOString();
-    window.localStorage.setItem(key, JSON.stringify(state));
-  } catch {
-    // Best-effort iPhone first-run progress.
-  }
-}
-
-function isPlanDetailStandaloneDisplay() {
-  return window.matchMedia?.("(display-mode: standalone)")?.matches || navigator.standalone === true;
-}
-
-function isPlanDetailIosDevice() {
-  return /iphone|ipad|ipod/i.test(navigator.userAgent || "");
-}
-
-function writePlanDetailLastRoute(plan) {
-  if (!isPlanDetailStandaloneDisplay() || !plan || typeof plan !== "object") return;
-  const id = plan.id || planId;
-  const path = "/plans/" + encodeURIComponent(String(id || ""));
-  const href = path + (window.location.search || "") + (window.location.hash || "");
-  const route = {
-    schemaVersion: 1,
-    href,
-    pathname: path,
-    hash: window.location.hash || "",
-    label: (plan.destination || "여행") + " 상세 이어가기",
-    reason: "plan-detail-render",
-    updatedAt: new Date().toISOString(),
-  };
-  try {
-    window.localStorage.setItem(IOS_HOME_DOCK_LAST_ROUTE_STORAGE, JSON.stringify(route));
-  } catch {
-    // Best-effort Home Screen resume pointer; never block detail rendering.
-  }
-}
-
-function updatePlanInstallModeCallout() {
-  const callout = document.getElementById("planInstallModeCallout");
-  if (!callout) return;
-  const title = callout.querySelector("strong");
-  const detail = callout.querySelector("span");
-  const snapshot = readPlanDetailSnapshot(planId);
-  const snapshotSuffix = snapshot?.savedAt ? ` 최근 상세 snapshot 저장: ${new Date(snapshot.savedAt).toLocaleString("ko-KR", {
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    month: "short",
-  })}.` : "";
-  if (isPlanDetailStandaloneDisplay()) {
-    callout.dataset.state = "standalone";
-    if (title) title.textContent = "홈 화면 앱 상세 보기";
-    if (detail) detail.textContent = `Travel 아이콘으로 열린 상세 화면입니다. 이 플랜은 최근 상세 snapshot으로 저장되어 연결이 불안정할 때 읽기 전용으로 다시 볼 수 있습니다.${snapshotSuffix}`;
-    return;
-  }
-  if (isPlanDetailIosDevice()) {
-    callout.dataset.state = "safari";
-    if (title) title.textContent = "Safari 상세 보기";
-    if (detail) detail.textContent = `공유 버튼 > 홈 화면에 추가로 설치하면 이 상세 화면도 주소창 없이 열리고 최근 상세 snapshot을 오프라인 읽기에 활용합니다.${snapshotSuffix}`;
-    return;
-  }
-  callout.dataset.state = "browser";
-  if (title) title.textContent = "브라우저 상세 보기";
-  if (detail) detail.textContent = `iPhone 홈 화면 앱으로 설치하면 이 플랜 상세도 앱처럼 열리고 최근 상세 snapshot을 오프라인 읽기에 활용합니다.${snapshotSuffix}`;
-}
-
-function renderPlanDetailSnapshotNotice(snapshot) {
-  const existing = document.getElementById("offlinePlanDetailSnapshotNotice");
-  if (!snapshot) {
-    existing?.remove();
-    return;
-  }
-  const notice = existing || document.createElement("p");
-  notice.id = "offlinePlanDetailSnapshotNotice";
-  notice.className = "offline-snapshot-notice";
-  notice.setAttribute("role", "status");
-  notice.setAttribute("aria-live", "polite");
-  const plan = snapshot.plan || {};
-  const savedAt = snapshot.savedAt
-    ? new Date(snapshot.savedAt).toLocaleString("ko-KR", {
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      month: "short",
-    })
-    : "최근";
-  notice.textContent = `오프라인 상세 snapshot 표시 중: ${plan.destination || "목적지 미정"} · v${plan.latestVersion || 1} · ${savedAt} 저장. 서버 연결 전까지 읽기 전용입니다.`;
-  const tripStatus = document.getElementById("tripStatus");
-  if (!existing && tripStatus?.parentNode) {
-    tripStatus.parentNode.insertBefore(notice, tripStatus.nextSibling);
-  }
-}
-
-function renderPlanDetailMissingSnapshotNotice() {
-  const existing = document.getElementById("offlinePlanDetailMissingSnapshotNotice");
-  const notice = existing || document.createElement("div");
-  notice.id = "offlinePlanDetailMissingSnapshotNotice";
-  notice.className = "offline-snapshot-missing-notice";
-  notice.setAttribute("role", "status");
-  notice.setAttribute("aria-live", "polite");
-  notice.dataset.planId = String(planId || "");
-  notice.innerHTML = "";
-  const title = document.createElement("strong");
-  title.textContent = "저장된 상세 snapshot이 없습니다.";
-  const detail = document.createElement("p");
-  detail.textContent = "서버 연결이 돌아오면 홈에서 이 플랜을 다시 열어 상세 snapshot을 저장하세요. iPhone 홈 화면 앱에서는 한 번 열린 상세만 오프라인으로 다시 볼 수 있습니다.";
-  const actions = document.createElement("div");
-  actions.className = "offline-snapshot-missing-actions";
-  const homeLink = document.createElement("a");
-  homeLink.className = "install-link";
-  homeLink.href = "/#planList";
-  homeLink.textContent = "홈에서 플랜 다시 열기";
-  homeLink.title = "연결 후 홈 화면의 플랜 목록에서 상세 snapshot을 다시 저장합니다.";
-  const installLink = document.createElement("a");
-  installLink.className = "install-link";
-  installLink.href = "/install.html#iosInstallFastPathTitle";
-  installLink.textContent = "1분 설치 루트";
-  installLink.title = "iPhone 설치 루트와 오프라인 읽기 준비 순서를 다시 확인합니다.";
-  actions.append(homeLink, installLink);
-  notice.append(title, detail, actions);
-  const tripStatus = document.getElementById("tripStatus");
-  if (!existing && tripStatus?.parentNode) {
-    tripStatus.parentNode.insertBefore(notice, tripStatus.nextSibling);
-  }
-}
-
-function setPlanDetailReadOnlySnapshotMode(enabled) {
-  document.body.toggleAttribute("data-offline-readonly", enabled);
-  document.querySelectorAll("button, input, textarea, select").forEach((control) => {
-    if (enabled) {
-      if (!control.dataset.offlineSnapshotPrevDisabled) {
-        control.dataset.offlineSnapshotPrevDisabled = control.disabled ? "true" : "false";
-      }
-      control.disabled = true;
-      control.setAttribute("aria-disabled", "true");
-      return;
-    }
-    if (control.dataset.offlineSnapshotPrevDisabled) {
-      control.disabled = control.dataset.offlineSnapshotPrevDisabled === "true";
-      delete control.dataset.offlineSnapshotPrevDisabled;
-    }
-    control.removeAttribute("aria-disabled");
-  });
-}
-
 function toLocalDate(value) {
   const date = value ? new Date(`${value}T00:00:00`) : new Date();
   return new Date(date.getFullYear(), date.getMonth(), date.getDate());
@@ -2257,7 +2066,6 @@ function renderQualityAuditSummary(anchor, planText) {
 
 function renderPlan(plan) {
   currentPlan = plan;
-  writePlanDetailLastRoute(plan);
   const title = document.getElementById("title");
   const meta = document.getElementById("meta");
   const period = document.getElementById("period");
@@ -2345,35 +2153,20 @@ async function loadPlan() {
     const res = await api(`/api/plans/${planId}`);
     if (!res.ok) throw new Error(`plan request failed: ${res.status}`);
     const plan = await parseJsonSafe(res);
-    writePlanDetailSnapshot(plan);
     renderPlan(plan);
-    updatePlanInstallModeCallout();
-    renderPlanDetailSnapshotNotice(null);
-    setPlanDetailReadOnlySnapshotMode(false);
   } catch {
-    const snapshot = readPlanDetailSnapshot(planId);
-    if (!snapshot) {
-      const title = document.getElementById("title");
-      const meta = document.getElementById("meta");
-      const period = document.getElementById("period");
-      const tripStatus = document.getElementById("tripStatus");
-      const planText = document.getElementById("planText");
-      const runway = document.getElementById("tripActionRunway");
-      if (title) title.textContent = "오프라인 상세 snapshot 없음";
-      if (meta) meta.textContent = `플랜 #${planId || "알 수 없음"} · 서버 연결 또는 저장된 snapshot이 필요합니다.`;
-      if (period) period.textContent = "연결 후 홈에서 플랜을 다시 열어주세요.";
-      if (tripStatus) tripStatus.innerHTML = '<span class="badge">오프라인</span> 상세 snapshot 없음';
-      if (planText) planText.textContent = "이 iPhone에 저장된 상세 snapshot이 아직 없습니다. 네트워크 연결 후 홈의 플랜 목록에서 이 상세 화면을 한 번 열면 다음부터 오프라인 읽기가 가능합니다.";
-      if (runway) runway.textContent = "연결 후 홈에서 플랜을 다시 열어 상세 snapshot을 저장하세요.";
-      renderPlanDetailMissingSnapshotNotice();
-      setPlanDetailReadOnlySnapshotMode(true);
-      updatePlanInstallModeCallout();
-      return;
-    }
-    renderPlan(snapshot.plan);
-    renderPlanDetailSnapshotNotice(snapshot);
-    setPlanDetailReadOnlySnapshotMode(true);
-    markIosFirstRunChecklistItem("offline-read");
+    const title = document.getElementById("title");
+    const meta = document.getElementById("meta");
+    const period = document.getElementById("period");
+    const tripStatus = document.getElementById("tripStatus");
+    const planText = document.getElementById("planText");
+    const runway = document.getElementById("tripActionRunway");
+    if (title) title.textContent = "플랜을 불러오지 못했습니다.";
+    if (meta) meta.textContent = `플랜 #${planId || "알 수 없음"}`;
+    if (period) period.textContent = "서버 연결을 확인한 뒤 다시 시도하세요.";
+    if (tripStatus) tripStatus.textContent = "플랜 정보를 불러오지 못했습니다.";
+    if (planText) planText.textContent = "잠시 후 페이지를 새로고침해 다시 시도하세요.";
+    if (runway) runway.textContent = "플랜을 불러온 뒤 다음 액션을 안내합니다.";
   }
 }
 
@@ -2381,19 +2174,6 @@ async function loadStatus() {
   const res = await api("/api/status");
   if (!res.ok) return;
   let status = await parseJsonSafe(res);
-  if (status.accessKeyRequired && typeof getAccessKey === "function" && getAccessKey() && typeof optionalApi === "function") {
-    const operatorRes = await optionalApi("/api/operator-status");
-    if (operatorRes?.ok) {
-      status = { ...status, ...(await parseJsonSafe(operatorRes)) };
-    } else if (operatorRes?.status === 429) {
-      const retryAfter = Number(operatorRes.headers.get("Retry-After") || "");
-      status = {
-        ...status,
-        operatorDetailsState: "rate-limited",
-        operatorRetryAfterSeconds: retryAfter > 0 ? Math.ceil(retryAfter) : 0,
-      };
-    }
-  }
   window.travelPlannerStatus = status;
   scheduleOperatorStatusRetry(status);
   const providerSelect = document.querySelector('select[name="llmProvider"][form="refineForm"]');
@@ -2416,7 +2196,6 @@ window.addEventListener("travel-llm-api-key-inputs-cleared", () => {
 });
 
 document.addEventListener("DOMContentLoaded", () => {
-  updatePlanInstallModeCallout();
   loadPlan();
   loadStatus();
   const refineForm = document.getElementById("refineForm");

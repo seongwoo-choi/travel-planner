@@ -279,10 +279,10 @@ export function buildOfflinePackMarkdown(plan, { exportedAt = new Date().toISOSt
   const offlineNightsLabel = Number.isFinite(offlineNights) ? `${offlineNights}박` : "미정";
   return [
     `# 여행 오프라인팩 - ${plan.destination || `플랜 #${plan.id}`}`,
-    "iPhone 파일/노트에 저장해두고 Discord나 웹 상세 화면이 느릴 때 꺼내보는 핵심 요약입니다.",
+    "기기 파일/노트에 저장해두고 Discord나 웹 상세 화면이 느릴 때 꺼내보는 핵심 요약입니다.",
     "## 먼저 이렇게 저장하세요",
     [
-      "- 여행 전: 이 파일을 iPhone 파일 앱이나 메모 앱에 저장",
+      "- 여행 전: 이 파일을 파일 앱이나 메모 앱에 저장",
       "- 이동 중: Discord가 느릴 때 `지금 볼 것`과 `다음 액션`부터 확인",
       "- 비상 시: `비상 카드`와 `지도 링크`를 먼저 확인",
     ].join("\n"),

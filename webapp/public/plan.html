@@ -7,48 +7,23 @@
     <meta name="color-scheme" content="light" />
     <meta name="application-name" content="Travel Planner" />
     <meta name="format-detection" content="telephone=no" />
-    <meta name="description" content="Travel Planner 플랜 상세 화면에서 여행 일정, 체크리스트, 오프라인 snapshot을 iPhone 홈 화면 앱처럼 확인합니다." />
+    <meta name="description" content="Travel Planner에서 여행 일정과 체크리스트를 확인합니다." />
     <meta property="og:site_name" content="Travel Planner" />
     <meta property="og:title" content="Travel Planner 플랜 상세" />
-    <meta property="og:description" content="iPhone 홈 화면 Travel 앱에서 여행 일정과 체크리스트를 확인하고 오프라인 snapshot으로 다시 엽니다." />
+    <meta property="og:description" content="여행 일정과 체크리스트를 확인합니다." />
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="ko_KR" />
-    <meta property="og:image" content="/icon-512.png" />
-    <meta property="og:image:type" content="image/png" />
-    <meta property="og:image:width" content="512" />
-    <meta property="og:image:height" content="512" />
-    <meta property="og:image:alt" content="Travel Planner iPhone 홈 화면 앱 아이콘" />
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:title" content="Travel Planner 플랜 상세" />
-    <meta name="twitter:description" content="iPhone 홈 화면 Travel 앱에서 여행 일정과 체크리스트를 확인하고 오프라인 snapshot으로 다시 엽니다." />
-    <meta name="twitter:image" content="/icon-512.png" />
-    <meta name="twitter:image:alt" content="Travel Planner iPhone 홈 화면 앱 아이콘" />
-    <meta name="mobile-web-app-capable" content="yes" />
-    <!-- iOS Home Screen metadata: https://developer.apple.com/library/archive/documentation/AppleApplications/Reference/SafariWebContent/ConfiguringWebApplications/ConfiguringWebApplications.html -->
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-title" content="Travel" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-    <meta name="format-detection" content="telephone=no" />
+    <meta name="twitter:description" content="여행 일정과 체크리스트를 확인합니다." />
     <title>여행 플랜 상세</title>
-    <link rel="manifest" href="/manifest.webmanifest" />
     <link rel="icon" href="/icon.svg" type="image/svg+xml" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="stylesheet" href="/style.css" />
   </head>
   <body>
     <main class="container">
       <a href="/" class="back-link">← 새 플랜 만들기</a>
-      <section id="planInstallModeCallout" class="install-mode-callout" data-state="browser" aria-live="polite">
-        <strong>iPhone 실행 모드 확인 중</strong>
-        <span>홈 화면 앱으로 열면 이 상세 화면도 Safari 주소창 없이 열리고 최근 상세 snapshot을 오프라인 읽기에 활용합니다.</span>
-        <div class="install-mode-callout-links">
-          <a class="install-link" href="/#iosHomeDock">iPhone 빠른 실행</a>
-          <a class="install-link" href="/install.html#iosInstallFastPathTitle" title="iPhone 1분 설치 루트로 돌아갑니다." aria-label="iPhone 1분 설치 루트 열기">1분 설치</a>
-          <a class="install-link" href="/api/ios-install-quickstart.txt" title="iPhone 설치 quickstart 텍스트를 엽니다." aria-label="iPhone 설치 quickstart 텍스트 열기">Quickstart TXT</a>
-          <a class="install-link" href="/api/ios-install-quickstart" title="iPhone 설치 quickstart JSON을 엽니다." aria-label="iPhone 설치 quickstart JSON 열기">Quickstart JSON</a>
-        </div>
-      </section>
+
       <section class="card">
         <h1 id="title"></h1>
         <p id="meta"></p>
@@ -629,6 +604,5 @@
     </main>
     <script src="/auth.js"></script>
     <script src="/plan.js"></script>
-    <script src="/pwa.js"></script>
   </body>
 </html>

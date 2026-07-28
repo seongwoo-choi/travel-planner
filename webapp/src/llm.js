@@ -319,7 +319,8 @@ async function callClaudeCompatible(prompt, options = {}) {
 export async function generatePlan(payload, previousPlan = null, feedback = null, llmOptions = {}) {
   const orchestratorGuide = await loadOrchestratorSkill();
   const prompt = buildPrompt(payload, previousPlan, feedback, orchestratorGuide);
-  const provider = (llmOptions.provider || process.env.LLM_PROVIDER || "auto").toLowerCase();
+  const options = llmOptions || {};
+  const provider = (options.provider || process.env.LLM_PROVIDER || "auto").toLowerCase();
   if (provider === "mock") {
     return { model: "mock-template", prompt, plan: appendPlanQualityAudit(payload, fallbackPlan(payload, feedback)) };
   }
@@ -327,10 +328,10 @@ export async function generatePlan(payload, previousPlan = null, feedback = null
   try {
     const result =
       provider === "claude" || provider === "anthropic"
-        ? await callClaudeCompatible(prompt, llmOptions)
+        ? await callClaudeCompatible(prompt, options)
         : provider === "auto" || provider === "codex" || provider === "openai"
-        ? await callOpenAiCompatible(prompt, llmOptions)
-        : await callOpenAiCompatible(prompt, llmOptions);
+        ? await callOpenAiCompatible(prompt, options)
+        : await callOpenAiCompatible(prompt, options);
     return { model: result.model, prompt, plan: appendPlanQualityAudit(payload, result.plan) };
   } catch (err) {
     return { model: "mock-template", prompt, plan: appendPlanQualityAudit(payload, fallbackPlan(payload, feedback)), error: err.message };

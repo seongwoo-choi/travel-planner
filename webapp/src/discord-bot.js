@@ -43,7 +43,6 @@ import { buildPackingList } from "./packing.js";
 import { buildReadinessActionPlan, buildReadinessReport, buildReadinessShareText } from "./readiness.js";
 import { buildTripRecap } from "./recap.js";
 import { buildExpenseCsv, buildExpenseLedger, buildSettlementBriefing, buildSettlementMatrix, buildSettlementMessage, buildSettlementTransfers } from "./settlement.js";
-import { buildQualityGateMatrix } from "./quality-todo-core.js";
 import { buildDeparturePackMarkdown, buildFileGuideMarkdown, buildFullPackMarkdown, buildMemoPackMarkdown, buildMoneyPackMarkdown, buildOfflinePackMarkdown as buildSharedOfflinePackMarkdown, buildSettlementPackMarkdown, buildSharePackMarkdown, buildTodayPackMarkdown } from "./markdown-packs.js";
 import {
   addPlanExpense,
@@ -54,7 +53,6 @@ import {
   findLatestPlanByDiscordUser,
   getPlan,
   getPlanForDiscordUser,
-  getPlanQualitySummary,
   listPinnedPlansByDiscordUser,
   listPlans,
   listPlansByDiscordUser,
@@ -516,41 +514,6 @@ function planListLine(plan) {
   return `${pinned}#${plan.id} v${plan.latestVersion} / ${plan.departure || "서울"} -> ${plan.destination} / ${plan.nights}박 / ${plan.startDate}${qualityText}`;
 }
 
-function qualityActionReasonText(plan) {
-  const storedReason = String(plan?.qualityActionReason || "").trim();
-  if (storedReason) return storedReason.startsWith("후보:") ? storedReason : `후보: ${storedReason}`;
-  const warningCount = Number(plan?.qualityWarningCount || 0);
-  const checkCount = Number(plan?.qualityCheckCount || 0);
-  const delta = Number.isFinite(plan?.qualityWarningDelta) ? Number(plan.qualityWarningDelta) : 0;
-  if (delta > 0) return `후보: 악화 +${delta} 먼저 보강`;
-  if (warningCount > 0) return `후보: 확인 ${warningCount} 보강`;
-  if (checkCount <= 0) return "후보: 품질 점검 생성";
-  return "";
-}
-
-function planNeedsQualityAudit(plan) {
-  const nextAction = String(plan?.qualityNextAction || "").trim();
-  if (nextAction) return nextAction === "quality-audit";
-  return Number(plan?.qualityCheckCount || 0) <= 0;
-}
-
-function qualityActionPriorityText(plan) {
-  const storedLabel = String(plan?.qualityActionPriorityLabel || "").trim();
-  if (storedLabel) return storedLabel;
-  const priority = Number(plan?.qualityActionPriority || 0);
-  if (!priority) return "";
-  if (priority >= 100) return `긴급 ${priority}`;
-  if (priority >= 80) return `높음 ${priority}`;
-  if (priority >= 70) return `점검 ${priority}`;
-  return `낮음 ${priority}`;
-}
-
-function qualityPlanListLine(plan, filter) {
-  const reason = filter === "quality-action" || filter === "quality-urgent" ? qualityActionReasonText(plan) : "";
-  const priority = filter === "quality-action" || filter === "quality-urgent" ? qualityActionPriorityText(plan) : "";
-  return [planListLine(plan), priority ? `우선도: ${priority}` : "", reason].filter(Boolean).join(" / ");
-}
-
 function dashboardSection(title, plans, emptyText) {
   if (!plans.length) return `${title}\n- ${emptyText}`;
   return `${title}\n${plans.map((plan) => `- ${planListLine(plan)}`).join("\n")}`;
@@ -893,13 +856,11 @@ function buildDiscordGuide() {
     "## 처음 만들기",
     "- `/quick request:2026-08-01 부산 2박3일 친구랑 맛집 위주 서울 출발 KTX 1인 20만원`",
     "- `/plan`으로 항목별 입력",
-    "- 밖에서 쓸 플랜은 `/offline`으로 iPhone 파일/노트에 저장",
+    "- 필요할 때는 `/offline`으로 파일/메모 앱에 저장할 Markdown 받기",
     "- `/home` 또는 `/dashboard`로 최근/여행 중/예정/고정 플랜 모아보기",
     "- `/status`로 봇/저장소/웹 링크 설정 확인",
     "- `/policy`로 서버/사용자/운영자 접근 정책 확인",
-    "- `/mobile`로 아이폰 원격 사용 흐름과 웹 링크 상태 확인",
-    "- `/iphone`으로 같은 Wi-Fi 밖에서 쓸 때의 조건 확인",
-    "- `/iphoneenv`로 iPhone/Discord 접근 설정 파일 받기",
+    "- `/mobile`로 Discord/웹 플랜 허브와 웹 링크 상태 확인",
     "- `/recover`로 접근이 막혔을 때 설정/ID/정책 복구 버튼 보기",
     "- `/ops`로 Mac 상시 실행/로그/재시작 힌트 확인",
     "- `/readiness`로 출발 전 보강할 빈칸 확인",
@@ -913,7 +874,7 @@ function buildDiscordGuide() {
     "- `/packing` 짐싸기",
     "- `/departure` 출발 전 브리핑",
     "- `/calendar` 캘린더 파일 받기",
-    "- `/web` 웹/PWA 상세 링크 확인",
+    "- `/web` 웹 상세 링크 확인",
     "",
     "## 여행 중 아침",
     "- `/brief` 오늘 일정과 하루 예산",
@@ -956,17 +917,17 @@ function buildDiscordStart() {
     "여행 플래너 시작하기",
     "",
     "1. 먼저 `/status`로 봇과 저장소, LLM 설정을 확인하세요.",
-    "2. 아이폰에서 밖에서도 쓸 계획이면 외부 LTE/5G 조건은 `/iphone`, 접근 설정 파일은 `/iphoneenv`로 확인하세요.",
+    "2. Discord 명령은 봇 프로세스가 인터넷에 연결된 채 실행 중이면 어디서나 사용할 수 있고, 웹 상세는 `TRAVEL_PUBLIC_BASE_URL` 설정을 확인하세요.",
     "3. 첫 여행은 `/quick request:부산 2박3일 친구랑 맛집 위주 서울 출발 KTX`처럼 한 줄로 만드세요.",
-    "4. 밖에서 쓸 플랜은 `/offline`으로 iPhone 파일/노트에 저장할 Markdown을 받아두세요.",
+    "4. 필요할 때는 `/offline`으로 파일/메모 앱에 저장할 Markdown을 받아두세요.",
     "5. 만든 뒤에는 `/home` 또는 `/dashboard`에서 최근/진행 중/고정 플랜을 다시 열 수 있습니다.",
     "6. 여행 중에는 `/now` 또는 `/nextaction`을 먼저 누르면 지금 필요한 명령을 고를 수 있습니다.",
     "",
     "자주 쓰는 명령",
     "- 새 플랜: `/quick`, `/plan`",
-    "- 모바일 홈: `/home`, `/dashboard`",
+    "- 플랜 허브: `/home`, `/dashboard`, `/mobile`",
     "- 오프라인 저장: `/offline`",
-    "- 운영 점검: `/status`, `/policy`, `/doctor`, `/ops`, `/mobile`, `/iphone`, `/iphoneenv`, `/recover`, `/whoami`",
+    "- 운영 점검: `/status`, `/policy`, `/doctor`, `/ops`, `/recover`, `/whoami`",
     "- 빠른 메모: `/memo`, `/memos`, `/memosearch`, `/memoshare`, `/note`",
     "- 돈 관리: `/money`, `/spendquick`, `/expenseundo`",
     "- 지금 상태: `/now`, `/nextaction`",
@@ -975,58 +936,7 @@ function buildDiscordStart() {
   ].join("\n");
 }
 
-function buildIphoneAccessGuide(userId = "", guildId = "") {
-  const detailUrl = publicPlanUrl("latest");
-  const detailLine = detailUrl
-    ? `- 웹 상세 버튼: ${detailUrl}`
-    : "- 웹 상세 버튼: `TRAVEL_PUBLIC_BASE_URL` 미설정. Discord 명령과 오프라인팩은 계속 사용 가능합니다.";
-  const diagnosisLine = `- 현재 웹 상세 접근 진단: ${webAccessDiagnosis()}`;
-  const adminLine = userId
-    ? `- 내 사용자만 허용: \`DISCORD_ALLOWED_USER_IDS=${userId}\` / 진단 권한: \`DISCORD_ADMIN_USER_IDS=${userId}\``
-    : "- 내 사용자만 허용: `/whoami`로 확인한 ID를 `DISCORD_ALLOWED_USER_IDS`와 `DISCORD_ADMIN_USER_IDS`에 추가";
-  const guildLine = guildId
-    ? `- 현재 서버 ID: \`${guildId}\` - \`DISCORD_GUILD_ID\` 또는 \`DISCORD_ALLOWED_GUILD_IDS\` 예시에 사용 가능`
-    : "- 현재 서버 ID: DM에서는 표시되지 않습니다. 서버 제한이나 빠른 guild 등록이 필요하면 서버에서 `/whoami` 또는 `/iphone`을 여세요.";
-  return [
-    "iPhone 외부 사용 체크리스트",
-    "",
-    "핵심 판단",
-    "- Discord 명령: 같은 Wi-Fi가 아니어도 됩니다. Mac/서버에서 봇이 켜져 있고 인터넷에 연결되어 있으면 LTE/5G에서도 호출됩니다.",
-    "- localhost:3000: iPhone에서 직접 열 수 없습니다. 웹 상세 화면은 Mac IP 같은 Wi-Fi, 터널/VPN, 또는 배포 URL이 필요합니다.",
-    detailLine,
-    diagnosisLine,
-    "",
-    "웹 상세가 안 열릴 때",
-    "- 일정/체크리스트/예산/정산은 Discord 버튼과 명령으로 계속 확인하세요.",
-    "- 이동 중이면 `/offline` 오프라인팩을 먼저 열어 핵심 일정과 비상 정보를 보세요.",
-    "- 웹 화면이 꼭 필요하면 `TRAVEL_PUBLIC_BASE_URL`을 터널/VPN/배포 URL로 바꾼 뒤 봇을 다시 시작하세요.",
-    "",
-    "설정 힌트",
-    adminLine,
-    guildLine,
-    "- 새 명령 빠른 등록: `DISCORD_GUILD_ID=내_DISCORD_SERVER_ID` 설정 후 봇 재시작",
-    "- 같은 Wi-Fi 웹 상세: `TRAVEL_PUBLIC_BASE_URL=http://맥IP:3000`",
-    "- 외부 웹 상세: `TRAVEL_PUBLIC_BASE_URL`에 터널/VPN/배포 URL 설정",
-    "",
-    "외부에서 쓰기 전 확인",
-    "1. 설정 전이거나 차단되면 `/recover`, `/start`, 또는 `/iphoneenv`로 접근 설정 파일 받기",
-    "2. `/whoami`로 `DISCORD_ALLOWED_USER_IDS`와 `DISCORD_ADMIN_USER_IDS`에 넣을 내 ID 확인",
-    "3. `/policy`로 서버/사용자/관리자 접근 정책 확인",
-    "4. 설정 반영 후 `/status`로 봇/저장소/웹 링크 상태 확인",
-    "5. 관리자라면 `/doctor`로 env, 저장소, launchd 상태 점검",
-    "6. `/ops`로 Mac 상시 실행과 로그 위치 확인",
-    "7. `/offline`으로 최신 오프라인팩 저장",
-    "8. `/mobile` 또는 `/home`에서 여행 화면 열기",
-    "- 버튼 첫 줄은 설정 전 복구용, 둘째 줄은 설정 반영 후 점검/운영용입니다.",
-    "",
-    "장애 대비",
-    "- Mac이 잠자기/종료되면 로컬 봇도 멈춥니다.",
-    "- 웹 상세 링크가 안 열려도 Discord 명령, 버튼, 오프라인팩은 계속 쓸 수 있습니다.",
-    "- 여행 전에는 `/offline` 파일명을 확인하고 iPhone 파일 앱이나 메모에 저장해두세요.",
-  ].join("\n");
-}
-
-function buildIphoneEnvContent(userId = "", guildId = "") {
+function buildAccessEnvContent(userId = "", guildId = "") {
   const adminValue = userId || "내_DISCORD_USER_ID";
   const serverValue = guildId || "내_DISCORD_SERVER_ID";
   return [
@@ -1042,8 +952,8 @@ function buildIphoneEnvContent(userId = "", guildId = "") {
     "# 특정 서버에서만 쓰려면:",
     `# DISCORD_ALLOWED_GUILD_IDS=${serverValue}`,
     "",
-    "# 같은 Wi-Fi에서만 웹 상세를 열 때:",
-    "# TRAVEL_PUBLIC_BASE_URL=http://맥IP:3000",
+    "# 같은 네트워크에서만 웹 상세를 열 때:",
+    "# TRAVEL_PUBLIC_BASE_URL=http://server-ip:3000",
     "",
     "# 외부에서도 웹 상세를 열 때:",
     "# TRAVEL_PUBLIC_BASE_URL=https://your-tunnel-or-domain.example",
@@ -1053,14 +963,13 @@ function buildIphoneEnvContent(userId = "", guildId = "") {
     "",
     "# Discord에서 확인:",
     "# /status",
-    "# /iphone",
   ].join("\n");
 }
 
-function buildIphoneEnvSnippet(userId = "", guildId = "") {
-  const envContent = buildIphoneEnvContent(userId, guildId);
+function buildAccessEnvSnippet(userId = "", guildId = "") {
+  const envContent = buildAccessEnvContent(userId, guildId);
   return [
-    "iPhone 외부 사용 .env 스니펫",
+    "Discord 접근 설정 .env 스니펫",
     "",
     "```env",
     envContent,
@@ -1071,7 +980,7 @@ function buildIphoneEnvSnippet(userId = "", guildId = "") {
     "- 저장 후 Mac에서 `cd webapp && npm run bot:restart`로 봇을 다시 시작하세요.",
     "- Discord 운영 안내는 관리자 설정 반영 후 `/ops`에서 확인하세요.",
     "- 새 slash command가 늦게 보이면 `DISCORD_GUILD_ID` 예시를 설정하고 다시 시작하세요.",
-    "- 다시 시작한 뒤 `/status`와 `/iphone`으로 설정 반영 여부를 확인하세요.",
+    "- 다시 시작한 뒤 `/status`와 `/policy`로 설정 반영 여부를 확인하세요.",
     "- 웹 상세 없이 쓸 때는 Discord 명령과 `/offline` 오프라인팩을 사용하세요.",
   ].join("\n");
 }
@@ -1085,7 +994,7 @@ function startComponents() {
         .setStyle(ButtonStyle.Primary),
       new ButtonBuilder()
         .setCustomId("start-mobile")
-        .setLabel("모바일")
+        .setLabel("Discord 허브")
         .setStyle(ButtonStyle.Secondary),
       new ButtonBuilder()
         .setCustomId("mobile-dashboard")
@@ -1106,19 +1015,15 @@ function startComponents() {
         .setLabel("오프라인 저장")
         .setStyle(ButtonStyle.Secondary),
       new ButtonBuilder()
-        .setCustomId("start-iphone")
-        .setLabel("외부 사용")
-        .setStyle(ButtonStyle.Secondary),
-      new ButtonBuilder()
-        .setCustomId("iphone-env")
+        .setCustomId("access-env")
         .setLabel("설정")
         .setStyle(ButtonStyle.Secondary),
       new ButtonBuilder()
-        .setCustomId("iphone-whoami")
+        .setCustomId("access-whoami")
         .setLabel("내 ID")
         .setStyle(ButtonStyle.Secondary),
       new ButtonBuilder()
-        .setCustomId("iphone-policy")
+        .setCustomId("access-policy")
         .setLabel("정책")
         .setStyle(ButtonStyle.Secondary),
       new ButtonBuilder()
@@ -1272,19 +1177,13 @@ export const commands = [
     .addIntegerOption((option) => option.setName("plan_id").setDescription("플랜 ID, 비우면 내 최근 플랜")),
   new SlashCommandBuilder()
     .setName("home")
-    .setDescription("모바일 홈처럼 내 여행 플랜 대시보드를 봅니다."),
+    .setDescription("내 여행 플랜 대시보드를 봅니다."),
   new SlashCommandBuilder()
     .setName("dashboard")
-    .setDescription("모바일에서 내 여행 플랜 대시보드를 봅니다."),
+    .setDescription("내 여행 플랜 대시보드를 봅니다."),
   new SlashCommandBuilder()
     .setName("mobile")
-    .setDescription("아이폰에서 Discord로 쓰는 방법과 웹 링크 상태를 확인합니다."),
-  new SlashCommandBuilder()
-    .setName("iphone")
-    .setDescription("iPhone에서 Discord 봇을 외부/LTE로 쓰는 조건을 봅니다."),
-  new SlashCommandBuilder()
-    .setName("iphoneenv")
-    .setDescription("iPhone/Discord 접근 설정용 .env 파일을 받습니다."),
+    .setDescription("Discord와 웹에서 쓰는 여행 플랜 허브와 웹 링크 상태를 확인합니다."),
   new SlashCommandBuilder()
     .setName("recover")
     .setDescription("접근이 막혔을 때 설정 복구 버튼을 봅니다."),
@@ -1368,60 +1267,6 @@ export const commands = [
   new SlashCommandBuilder()
     .setName("upcoming")
     .setDescription("내 예정 여행 플랜 목록을 봅니다.")
-    .addIntegerOption((option) => option.setName("limit").setDescription("표시 개수").setMinValue(1).setMaxValue(20)),
-  new SlashCommandBuilder()
-    .setName("quality")
-    .setDescription("자동 품질 점검에서 보강이 필요한 내 플랜을 봅니다.")
-    .addIntegerOption((option) => option.setName("limit").setDescription("표시 개수").setMinValue(1).setMaxValue(20)),
-  new SlashCommandBuilder()
-    .setName("qualitytodo")
-    .setDescription("지금 고도화할 품질 후보 플랜을 봅니다.")
-    .addIntegerOption((option) => option.setName("limit").setDescription("표시 개수").setMinValue(1).setMaxValue(20))
-    .addBooleanOption((option) => option.setName("urgent").setDescription("우선도 80 이상 긴급 후보만 표시"))
-    .addBooleanOption((option) => option.setName("next").setDescription("현재 추천 품질 필터 후보만 표시"))
-    .addIntegerOption((option) => option.setName("min_priority").setDescription("이 우선도 이상만 표시").setMinValue(0).setMaxValue(100)),
-  new SlashCommandBuilder()
-    .setName("qualityurgent")
-    .setDescription("우선도 80 이상 긴급 품질 후보 플랜을 봅니다.")
-    .addIntegerOption((option) => option.setName("limit").setDescription("표시 개수").setMinValue(1).setMaxValue(20)),
-  new SlashCommandBuilder()
-    .setName("qualitybrief")
-    .setDescription("공유할 품질 고도화 TODO를 만듭니다.")
-    .addIntegerOption((option) => option.setName("limit").setDescription("상위 후보 개수").setMinValue(1).setMaxValue(10))
-    .addBooleanOption((option) => option.setName("urgent").setDescription("우선도 80 이상 긴급 후보만 보기"))
-    .addBooleanOption((option) => option.setName("next").setDescription("현재 추천 품질 필터 후보로 TODO 만들기"))
-    .addIntegerOption((option) => option.setName("min_priority").setDescription("이 우선도 이상만 TODO로 묶기").setMinValue(0).setMaxValue(100)),
-  new SlashCommandBuilder()
-    .setName("qualityok")
-    .setDescription("자동 품질 점검이 모두 OK인 내 플랜을 봅니다.")
-    .addIntegerOption((option) => option.setName("limit").setDescription("표시 개수").setMinValue(1).setMaxValue(20)),
-  new SlashCommandBuilder()
-    .setName("qualityunaudited")
-    .setDescription("자동 품질 점검이 아직 없는 내 플랜을 봅니다.")
-    .addIntegerOption((option) => option.setName("limit").setDescription("표시 개수").setMinValue(1).setMaxValue(20)),
-  new SlashCommandBuilder()
-    .setName("qualitystatus")
-    .setDescription("내 플랜의 품질 확인/악화/개선 개수를 봅니다."),
-  new SlashCommandBuilder()
-    .setName("qualitygate")
-    .setDescription("내 플랜 품질 게이트 통과 여부를 봅니다.")
-    .addIntegerOption((option) => option.setName("max_actions").setDescription("허용할 품질 후보 개수").setMinValue(0).setMaxValue(100))
-    .addBooleanOption((option) => option.setName("urgent").setDescription("우선도 80 이상 긴급 후보만 점검"))
-    .addBooleanOption((option) => option.setName("next").setDescription("현재 추천 품질 필터 후보만 점검"))
-    .addIntegerOption((option) => option.setName("min_priority").setDescription("이 우선도 이상만 점검").setMinValue(0).setMaxValue(100)),
-  new SlashCommandBuilder()
-    .setName("qualitygates")
-    .setDescription("내 플랜 품질 게이트 매트릭스와 추천 액션, CI 명령을 봅니다."),
-  new SlashCommandBuilder()
-    .setName("qualitycommands")
-    .setDescription("내 플랜 품질 게이트 CI 명령만 봅니다."),
-  new SlashCommandBuilder()
-    .setName("qualityworse")
-    .setDescription("직전 버전보다 품질 확인 항목이 늘어난 내 플랜을 봅니다.")
-    .addIntegerOption((option) => option.setName("limit").setDescription("표시 개수").setMinValue(1).setMaxValue(20)),
-  new SlashCommandBuilder()
-    .setName("qualitybetter")
-    .setDescription("직전 버전보다 품질 확인 항목이 줄어든 내 플랜을 봅니다.")
     .addIntegerOption((option) => option.setName("limit").setDescription("표시 개수").setMinValue(1).setMaxValue(20)),
   new SlashCommandBuilder()
     .setName("backup")
@@ -1556,15 +1401,15 @@ export const commands = [
     .addIntegerOption((option) => option.setName("plan_id").setDescription("플랜 ID")),
   new SlashCommandBuilder()
     .setName("web")
-    .setDescription("내 플랜의 웹/PWA 상세 링크를 봅니다.")
+    .setDescription("내 플랜의 웹 상세 링크를 봅니다.")
     .addIntegerOption((option) => option.setName("plan_id").setDescription("플랜 ID")),
   new SlashCommandBuilder()
     .setName("calendar")
-    .setDescription("내 플랜을 iOS/Google Calendar용 .ics 파일로 받습니다.")
+    .setDescription("내 플랜을 캘린더 앱용 .ics 파일로 받습니다.")
     .addIntegerOption((option) => option.setName("plan_id").setDescription("플랜 ID")),
   new SlashCommandBuilder()
     .setName("offline")
-    .setDescription("내 플랜을 iPhone 오프라인 저장용 Markdown 파일로 받습니다.")
+    .setDescription("내 플랜을 오프라인 저장용 Markdown 파일로 받습니다.")
     .addIntegerOption((option) => option.setName("plan_id").setDescription("플랜 ID")),
   new SlashCommandBuilder()
     .setName("export")
@@ -2104,7 +1949,7 @@ async function handleDashboard(interaction) {
 
 function webAccessDiagnosis() {
   if (!PUBLIC_BASE_URL) {
-    return "미설정. Discord 명령은 외부 LTE/5G에서도 가능하지만 웹 상세 버튼은 표시하지 않습니다.";
+    return "미설정. Discord 명령과 파일 첨부만 사용하며 웹 상세 버튼은 표시하지 않습니다.";
   }
 
   let url;
@@ -2116,14 +1961,14 @@ function webAccessDiagnosis() {
 
   const host = url.hostname;
   if (host === "localhost" || host === "127.0.0.1" || host === "::1") {
-    return `${PUBLIC_BASE_URL} - Mac 자기 자신용이라 iPhone에서는 열기 어렵습니다. Mac LAN IP, 터널/VPN URL, 배포 URL을 사용하세요.`;
+    return `${PUBLIC_BASE_URL} - 이 서버의 로컬 브라우저에서만 열립니다. LAN IP, 터널/VPN URL, 또는 배포 URL을 사용하세요.`;
   }
 
   if (/^(10|192\.168|172\.(1[6-9]|2\d|3[0-1]))\./.test(host)) {
     return `${PUBLIC_BASE_URL} - 같은 Wi-Fi에서는 열 수 있고, 외부에서는 VPN/터널이 필요합니다.`;
   }
 
-  return `${PUBLIC_BASE_URL} - iPhone에서 접근 가능한 외부 URL이면 집 밖에서도 웹 버튼을 열 수 있습니다.`;
+  return `${PUBLIC_BASE_URL} - 외부에서 접근 가능한 URL이면 어디서나 웹 버튼을 열 수 있습니다.`;
 }
 
 function mobileComponents() {
@@ -2173,13 +2018,13 @@ function mobileComponents() {
     { label: "파일: 사용 가이드", description: "상황별로 어떤 파일을 받을지 봅니다.", value: "file-guide" },
     { label: "파일: 회고 Markdown", description: "최근 플랜 회고 Markdown 파일을 받습니다.", value: "recap-markdown" },
     { label: "파일: Markdown", description: "최근 플랜 Markdown 파일을 받습니다.", value: "markdown" },
-    { label: "파일: 캘린더", description: "최근 플랜 iOS/Google Calendar 파일을 받습니다.", value: "calendar" },
+    { label: "파일: 캘린더", description: "최근 플랜 캘린더 앱용 .ics 파일을 받습니다.", value: "calendar" },
     { label: "백업: JSON", description: "내 Discord 플랜 전체 JSON 백업을 받습니다.", value: "backup" },
   ];
   if (PUBLIC_BASE_URL) {
     mobileActionOptions.splice(1, 0, {
       label: "웹: 상세",
-      description: "최근 플랜의 웹/PWA 상세 링크를 봅니다.",
+      description: "최근 플랜의 웹 상세 링크를 봅니다.",
       value: "web",
     });
   }
@@ -2240,16 +2085,12 @@ function mobileComponents() {
       new ButtonBuilder()
         .setCustomId("mobile-offline")
         .setLabel("오프라인")
-        .setStyle(ButtonStyle.Secondary),
-      new ButtonBuilder()
-        .setCustomId("mobile-iphone")
-        .setLabel("외부")
         .setStyle(ButtonStyle.Secondary)
     ),
     new ActionRowBuilder().addComponents(
       new StringSelectMenuBuilder()
         .setCustomId("mobile-action-select")
-        .setPlaceholder("모바일 추가 액션을 선택하세요")
+        .setPlaceholder("추가 액션을 선택하세요")
         .addOptions(mobileActionOptions)
     ),
     new ActionRowBuilder().addComponents(
@@ -2270,68 +2111,15 @@ function mobileComponents() {
   return rows;
 }
 
-function iphoneComponents() {
-  return [
-    new ActionRowBuilder().addComponents(
-      new ButtonBuilder()
-        .setCustomId("iphone-env")
-        .setLabel("설정")
-        .setStyle(ButtonStyle.Primary),
-      new ButtonBuilder()
-        .setCustomId("iphone-whoami")
-        .setLabel("내 ID")
-        .setStyle(ButtonStyle.Secondary),
-      new ButtonBuilder()
-        .setCustomId("iphone-policy")
-        .setLabel("정책")
-        .setStyle(ButtonStyle.Secondary),
-      new ButtonBuilder()
-        .setCustomId("start-iphone")
-        .setLabel("체크리스트")
-        .setStyle(ButtonStyle.Secondary)
-    ),
-    new ActionRowBuilder().addComponents(
-      new ButtonBuilder()
-        .setCustomId("mobile-status")
-        .setLabel("상태")
-        .setStyle(ButtonStyle.Primary),
-      new ButtonBuilder()
-        .setCustomId("iphone-doctor")
-        .setLabel("진단")
-        .setStyle(ButtonStyle.Secondary),
-      new ButtonBuilder()
-        .setCustomId("mobile-ops")
-        .setLabel("운영")
-        .setStyle(ButtonStyle.Secondary),
-      new ButtonBuilder()
-        .setCustomId("mobile-offline")
-        .setLabel("오프라인")
-        .setStyle(ButtonStyle.Secondary),
-      new ButtonBuilder()
-        .setCustomId("start-mobile")
-        .setLabel("모바일")
-        .setStyle(ButtonStyle.Secondary),
-      new ButtonBuilder()
-        .setCustomId("mobile-dashboard")
-        .setLabel("홈")
-        .setStyle(ButtonStyle.Secondary)
-    ),
-  ];
-}
-
 function statusComponents() {
   return [
     new ActionRowBuilder().addComponents(
       new ButtonBuilder()
-        .setCustomId("mobile-iphone")
-        .setLabel("외부")
+        .setCustomId("access-env")
+        .setLabel("설정")
         .setStyle(ButtonStyle.Primary),
       new ButtonBuilder()
-        .setCustomId("iphone-env")
-        .setLabel("설정")
-        .setStyle(ButtonStyle.Secondary),
-      new ButtonBuilder()
-        .setCustomId("iphone-policy")
+        .setCustomId("access-policy")
         .setLabel("정책")
         .setStyle(ButtonStyle.Secondary),
       new ButtonBuilder()
@@ -2354,7 +2142,7 @@ function opsComponents() {
   return [
     new ActionRowBuilder().addComponents(
       new ButtonBuilder()
-        .setCustomId("iphone-doctor")
+        .setCustomId("ops-doctor")
         .setLabel("진단")
         .setStyle(ButtonStyle.Primary),
       new ButtonBuilder()
@@ -2362,11 +2150,7 @@ function opsComponents() {
         .setLabel("상태")
         .setStyle(ButtonStyle.Secondary),
       new ButtonBuilder()
-        .setCustomId("mobile-iphone")
-        .setLabel("외부")
-        .setStyle(ButtonStyle.Secondary),
-      new ButtonBuilder()
-        .setCustomId("iphone-env")
+        .setCustomId("access-env")
         .setLabel("설정")
         .setStyle(ButtonStyle.Secondary),
       new ButtonBuilder()
@@ -2376,7 +2160,7 @@ function opsComponents() {
     ),
     new ActionRowBuilder().addComponents(
       new ButtonBuilder()
-        .setCustomId("iphone-policy")
+        .setCustomId("access-policy")
         .setLabel("정책")
         .setStyle(ButtonStyle.Secondary),
       new ButtonBuilder()
@@ -2395,11 +2179,7 @@ function doctorComponents() {
         .setLabel("상태")
         .setStyle(ButtonStyle.Primary),
       new ButtonBuilder()
-        .setCustomId("mobile-iphone")
-        .setLabel("외부")
-        .setStyle(ButtonStyle.Secondary),
-      new ButtonBuilder()
-        .setCustomId("iphone-env")
+        .setCustomId("access-env")
         .setLabel("설정")
         .setStyle(ButtonStyle.Secondary),
       new ButtonBuilder()
@@ -2430,11 +2210,11 @@ function deniedComponents(reason = "", source = "") {
         .setLabel("상태")
         .setStyle(ButtonStyle.Primary),
       new ButtonBuilder()
-        .setCustomId("iphone-policy")
+        .setCustomId("access-policy")
         .setLabel("정책")
         .setStyle(ButtonStyle.Secondary),
       new ButtonBuilder()
-        .setCustomId("iphone-env")
+        .setCustomId("access-env")
         .setLabel("설정")
         .setStyle(ButtonStyle.Secondary),
       new ButtonBuilder()
@@ -2484,7 +2264,7 @@ function deniedComponents(reason = "", source = "") {
     ),
     new ActionRowBuilder().addComponents(
       new ButtonBuilder()
-        .setCustomId("iphone-recover")
+        .setCustomId("access-recover")
         .setLabel("복구")
         .setStyle(ButtonStyle.Secondary),
       new ButtonBuilder()
@@ -2495,47 +2275,24 @@ function deniedComponents(reason = "", source = "") {
   ];
 }
 
-function iphoneEnvComponents() {
-  return [
-    new ActionRowBuilder().addComponents(
-      new ButtonBuilder()
-        .setCustomId("mobile-iphone")
-        .setLabel("외부 사용")
-        .setStyle(ButtonStyle.Primary),
-      new ButtonBuilder()
-        .setCustomId("iphone-whoami")
-        .setLabel("내 ID")
-        .setStyle(ButtonStyle.Secondary),
-      new ButtonBuilder()
-        .setCustomId("iphone-policy")
-        .setLabel("정책")
-        .setStyle(ButtonStyle.Secondary),
-      new ButtonBuilder()
-        .setCustomId("start-iphone")
-        .setLabel("체크리스트")
-        .setStyle(ButtonStyle.Secondary)
-    ),
-  ];
-}
-
 function accessRecoveryComponents() {
   return [
     new ActionRowBuilder().addComponents(
       new ButtonBuilder()
-        .setCustomId("mobile-iphone")
-        .setLabel("외부 사용")
+        .setCustomId("access-env")
+        .setLabel("설정")
         .setStyle(ButtonStyle.Primary),
       new ButtonBuilder()
-        .setCustomId("iphone-env")
-        .setLabel("설정")
-        .setStyle(ButtonStyle.Secondary),
-      new ButtonBuilder()
-        .setCustomId("iphone-whoami")
+        .setCustomId("access-whoami")
         .setLabel("내 ID")
         .setStyle(ButtonStyle.Secondary),
       new ButtonBuilder()
-        .setCustomId("iphone-policy")
+        .setCustomId("access-policy")
         .setLabel("정책")
+        .setStyle(ButtonStyle.Secondary),
+      new ButtonBuilder()
+        .setCustomId("access-recover")
+        .setLabel("복구")
         .setStyle(ButtonStyle.Secondary)
     ),
   ];
@@ -2577,11 +2334,11 @@ function dmAllowed() {
 
 function isAccessInfoInteraction(interaction) {
   if (typeof interaction.isChatInputCommand === "function" && interaction.isChatInputCommand()) {
-    return ["start", "iphone", "whoami", "policy", "iphoneenv", "recover"].includes(interaction.commandName);
+    return ["start", "whoami", "policy", "recover"].includes(interaction.commandName);
   }
   return typeof interaction.isButton === "function"
     && interaction.isButton()
-    && ["start-iphone", "mobile-iphone", "iphone-whoami", "iphone-policy", "iphone-env"].includes(interaction.customId);
+    && ["access-env", "access-whoami", "access-policy", "access-recover"].includes(interaction.customId);
 }
 
 function interactionName(interaction) {
@@ -2749,8 +2506,8 @@ async function requireAllowedGuild(interaction) {
   }
   logAccessDenied(interaction, interaction.guildId ? "guild_not_allowed" : "dm_not_allowed");
   const message = interaction.guildId
-    ? "이 서버에서는 여행 플래너 봇을 사용할 수 없습니다. `/recover`로 복구 버튼을 열거나 `/whoami`로 server ID를 확인하고, `/iphoneenv`로 설정 파일을 받은 뒤 `.env`의 `DISCORD_ALLOWED_GUILD_IDS`에 추가해주세요."
-    : "DM에서는 여행 플래너 봇을 사용할 수 없습니다. 개인 DM을 쓰려면 `/recover`로 복구 버튼을 열거나 `/iphoneenv`로 설정 파일을 받은 뒤 `.env`에 `DISCORD_ALLOW_DM=true`와 `DISCORD_ALLOWED_USER_IDS`를 설정해주세요.";
+    ? "이 서버에서는 여행 플래너 봇을 사용할 수 없습니다. `/recover`로 복구 버튼을 열거나 `/whoami`로 server ID를 확인한 뒤 `.env`의 `DISCORD_ALLOWED_GUILD_IDS`에 추가해주세요."
+    : "DM에서는 여행 플래너 봇을 사용할 수 없습니다. 개인 DM을 쓰려면 `/recover`로 복구 버튼을 열어 `.env`에 `DISCORD_ALLOW_DM=true`와 `DISCORD_ALLOWED_USER_IDS`를 설정해주세요.";
   if (interaction.deferred || interaction.replied) {
     await interaction.editReply({ content: message, components: accessRecoveryComponents() });
   } else {
@@ -2772,7 +2529,7 @@ async function requireAllowedUser(interaction) {
     return true;
   }
   logAccessDenied(interaction, "user_not_allowed");
-  const message = "이 사용자는 여행 플래너 봇을 사용할 수 없습니다. `/recover`로 복구 버튼을 열거나 `/whoami`로 user ID를 확인하고, `/iphoneenv`로 설정 파일을 받은 뒤 `.env`의 `DISCORD_ALLOWED_USER_IDS`에 추가해주세요.";
+  const message = "이 사용자는 여행 플래너 봇을 사용할 수 없습니다. `/recover`로 복구 버튼을 열거나 `/whoami`로 user ID를 확인한 뒤 `.env`의 `DISCORD_ALLOWED_USER_IDS`에 추가해주세요.";
   if (interaction.deferred || interaction.replied) {
     await interaction.editReply({ content: message, components: accessRecoveryComponents() });
   } else {
@@ -2791,7 +2548,7 @@ async function requireOpsAccess(interaction) {
     return true;
   }
   logAccessDenied(interaction, "ops_not_allowed");
-  const message = "이 운영 명령은 관리자만 사용할 수 있습니다. `/recover`로 복구 버튼을 열거나 `/whoami`로 내 Discord user ID를 확인하고, `/iphoneenv`로 설정 파일을 받은 뒤 `.env`의 `DISCORD_ADMIN_USER_IDS`에 추가해주세요.";
+  const message = "이 운영 명령은 관리자만 사용할 수 있습니다. `/recover`로 복구 버튼을 열거나 `/whoami`로 내 Discord user ID를 확인한 뒤 `.env`의 `DISCORD_ADMIN_USER_IDS`에 추가해주세요.";
   if (interaction.deferred || interaction.replied) {
     await interaction.editReply({ content: message, components: accessRecoveryComponents() });
   } else {
@@ -2814,7 +2571,7 @@ function safeWebAccessSummary() {
 
   const host = url.hostname;
   if (host === "localhost" || host === "127.0.0.1" || host === "::1") {
-    return "로컬 전용 URL 설정됨. iPhone에서는 열기 어려울 수 있음";
+    return "로컬 전용 URL 설정됨. 다른 기기에서는 열기 어려울 수 있음";
   }
 
   if (/^(10|192\.168|172\.(1[6-9]|2\d|3[0-1]))\./.test(host)) {
@@ -2843,7 +2600,7 @@ async function handleStatus(interaction) {
     `- 봇: 온라인 (${interaction.client.user?.tag || "unknown"})`,
     `- 업타임: ${formatUptime(process.uptime())}`,
     `- 저장소: ${storageLine}`,
-    `- 모바일 Discord: 같은 Wi-Fi 불필요. 봇 프로세스가 켜져 있으면 외부 LTE/5G에서도 명령 사용 가능`,
+    `- Discord 명령: 봇 프로세스가 인터넷에 연결된 채 실행 중이면 네트워크 위치와 무관하게 사용 가능`,
     `- 웹 상세 접근: ${canSeeOpsDetails ? webAccessDiagnosis() : safeWebAccessSummary()}`,
     `- LLM: ${llmStatusText()}`,
     `- 웹 LLM 정책: ${webLlmPolicyText()}`,
@@ -2858,7 +2615,7 @@ async function handleStatus(interaction) {
     "",
     "다음 액션:",
     "- 플랜이 안 보이면 `/dashboard`",
-    "- iPhone 외부 사용 조건은 `/iphone`, 설정 파일은 `/iphoneenv`",
+    "- 접근 설정은 `/recover` 또는 `설정` 버튼에서 확인",
     "- 웹 버튼이 안 보이면 `TRAVEL_PUBLIC_BASE_URL` 확인",
     "- 새 명령이 안 보이면 봇 재시작 후 Discord 명령 동기화 대기",
   ];
@@ -2890,11 +2647,24 @@ async function handleWhoami(interaction) {
     "응답 가능한 서버를 제한하려면 `.env`에 다음처럼 넣으세요.",
     `DISCORD_ALLOWED_GUILD_IDS=${interaction.guildId || "서버_ID"}`,
     "",
-    "설정 파일이 필요하면 `/iphoneenv`, 처음 흐름으로 돌아가려면 `/start`를 사용하세요.",
+    "설정 파일이 필요하면 `설정` 버튼을 누르고, 처음 흐름으로 돌아가려면 `/start`를 사용하세요.",
   ];
   await interaction.reply({
     content: lines.join("\n"),
     ephemeral: true,
+    components: accessRecoveryComponents(),
+  });
+}
+
+async function handleAccessEnv(interaction) {
+  const content = buildAccessEnvContent(interaction.user.id, interaction.guildId || "");
+  const attachment = new AttachmentBuilder(Buffer.from(content, "utf-8"), {
+    name: "travel-planner-discord-access.env",
+  });
+  await interaction.reply({
+    content: buildAccessEnvSnippet(interaction.user.id, interaction.guildId || ""),
+    ephemeral: true,
+    files: [attachment],
     components: accessRecoveryComponents(),
   });
 }
@@ -2917,12 +2687,12 @@ async function handleRecover(interaction) {
       guildLine,
       "```",
       "",
-      "- 설정 파일: `/iphoneenv` 또는 `설정`",
+      "- 설정 파일: `설정`",
       "- 내 ID 확인: `/whoami` 또는 `내 ID`",
       "- 정책 확인: `/policy` 또는 `정책`",
-      "- iPhone 외부 조건: `/iphone` 또는 `외부 사용`",
+      "- 웹 상세 접근: `TRAVEL_PUBLIC_BASE_URL` 설정 확인",
       "",
-      "더 긴 설정 파일은 `/iphoneenv`에서 받을 수 있습니다.",
+      "더 긴 설정 파일은 `설정` 버튼에서 받을 수 있습니다.",
       "여행 생성, 운영, 홈/상태/오프라인 기능은 allowlist 설정 후 사용할 수 있습니다.",
     ].join("\n"),
     ephemeral: true,
@@ -3025,7 +2795,7 @@ async function handlePolicy(interaction) {
     `- DM 허용: ${dmAllowed() ? "켜짐" : "꺼짐"}`,
     `- 사용자 제한: ${allowedUserIds.length > 0 ? canSeeOpsDetails ? allowedUserIds.join(", ") : "설정됨" : "미설정"}`,
     `- 운영 관리자 제한: ${adminUserIds.length > 0 ? canSeeOpsDetails ? adminUserIds.join(", ") : "설정됨" : "미설정"}`,
-    "- `/start`, `/iphone`, `/whoami`, `/policy`, `/iphoneenv`, `/recover`와 복구 버튼은 시작/ID/env 확인용으로 allowlist 밖에서도 응답합니다.",
+    "- `/start`, `/whoami`, `/policy`, `/recover`와 복구 버튼은 시작/ID/env 확인용으로 allowlist 밖에서도 응답합니다.",
     "",
     "추천 `.env` 스니펫",
     ...(interaction.guildId
@@ -3044,9 +2814,9 @@ async function handlePolicy(interaction) {
     "",
     "다음 액션:",
     "- ID를 확인하려면 `/whoami`",
-    "- 설정 파일이 필요하면 `/iphoneenv`",
+    "- 설정 파일이 필요하면 `설정` 버튼",
     "- 접근이 막혔을 때는 `/recover`",
-    "- iPhone 외부 사용 조건은 `/iphone`",
+    "- 웹 상세 접근은 `TRAVEL_PUBLIC_BASE_URL` 확인",
     "- 처음 흐름으로 돌아가려면 `/start`",
     "- 런타임 상태는 `/status`",
     "- 상세 진단과 운영 명령은 관리자 계정에서 `/doctor`, `/ops`",
@@ -3141,12 +2911,11 @@ async function handleOps(interaction) {
       "- 에러 로그: tail -f /tmp/travel-planner-discord-bot.err",
       "- 차단 로그 찾기: grep discord-access-denied /tmp/travel-planner-discord-bot.err",
       "",
-      "폰에서 먼저 확인",
+      "먼저 확인",
       "- `/doctor`로 런타임 env/저장소/웹 링크/launchd 상태 점검",
       "- `/status`로 봇/저장소/LLM/웹 링크 상태 확인",
-      "- `/iphone`으로 외부 LTE/5G 사용 조건과 웹 상세 링크 조건 확인",
       "- `/mobile`로 모바일 허브 열기",
-      "- `/offline`으로 iPhone 파일/노트에 저장할 오프라인팩 받기",
+      "- `/offline`으로 파일/노트에 저장할 오프라인팩 받기",
       "- `/home`으로 내 플랜 대시보드 열기",
     ].join("\n"),
     components: opsComponents(),
@@ -3227,9 +2996,9 @@ async function handleMobile(interaction) {
   await interaction.reply({
     ephemeral: true,
     content: [
-      "아이폰 Discord 사용 모드",
+      "모바일 Discord 사용",
       "",
-      "- Mac이나 배포 서버에서 봇 프로세스가 켜져 있으면, 폰이 외부 LTE/5G에 있어도 Discord 명령은 사용할 수 있습니다.",
+      "- Mac이나 배포 서버에서 봇 프로세스가 켜져 있으면, 모바일 기기가 외부 네트워크에 있어도 Discord 명령은 사용할 수 있습니다.",
       "- `localhost:3000`을 외부에 공개할 필요는 없습니다. 봇이 Discord에 접속해 메시지로 결과를 돌려주는 구조입니다.",
       "- 단, Mac이 잠자기 상태가 되거나 `npm run bot` 프로세스가 꺼지면 명령도 멈춥니다.",
       `- 웹 상세 접근: ${webAccessDiagnosis()}`,
@@ -3237,7 +3006,7 @@ async function handleMobile(interaction) {
       "모바일 추천 순서",
       "1. `/status`로 봇/저장소/웹 링크 상태 확인",
       "2. `/home` 또는 `/dashboard`로 최근/고정/진행 중 플랜 열기",
-      "3. `/offline`으로 iPhone 파일/노트에 저장할 오프라인팩 받기",
+      "3. `/offline`으로 파일/노트에 저장할 오프라인팩 받기",
       "4. `/now` 또는 `/nextaction`으로 지금 볼 카드 선택",
       "5. 관리/파일/백업 선택 메뉴의 `파일: 사용 가이드`로 받을 파일 고르기",
       "6. `/guide`로 상황별 명령 다시 확인",
@@ -3246,145 +3015,10 @@ async function handleMobile(interaction) {
   });
 }
 
-async function handleIphone(interaction) {
-  await interaction.reply({
-    content: buildIphoneAccessGuide(interaction.user.id, interaction.guildId),
-    ephemeral: true,
-    components: iphoneComponents(),
-  });
-}
-
-async function handleIphoneEnvButton(interaction) {
-  const envContent = buildIphoneEnvContent(interaction.user.id, interaction.guildId);
-  const snippet = buildIphoneEnvSnippet(interaction.user.id, interaction.guildId);
-  await interaction.reply({
-    content: `${snippet}\n\n첨부 파일: travel-planner-iphone.env`,
-    files: [markdownAttachment(envContent, "travel-planner-iphone.env")],
-    ephemeral: true,
-    components: iphoneEnvComponents(),
-  });
-}
-
-function buildDiscordQualityGuide() {
-  return [
-    "품질 루프",
-    "- `/qualitystatus`: 내 플랜의 품질 확인/악화/개선 개수와 다음 액션",
-    "- `/qualitytodo`: 지금 고도화할 품질 후보 플랜. `next:true`로 현재 추천 품질 필터만 선택",
-    "- `/qualityurgent`: 우선도 80 이상 긴급 품질 후보 플랜",
-    "- `/qualitybrief`: 공유할 품질 고도화 TODO. `next:true`, `min_priority`, `urgent:true`로 후보 선택",
-    "- `/qualitygate`: 내 플랜 품질 게이트 통과 여부. `max_actions:5`, `next:true`, `urgent:true`로 완화/추천/긴급 기준 조정",
-    "- `/qualitygates`: strict/완화/긴급/추천 품질 게이트 매트릭스와 추천 액션, CI 명령",
-    "- `/qualitycommands`: 품질 게이트 CI 명령 JSON/text 경로, SARIF/JUnit/Step Summary/Annotations/Outputs 산출물, SARIF 업로드 Actions 예시, 명령 묶음",
-    "- `/quality`: 자동 품질 점검에서 보강이 필요한 플랜",
-    "- `/qualityok`: 자동 품질 점검이 모두 OK인 플랜",
-    "- `/qualityunaudited`: 자동 품질 점검이 아직 없는 플랜",
-    "- `/qualityworse`: 직전 버전보다 확인 항목이 늘어난 플랜",
-    "- `/qualitybetter`: 직전 버전보다 확인 항목이 줄어든 플랜",
-  ].join("\n");
-}
-
-function qualityWarningFocusLine(summary = {}) {
-  const topWarnings = Array.isArray(summary.topQualityWarnings)
-    ? summary.topQualityWarnings.filter((item) => item?.label && Number(item.count) > 0).slice(0, 3)
-    : [];
-  if (!topWarnings.length) return "- 많이 남은 항목: 없음";
-  return `- 많이 남은 항목: ${topWarnings.map((item) => `${item.label} ${Number(item.count)}`).join(", ")}`;
-}
-
-function qualityOkLine(summary = {}) {
-  const audited = Number(summary.qualityAudited);
-  const ok = Number(summary.qualityOk);
-  const okRate = Number(summary.qualityOkRate);
-  if (![audited, ok, okRate].every(Number.isFinite)) return "- 품질 OK: 집계 없음";
-  return `- 품질 OK: ${ok}/${audited} (${okRate}%)`;
-}
-
-function qualityUnauditedLine(summary = {}) {
-  const unaudited = Number(summary.qualityUnaudited);
-  return Number.isFinite(unaudited) ? `- 품질 미점검: ${unaudited}` : "- 품질 미점검: 집계 없음";
-}
-
-function qualityActionBreakdownLine(summary = {}) {
-  const action = Number(summary.qualityAction);
-  const urgent = Number(summary.qualityUrgent);
-  const quality = Number(summary.quality);
-  const unaudited = Number(summary.qualityUnaudited);
-  const regression = Number(summary.qualityRegression);
-  if (![action, urgent, quality, unaudited, regression].every(Number.isFinite)) return "- 고도화 후보 구성: 집계 없음";
-  const regularWarnings = Math.max(0, quality - regression);
-  const parts = [
-    urgent > 0 ? `긴급 ${urgent}` : "",
-    regression > 0 ? `악화 ${regression}` : "",
-    regularWarnings > 0 ? `확인 ${regularWarnings}` : "",
-    unaudited > 0 ? `미점검 ${unaudited}` : "",
-  ].filter(Boolean);
-  return `- 고도화 후보 구성: ${action}${parts.length ? ` (${parts.join(", ")})` : ""}`;
-}
-
-function qualityTargetLine(topPlan, summary = {}) {
-  if (!topPlan?.id) return "- 최우선 대상: 없음";
-  const reason = qualityActionReasonText(topPlan);
-  const priority = qualityActionPriorityText(topPlan);
-  const urgentReason = Number(summary.qualityUrgent) > 0 ? " / 긴급 후보 우선" : "";
-  return `- 최우선 대상: ${topPlan.destination || "목적지 미정"} #${topPlan.id}${topPlan.startDate ? ` (${topPlan.startDate})` : ""}${urgentReason}${priority ? ` / 우선도: ${priority}` : ""}${reason ? ` / ${reason}` : ""}`;
-}
-
-function qualityTodoCandidateLine(plan, index) {
-  const reason = qualityActionReasonText(plan).replace(/^후보:\s*/, "") || "품질 보강 필요";
-  const needsAudit = planNeedsQualityAudit(plan);
-  const priority = qualityActionPriorityText(plan);
-  const hint = needsAudit
-    ? `/refine plan_id:${plan.id} feedback:자동 품질 점검 섹션을 추가해줘`
-    : `품질 보강 버튼 또는 /refine plan_id:${plan.id}`;
-  return [
-    `${index + 1}. ${plan.destination || "목적지 미정"} #${plan.id}${plan.startDate ? ` (${plan.startDate})` : ""}`,
-    priority ? `   - 우선도: ${priority}` : "",
-    `   - 이유: ${reason}`,
-    `   - 다음 액션: ${needsAudit ? "품질 점검 생성" : "품질 보강"}`,
-    `   - 실행 힌트: ${hint}`,
-  ].join("\n");
-}
-
-function qualityTodoBundlePrompt(candidatePlans = []) {
-  const count = candidatePlans.filter((plan) => plan?.id).length;
-  if (!count) return "";
-  return `묶음 실행 프롬프트: 상위 후보 ${count}개를 우선도 높은 순서대로 처리해줘. 미점검은 자동 품질 점검 섹션 생성, 품질 경고/악화는 이유에 맞춰 품질 보강.`;
-}
-
-function qualityTodoBriefText(summary = {}, topPlan = null, candidatePlans = [], options = {}) {
-  const minPriority = Number.isFinite(Number(options.minPriority)) ? Math.max(0, Math.floor(Number(options.minPriority))) : 0;
-  const action = Number(summary.qualityAction);
-  const filterLabel = String(options.filterLabel || "").trim();
-  const headingSuffix = [filterLabel, minPriority > 0 ? `우선도 ${minPriority} 이상` : ""].filter(Boolean).join(", ");
-  const candidates = Array.isArray(candidatePlans)
-    ? candidatePlans
-      .filter((plan) => plan?.id)
-      .filter((plan) => minPriority <= 0 || Number(plan.qualityActionPriority || 0) >= minPriority)
-      .slice(0, 10)
-    : [];
-  const targetPlan = minPriority > 0 ? candidates[0] : topPlan;
-  const reason = targetPlan?.id ? qualityActionReasonText(targetPlan).replace(/^후보:\s*/, "") : "";
-  const needsAudit = planNeedsQualityAudit(targetPlan);
-  return [
-    headingSuffix ? `품질 고도화 TODO (${headingSuffix})` : "품질 고도화 TODO",
-    filterLabel || minPriority > 0 ? `${filterLabel || "후보"}: ${candidates.length}개` : Number.isFinite(action) ? qualityActionBreakdownLine(summary).replace(/^- /, "") : "",
-    minPriority > 0 && !candidates.length && Number.isFinite(action) && action > 0 ? "상태: 지정 우선도 이상의 후보가 없습니다. 일반 TODO 5/10으로 낮춰 확인하세요." : "",
-    targetPlan?.id ? qualityTargetLine(targetPlan).replace(/^- /, "") : "최우선 대상: 없음",
-    reason ? `이유: ${reason}` : "",
-    targetPlan?.id ? `다음 액션: ${needsAudit ? "품질 점검 생성" : "품질 보강"}` : "",
-    targetPlan?.id ? `실행 힌트: ${needsAudit ? `/refine plan_id:${targetPlan.id} feedback:자동 품질 점검 섹션을 추가해줘` : `품질 보강 버튼 또는 /refine plan_id:${targetPlan.id}`}` : "",
-    qualityTodoBundlePrompt(candidates),
-    candidates.length ? `상위 후보\n${candidates.map((plan, index) => qualityTodoCandidateLine(plan, index)).join("\n")}` : "",
-  ].filter(Boolean).join("\n");
-}
-
 async function handleGuide(interaction) {
-  const summary = await getPlanQualitySummary(DB_PATH, { discordUserId: interaction.user.id });
-  const topPlan = await findTopQualityPlan(interaction.user.id, summary);
   await interaction.reply({
-    content: truncateText(`${buildDiscordGuide()}\n\n${buildDiscordQualityGuide()}\n${qualityOkLine(summary)}\n${qualityUnauditedLine(summary)}\n${qualityActionBreakdownLine(summary)}\n${qualityWarningFocusLine(summary)}\n${qualityTargetLine(topPlan, summary)}`),
+    content: truncateText(buildDiscordGuide()),
     ephemeral: true,
-    components: qualityStatusComponents(summary, topPlan),
   });
 }
 
@@ -4072,690 +3706,6 @@ async function handleUpcoming(interaction) {
   });
 }
 
-async function handleQuality(interaction) {
-  await interaction.deferReply({ ephemeral: true });
-  await replyWithQualityList(interaction, "quality", interaction.options.getInteger("limit") || 10);
-}
-
-async function handleQualityTodo(interaction) {
-  await interaction.deferReply({ ephemeral: true });
-  const urgent = interaction.options.getBoolean("urgent") || false;
-  const next = interaction.options.getBoolean("next") || false;
-  const limit = interaction.options.getInteger("limit") || 10;
-  const minPriorityOption = interaction.options.getInteger("min_priority") || 0;
-  const summary = next ? await getPlanQualitySummary(DB_PATH, { discordUserId: interaction.user.id }) : {};
-  const filter = urgent ? "quality-action" : next ? String(summary.qualityNextFilter || "quality-action").trim() || "quality-action" : "quality-action";
-  await replyWithQualityList(interaction, filter, limit, {
-    minPriority: minPriorityOption || (urgent || filter === "quality-urgent" ? 80 : 0),
-  });
-}
-
-async function handleQualityUrgent(interaction) {
-  await interaction.deferReply({ ephemeral: true });
-  await replyWithQualityList(interaction, "quality-urgent", interaction.options.getInteger("limit") || 10);
-}
-
-async function handleQualityBrief(interaction) {
-  await interaction.deferReply({ ephemeral: true });
-  const limit = interaction.options.getInteger("limit") || 5;
-  const urgent = interaction.options.getBoolean("urgent") || false;
-  const next = interaction.options.getBoolean("next") || false;
-  const minPriorityOption = interaction.options.getInteger("min_priority") || 0;
-  const summary = await getPlanQualitySummary(DB_PATH, { discordUserId: interaction.user.id });
-  const filter = urgent ? "quality-action" : next ? String(summary.qualityNextFilter || "quality-action").trim() || "quality-action" : "quality-action";
-  const minPriority = minPriorityOption || (urgent || filter === "quality-urgent" ? 80 : 0);
-  const topPlan = await findTopQualityPlan(interaction.user.id, summary);
-  const candidatePlans = await listPlansByDiscordUser(interaction.user.id, limit, DB_PATH, filter);
-  const todoTopPlan = next ? candidatePlans[0] || topPlan : topPlan;
-  await interaction.editReply({
-    content: truncateText(qualityTodoBriefText(summary, todoTopPlan, candidatePlans, qualityTodoFilterOptions(filter, minPriority > 0 ? { minPriority, urgent } : { urgent }))),
-    components: qualityStatusComponents(summary, todoTopPlan),
-  });
-}
-
-async function handleQualityOk(interaction) {
-  await interaction.deferReply({ ephemeral: true });
-  await replyWithQualityList(interaction, "quality-ok", interaction.options.getInteger("limit") || 10);
-}
-
-async function handleQualityUnaudited(interaction) {
-  await interaction.deferReply({ ephemeral: true });
-  await replyWithQualityList(interaction, "quality-unaudited", interaction.options.getInteger("limit") || 10);
-}
-
-async function handleQualityStatus(interaction) {
-  await interaction.deferReply({ ephemeral: true });
-  const summary = await getPlanQualitySummary(DB_PATH, { discordUserId: interaction.user.id });
-  const topPlan = await findTopQualityPlan(interaction.user.id, summary);
-  const nextAction = summary.qualityNextReason || (summary.qualityRegression > 0
-    ? "최우선 악화 보강 버튼이나 /qualityworse로 악화된 플랜부터 확인하세요."
-    : summary.quality > 0
-    ? "최우선 품질 보강 버튼이나 /qualitytodo로 고도화 후보를 확인하세요."
-    : summary.qualityUnaudited > 0
-    ? "품질 점검 생성 버튼이나 /qualitytodo로 오래된 플랜을 먼저 확인하세요."
-    : "현재 품질 보강이 필요한 내 플랜은 없습니다.");
-  await interaction.editReply({ content: [
-    "내 플랜 품질 요약",
-    `- 고도화 후보: ${summary.qualityAction}`,
-    `- 긴급 후보: ${summary.qualityUrgent}`,
-    `- 품질 확인: ${summary.quality}`,
-    `- 품질 악화: ${summary.qualityRegression}`,
-    `- 품질 개선: ${summary.qualityImproved}`,
-    qualityOkLine(summary),
-    qualityUnauditedLine(summary),
-    qualityActionBreakdownLine(summary),
-    qualityWarningFocusLine(summary),
-    qualityTargetLine(topPlan, summary),
-    `다음 액션: ${nextAction}`,
-    summary.qualityNextApiPath ? `- 다음 목록 API: ${summary.qualityNextApiPath}` : "",
-    summary.qualityNextTodoTextPath ? `- 다음 TODO text: ${summary.qualityNextTodoTextPath}` : "",
-    summary.qualityGatesPath ? `- 게이트 매트릭스 API: ${summary.qualityGatesPath}` : "",
-    summary.qualityGatesTextPath ? `- 게이트 매트릭스 text: ${summary.qualityGatesTextPath}` : "",
-    summary.qualityGatesCsvPath ? `- 게이트 매트릭스 CSV: ${summary.qualityGatesCsvPath}` : "",
-    summary.qualityGatesCsvGatePath ? `- 게이트 매트릭스 CSV 게이트: ${summary.qualityGatesCsvGatePath}` : "",
-    summary.qualityGatesReportPath ? `- 게이트 Markdown 리포트: ${summary.qualityGatesReportPath}` : "",
-    summary.qualityGatesReportGatePath ? `- 게이트 Markdown 리포트 게이트: ${summary.qualityGatesReportGatePath}` : "",
-    summary.qualityGatesMetricsPath ? `- 게이트 Metrics: ${summary.qualityGatesMetricsPath}` : "",
-    summary.qualityGatesMetricsGatePath ? `- 게이트 Metrics 게이트: ${summary.qualityGatesMetricsGatePath}` : "",
-    summary.qualityGatesEventsPath ? `- 게이트 Events: ${summary.qualityGatesEventsPath}` : "",
-    summary.qualityGatesEventsGatePath ? `- 게이트 Events 게이트: ${summary.qualityGatesEventsGatePath}` : "",
-    summary.qualityGatesAlertPath ? `- 게이트 Alert JSON: ${summary.qualityGatesAlertPath}` : "",
-    summary.qualityGatesAlertGatePath ? `- 게이트 Alert JSON 게이트: ${summary.qualityGatesAlertGatePath}` : "",
-    summary.qualityGatesHealthPath ? `- 게이트 Health: ${summary.qualityGatesHealthPath}` : "",
-    summary.qualityGatesRemediationPath ? `- 게이트 Runbook: ${summary.qualityGatesRemediationPath}` : "",
-    summary.qualityGatesRemediationGatePath ? `- 게이트 Runbook 게이트: ${summary.qualityGatesRemediationGatePath}` : "",
-    summary.qualityGatesBadgePath ? `- 게이트 배지 JSON: ${summary.qualityGatesBadgePath}` : "",
-    summary.qualityGatesBadgeSvgPath ? `- 게이트 배지 SVG: ${summary.qualityGatesBadgeSvgPath}` : "",
-    summary.qualityGatesBadgeMarkdownPath ? `- 게이트 배지 Markdown: ${summary.qualityGatesBadgeMarkdownPath}` : "",
-    summary.qualityGatesJunitPath ? `- 게이트 JUnit XML: ${summary.qualityGatesJunitPath}` : "",
-    summary.qualityGatesJunitGatePath ? `- 게이트 JUnit XML 게이트: ${summary.qualityGatesJunitGatePath}` : "",
-    summary.qualityGatesSarifPath ? `- 게이트 SARIF JSON: ${summary.qualityGatesSarifPath}` : "",
-    summary.qualityGatesSarifGatePath ? `- 게이트 SARIF JSON 게이트: ${summary.qualityGatesSarifGatePath}` : "",
-    summary.qualityGatesStepSummaryPath ? `- 게이트 Step Summary: ${summary.qualityGatesStepSummaryPath}` : "",
-    summary.qualityGatesStepSummaryGatePath ? `- 게이트 Step Summary 게이트: ${summary.qualityGatesStepSummaryGatePath}` : "",
-    summary.qualityGatesAnnotationsPath ? `- 게이트 Annotations: ${summary.qualityGatesAnnotationsPath}` : "",
-    summary.qualityGatesAnnotationsGatePath ? `- 게이트 Annotations 게이트: ${summary.qualityGatesAnnotationsGatePath}` : "",
-    summary.qualityGatesOutputsPath ? `- 게이트 Outputs: ${summary.qualityGatesOutputsPath}` : "",
-    summary.qualityGatesOutputsGatePath ? `- 게이트 Outputs 게이트: ${summary.qualityGatesOutputsGatePath}` : "",
-    summary.qualityGatesPrCommentPath ? `- 게이트 PR Comment: ${summary.qualityGatesPrCommentPath}` : "",
-    summary.qualityGatesPrCommentGatePath ? `- 게이트 PR Comment 게이트: ${summary.qualityGatesPrCommentGatePath}` : "",
-    summary.qualityGatesArtifactsPath ? `- 게이트 Artifacts JSON: ${summary.qualityGatesArtifactsPath}` : "",
-    summary.qualityGatesArtifactsGatePath ? `- 게이트 Artifacts JSON 게이트: ${summary.qualityGatesArtifactsGatePath}` : "",
-    summary.qualityGatesCiGuidePath ? `- CI 가이드 Markdown: ${summary.qualityGatesCiGuidePath}` : "",
-    summary.qualityGatesCiGuideGatePath ? `- CI 가이드 게이트 Markdown: ${summary.qualityGatesCiGuideGatePath}` : "",
-    summary.qualityGatesCommandsPath ? `- CI 명령 묶음 JSON: ${summary.qualityGatesCommandsPath}` : "",
-    summary.qualityGatesCommandsTextPath ? `- CI 명령 묶음 text: ${summary.qualityGatesCommandsTextPath}` : "",
-    summary.qualityGatesGatePath ? `- CI 게이트 매트릭스 API: ${summary.qualityGatesGatePath}` : "",
-    summary.qualityGatesGateTextPath ? `- CI 게이트 매트릭스 text: ${summary.qualityGatesGateTextPath}` : "",
-    summary.qualityGatesCommandsGatePath ? `- CI 명령 게이트 JSON: ${summary.qualityGatesCommandsGatePath}` : "",
-    summary.qualityGatesCommandsGateTextPath ? `- CI 명령 게이트 text: ${summary.qualityGatesCommandsGateTextPath}` : "",
-    summary.qualityGatesGateCurlCommand ? `- CI 게이트 명령: ${summary.qualityGatesGateCurlCommand}` : "",
-    summary.qualityGatesGateJsonCurlCommand ? `- CI 게이트 JSON 명령: ${summary.qualityGatesGateJsonCurlCommand}` : "",
-    summary.qualityGatesCsvGateCurlCommand ? `- CI 게이트 CSV 명령: ${summary.qualityGatesCsvGateCurlCommand}` : "",
-    summary.qualityGatesReportGateCurlCommand ? `- CI 게이트 리포트 명령: ${summary.qualityGatesReportGateCurlCommand}` : "",
-    summary.qualityGatesMetricsGateCurlCommand ? `- CI 게이트 Metrics 명령: ${summary.qualityGatesMetricsGateCurlCommand}` : "",
-    summary.qualityGatesEventsGateCurlCommand ? `- CI 게이트 Events 명령: ${summary.qualityGatesEventsGateCurlCommand}` : "",
-    summary.qualityGatesAlertGateCurlCommand ? `- CI 게이트 Alert 명령: ${summary.qualityGatesAlertGateCurlCommand}` : "",
-    summary.qualityGatesHealthCurlCommand ? `- Health 명령: ${summary.qualityGatesHealthCurlCommand}` : "",
-    summary.qualityGatesRemediationGateCurlCommand ? `- CI 게이트 Runbook 명령: ${summary.qualityGatesRemediationGateCurlCommand}` : "",
-    summary.qualityGatesGateNpmCommand ? `- npm CI 명령: ${summary.qualityGatesGateNpmCommand}` : "",
-    summary.qualityGatesGateJsonNpmCommand ? `- npm CI JSON 명령: ${summary.qualityGatesGateJsonNpmCommand}` : "",
-    summary.qualityGatesCsvGateNpmCommand ? `- npm CSV 명령: ${summary.qualityGatesCsvGateNpmCommand}` : "",
-    summary.qualityGatesReportGateNpmCommand ? `- npm Report 명령: ${summary.qualityGatesReportGateNpmCommand}` : "",
-    summary.qualityGatesMetricsGateNpmCommand ? `- npm Metrics 명령: ${summary.qualityGatesMetricsGateNpmCommand}` : "",
-    summary.qualityGatesEventsGateNpmCommand ? `- npm Events 명령: ${summary.qualityGatesEventsGateNpmCommand}` : "",
-    summary.qualityGatesAlertGateNpmCommand ? `- npm Alert 명령: ${summary.qualityGatesAlertGateNpmCommand}` : "",
-    summary.qualityGatesHealthNpmCommand ? `- npm Health 명령: ${summary.qualityGatesHealthNpmCommand}` : "",
-    summary.qualityGatesRemediationGateNpmCommand ? `- npm Runbook 명령: ${summary.qualityGatesRemediationGateNpmCommand}` : "",
-    summary.qualityGatesCiGuideGateNpmCommand ? `- npm CI 가이드 명령: ${summary.qualityGatesCiGuideGateNpmCommand}` : "",
-    summary.qualityGatesJunitGateNpmCommand ? `- npm JUnit XML 명령: ${summary.qualityGatesJunitGateNpmCommand}` : "",
-    summary.qualityGatesSarifGateNpmCommand ? `- npm SARIF 명령: ${summary.qualityGatesSarifGateNpmCommand}` : "",
-    summary.qualityGatesStepSummaryGateNpmCommand ? `- npm Step Summary 명령: ${summary.qualityGatesStepSummaryGateNpmCommand}` : "",
-    summary.qualityGatesAnnotationsGateNpmCommand ? `- npm Annotations 명령: ${summary.qualityGatesAnnotationsGateNpmCommand}` : "",
-    summary.qualityGatesOutputsGateNpmCommand ? `- npm Outputs 명령: ${summary.qualityGatesOutputsGateNpmCommand}` : "",
-    summary.qualityGatesPrCommentGateNpmCommand ? `- npm PR Comment 명령: ${summary.qualityGatesPrCommentGateNpmCommand}` : "",
-    summary.qualityGatesArtifactsGateNpmCommand ? `- npm Artifacts 명령: ${summary.qualityGatesArtifactsGateNpmCommand}` : "",
-    summary.qualityGatesGateCommandBundle ? `- CI 게이트 명령 묶음:\n${summary.qualityGatesGateCommandBundle}` : "",
-    summary.qualityGatesGateLocalShellPath ? `- 로컬 shell 예시 경로: ${summary.qualityGatesGateLocalShellPath}` : "",
-    summary.qualityGatesGateGithubActionsPath ? `- GitHub Actions 예시 경로: ${summary.qualityGatesGateGithubActionsPath}` : "",
-    summary.qualityGatesGateLocalShellExample ? `- 로컬 shell 예시:\n${summary.qualityGatesGateLocalShellExample}` : "",
-    summary.qualityGatesGateGithubActionsExample ? `- GitHub Actions 예시:\n${summary.qualityGatesGateGithubActionsExample}` : "",
-    summary.qualityGatePath ? `- 품질 게이트 API: ${summary.qualityGatePath}` : "",
-    summary.qualityGateTextPath ? `- 품질 게이트 text: ${summary.qualityGateTextPath}` : "",
-    summary.qualitySoftGatePath ? `- 완화 게이트 API: ${summary.qualitySoftGatePath}` : "",
-    summary.qualitySoftGateTextPath ? `- 완화 게이트 text: ${summary.qualitySoftGateTextPath}` : "",
-    summary.qualityUrgentGatePath ? `- 긴급 게이트 API: ${summary.qualityUrgentGatePath}` : "",
-    summary.qualityUrgentGateTextPath ? `- 긴급 게이트 text: ${summary.qualityUrgentGateTextPath}` : "",
-    summary.qualityUrgentSoftGatePath ? `- 긴급 완화 API: ${summary.qualityUrgentSoftGatePath}` : "",
-    summary.qualityUrgentSoftGateTextPath ? `- 긴급 완화 text: ${summary.qualityUrgentSoftGateTextPath}` : "",
-    summary.qualityNextGatePath ? `- 다음 게이트 API: ${summary.qualityNextGatePath}` : "",
-    summary.qualityNextGateTextPath ? `- 다음 게이트 text: ${summary.qualityNextGateTextPath}` : "",
-    summary.qualityNextSoftGatePath ? `- 다음 완화 API: ${summary.qualityNextSoftGatePath}` : "",
-    summary.qualityNextSoftGateTextPath ? `- 다음 완화 text: ${summary.qualityNextSoftGateTextPath}` : "",
-  ].filter(Boolean).join("\n"), components: qualityStatusComponents(summary, topPlan) });
-}
-
-async function buildQualityGateReply(discordUserId, options = {}) {
-  const urgent = Boolean(options.urgent);
-  const next = Boolean(options.next);
-  const maxActions = Number.isFinite(Number(options.maxActions)) ? Math.max(0, Math.min(100, Math.floor(Number(options.maxActions)))) : 0;
-  const minPriorityOption = Number.isFinite(Number(options.minPriority)) ? Math.max(0, Math.min(100, Math.floor(Number(options.minPriority)))) : 0;
-  const summary = await getPlanQualitySummary(DB_PATH, { discordUserId });
-  const filter = urgent ? "quality-action" : next ? String(summary.qualityNextFilter || "quality-action").trim() || "quality-action" : "quality-action";
-  const minPriority = minPriorityOption || (urgent || filter === "quality-urgent" ? 80 : 0);
-  const listFilter = filter === "quality-urgent" ? "quality-action" : filter;
-  const candidatePlans = (await listPlansByDiscordUser(discordUserId, 5000, DB_PATH, listFilter))
-    .filter((plan) => minPriority <= 0 || Number(plan.qualityActionPriority || 0) >= minPriority);
-  const count = candidatePlans.length;
-  const passed = count <= maxActions;
-  const topPlan = candidatePlans[0] || await findTopQualityPlan(discordUserId, summary);
-  const filterOptions = qualityTodoFilterOptions(filter, { minPriority, urgent });
-  const filterLabel = filterOptions.filterLabel || "고도화 후보";
-  return {
-    content: truncateText([
-      passed ? "품질 게이트 통과" : "품질 게이트 실패",
-      `- 기준: ${filterLabel}${minPriority > 0 ? ` · 우선도 ${minPriority} 이상` : ""}`,
-      `- 후보: ${count}개 / 허용 ${maxActions}개`,
-      `- 상태: ${passed ? "통과" : "실패"}`,
-      passed ? "" : `- 다음 액션: ${next ? "/qualitybrief next:true" : urgent || minPriority >= 80 ? "/qualitybrief urgent:true" : "/qualitybrief"}로 상위 후보를 묶어 보강하세요.`,
-      topPlan?.id ? qualityTargetLine(topPlan, summary) : "",
-    ].filter(Boolean).join("\n")),
-    summary,
-    topPlan,
-  };
-}
-
-function qualityGateMatrixLine(label, gate) {
-  const lines = String(gate?.content || "").split("\n");
-  const status = String(lines[0] || "품질 게이트 확인").replace(/^품질 게이트\s*/, "").trim();
-  const basis = String(lines.find((line) => line.startsWith("- 기준:")) || "").replace("- 기준:", "").trim();
-  const candidate = String(lines.find((line) => line.startsWith("- 후보:")) || "").replace("- 후보:", "").trim();
-  return `- ${label}: ${status}${candidate ? ` · ${candidate}` : ""}${basis ? ` · ${basis}` : ""}`;
-}
-
-function qualityGateNextAction(gate) {
-  return String(String(gate?.content || "").split("\n").find((line) => line.startsWith("- 다음 액션:")) || "")
-    .replace("- 다음 액션:", "")
-    .trim();
-}
-
-function appendQualityGateActions(lines, gates) {
-  const actions = [];
-  gates.forEach((gate) => {
-    const action = qualityGateNextAction(gate);
-    if (action && !actions.includes(action)) actions.push(action);
-  });
-  lines.push("", "추천 액션");
-  if (actions.length) {
-    lines.push(...actions.map((action) => `- ${action}`));
-    return;
-  }
-  lines.push("- 모든 기준을 통과했습니다. 신규 플랜 생성이나 다음 고도화로 넘어가도 됩니다.");
-}
-
-function appendQualityGateCommands(lines, summary = {}) {
-  const commands = Array.isArray(summary.qualityGatesGateCommands)
-    ? summary.qualityGatesGateCommands
-      .map((command) => command?.command ? `- ${command.label || command.key}: ${command.command}` : "")
-      .filter(Boolean)
-    : [
-      summary.qualityGatesGateCurlCommand ? `- text: ${summary.qualityGatesGateCurlCommand}` : "",
-      summary.qualityGatesGateJsonCurlCommand ? `- JSON: ${summary.qualityGatesGateJsonCurlCommand}` : "",
-      summary.qualityGatesGateNpmCommand ? `- npm: ${summary.qualityGatesGateNpmCommand}` : "",
-      summary.qualityGatesGateJsonNpmCommand ? `- npm JSON: ${summary.qualityGatesGateJsonNpmCommand}` : "",
-    ].filter(Boolean);
-  if (!commands.length) return;
-  lines.push("", "CI 명령", ...commands);
-  if (summary.qualityGatesGateCommandBundle) {
-    lines.push("", "CI 명령 묶음", summary.qualityGatesGateCommandBundle);
-  }
-  if (summary.qualityGatesGateGithubActionsExample) {
-    lines.push("", "GitHub Actions 예시", summary.qualityGatesGateGithubActionsExample);
-  }
-}
-
-async function buildQualityGatesReply(discordUserId) {
-  const [strictGate, softGate, urgentGate, urgentSoftGate] = await Promise.all([
-    buildQualityGateReply(discordUserId, { maxActions: 0 }),
-    buildQualityGateReply(discordUserId, { maxActions: 5 }),
-    buildQualityGateReply(discordUserId, { maxActions: 0, urgent: true }),
-    buildQualityGateReply(discordUserId, { maxActions: 5, urgent: true }),
-  ]);
-  const gates = [strictGate, softGate, urgentGate, urgentSoftGate];
-  const lines = [
-    "품질 게이트 매트릭스",
-    qualityGateMatrixLine("전체 strict", strictGate),
-    qualityGateMatrixLine("전체 완화 5", softGate),
-    qualityGateMatrixLine("긴급 strict", urgentGate),
-    qualityGateMatrixLine("긴급 완화 5", urgentSoftGate),
-  ];
-  if (strictGate.summary?.qualityNextFilter) {
-    const [nextGate, nextSoftGate] = await Promise.all([
-      buildQualityGateReply(discordUserId, { maxActions: 0, next: true }),
-      buildQualityGateReply(discordUserId, { maxActions: 5, next: true }),
-    ]);
-    lines.push(
-      qualityGateMatrixLine("다음 strict", nextGate),
-      qualityGateMatrixLine("다음 완화 5", nextSoftGate)
-    );
-    gates.push(nextGate, nextSoftGate);
-  }
-  appendQualityGateActions(lines, gates);
-  appendQualityGateCommands(lines, strictGate.summary);
-  return {
-    content: truncateText(lines.filter(Boolean).join("\n")),
-    summary: strictGate.summary,
-    topPlan: strictGate.topPlan,
-  };
-}
-
-async function handleQualityGate(interaction) {
-  await interaction.deferReply({ ephemeral: true });
-  const gate = await buildQualityGateReply(interaction.user.id, {
-    urgent: interaction.options.getBoolean("urgent") || false,
-    next: interaction.options.getBoolean("next") || false,
-    maxActions: interaction.options.getInteger("max_actions") ?? 0,
-    minPriority: interaction.options.getInteger("min_priority") || 0,
-  });
-  await interaction.editReply({
-    content: gate.content,
-    components: qualityStatusComponents(gate.summary, gate.topPlan),
-  });
-}
-
-async function handleQualityGates(interaction) {
-  await interaction.deferReply({ ephemeral: true });
-  const gates = await buildQualityGatesReply(interaction.user.id);
-  await interaction.editReply({
-    content: gates.content,
-    components: qualityStatusComponents(gates.summary, gates.topPlan),
-  });
-}
-
-async function handleQualityCommands(interaction) {
-  await interaction.deferReply({ ephemeral: true });
-  const summary = await getPlanQualitySummary(DB_PATH, { discordUserId: interaction.user.id });
-  const matrix = buildQualityGateMatrix(summary);
-  const gateLines = Array.isArray(matrix.gates)
-    ? matrix.gates
-      .map((gate) => `- ${gate.label || gate.key}: ${gate.failed ? "실패" : "통과"} · 후보 ${gate.count}개 / 허용 ${gate.limit}개`)
-      .filter(Boolean)
-    : [];
-  const commandLines = Array.isArray(matrix.commands)
-    ? matrix.commands
-      .map((command) => command?.command ? `- ${command.label || command.key}: ${command.command}` : "")
-      .filter(Boolean)
-    : [];
-  const commandBundle = String(matrix.commandBundle || summary.qualityGatesGateCommandBundle || "").trim();
-  const ciExampleLines = Array.isArray(matrix.ciExamples)
-    ? matrix.ciExamples
-      .map((example) => example?.body ? `${example.label || example.key}${example.path ? ` (${example.path})` : example.filename ? ` (${example.filename})` : ""}\n${example.body}` : "")
-      .filter(Boolean)
-    : [];
-  await interaction.editReply({
-    content: truncateText([
-      "품질 게이트 CI 명령",
-      ...gateLines,
-      summary.qualityGatesBadgePath ? `- badge JSON: ${summary.qualityGatesBadgePath}` : "",
-      summary.qualityGatesCsvPath ? `- CSV: ${summary.qualityGatesCsvPath}` : "",
-      summary.qualityGatesCsvGatePath ? `- CSV gate: ${summary.qualityGatesCsvGatePath}` : "",
-      summary.qualityGatesReportPath ? `- Report: ${summary.qualityGatesReportPath}` : "",
-      summary.qualityGatesReportGatePath ? `- Report gate: ${summary.qualityGatesReportGatePath}` : "",
-      summary.qualityGatesMetricsPath ? `- Metrics: ${summary.qualityGatesMetricsPath}` : "",
-      summary.qualityGatesMetricsGatePath ? `- Metrics gate: ${summary.qualityGatesMetricsGatePath}` : "",
-      summary.qualityGatesEventsPath ? `- Events: ${summary.qualityGatesEventsPath}` : "",
-      summary.qualityGatesEventsGatePath ? `- Events gate: ${summary.qualityGatesEventsGatePath}` : "",
-      summary.qualityGatesAlertPath ? `- Alert JSON: ${summary.qualityGatesAlertPath}` : "",
-      summary.qualityGatesAlertGatePath ? `- Alert JSON gate: ${summary.qualityGatesAlertGatePath}` : "",
-      summary.qualityGatesHealthPath ? `- Health: ${summary.qualityGatesHealthPath}` : "",
-      summary.qualityGatesRemediationPath ? `- Runbook: ${summary.qualityGatesRemediationPath}` : "",
-      summary.qualityGatesRemediationGatePath ? `- Runbook gate: ${summary.qualityGatesRemediationGatePath}` : "",
-      summary.qualityGatesBadgeSvgPath ? `- badge SVG: ${summary.qualityGatesBadgeSvgPath}` : "",
-      summary.qualityGatesBadgeMarkdownPath ? `- badge Markdown: ${summary.qualityGatesBadgeMarkdownPath}` : "",
-      summary.qualityGatesJunitPath ? `- JUnit XML: ${summary.qualityGatesJunitPath}` : "",
-      summary.qualityGatesJunitGatePath ? `- JUnit XML gate: ${summary.qualityGatesJunitGatePath}` : "",
-      summary.qualityGatesSarifPath ? `- SARIF JSON: ${summary.qualityGatesSarifPath}` : "",
-      summary.qualityGatesSarifGatePath ? `- SARIF JSON gate: ${summary.qualityGatesSarifGatePath}` : "",
-      summary.qualityGatesStepSummaryPath ? `- Step Summary: ${summary.qualityGatesStepSummaryPath}` : "",
-      summary.qualityGatesStepSummaryGatePath ? `- Step Summary gate: ${summary.qualityGatesStepSummaryGatePath}` : "",
-      summary.qualityGatesAnnotationsPath ? `- Annotations: ${summary.qualityGatesAnnotationsPath}` : "",
-      summary.qualityGatesAnnotationsGatePath ? `- Annotations gate: ${summary.qualityGatesAnnotationsGatePath}` : "",
-      summary.qualityGatesOutputsPath ? `- Outputs: ${summary.qualityGatesOutputsPath}` : "",
-      summary.qualityGatesOutputsGatePath ? `- Outputs gate: ${summary.qualityGatesOutputsGatePath}` : "",
-      summary.qualityGatesPrCommentPath ? `- PR Comment: ${summary.qualityGatesPrCommentPath}` : "",
-      summary.qualityGatesPrCommentGatePath ? `- PR Comment gate: ${summary.qualityGatesPrCommentGatePath}` : "",
-      summary.qualityGatesArtifactsPath ? `- Artifacts JSON: ${summary.qualityGatesArtifactsPath}` : "",
-      summary.qualityGatesArtifactsGatePath ? `- Artifacts JSON gate: ${summary.qualityGatesArtifactsGatePath}` : "",
-      summary.qualityGatesCiGuidePath ? `- CI guide: ${summary.qualityGatesCiGuidePath}` : "",
-      summary.qualityGatesCiGuideGatePath ? `- CI guide gate: ${summary.qualityGatesCiGuideGatePath}` : "",
-      summary.qualityGatesCommandsPath ? `- JSON: ${summary.qualityGatesCommandsPath}` : "",
-      summary.qualityGatesCommandsTextPath ? `- text: ${summary.qualityGatesCommandsTextPath}` : "",
-      summary.qualityGatesCommandsGatePath ? `- gate JSON: ${summary.qualityGatesCommandsGatePath}` : "",
-      summary.qualityGatesCommandsGateTextPath ? `- gate text: ${summary.qualityGatesCommandsGateTextPath}` : "",
-      commandLines.length ? ["", "명령 목록", ...commandLines].join("\n") : "",
-      commandBundle ? ["", "명령 묶음", commandBundle].join("\n") : "",
-      ciExampleLines.length ? ["", "CI 예시", ...ciExampleLines].join("\n\n") : "",
-    ].filter(Boolean).join("\n")),
-  });
-}
-
-async function handleQualityGateButton(interaction) {
-  const [, maxActions = "0", mode = ""] = interaction.customId.split(":");
-  await interaction.deferUpdate();
-  const gate = await buildQualityGateReply(interaction.user.id, {
-    maxActions: Number(maxActions),
-    next: mode === "next",
-    urgent: mode === "urgent",
-  });
-  await interaction.editReply({
-    content: gate.content,
-    components: qualityStatusComponents(gate.summary, gate.topPlan),
-  });
-}
-
-async function handleQualityWorse(interaction) {
-  await interaction.deferReply({ ephemeral: true });
-  await replyWithQualityList(interaction, "quality-regression", interaction.options.getInteger("limit") || 10);
-}
-
-async function handleQualityBetter(interaction) {
-  await interaction.deferReply({ ephemeral: true });
-  await replyWithQualityList(interaction, "quality-improved", interaction.options.getInteger("limit") || 10);
-}
-
-function qualityListConfig(filter) {
-  return {
-    "quality-action": {
-      title: "고도화 후보 플랜",
-      empty: "지금 고도화할 품질 후보 플랜이 없습니다.",
-    },
-    "quality-urgent": {
-      title: "긴급 품질 후보 플랜",
-      empty: "우선도 80 이상 긴급 품질 후보 플랜이 없습니다.",
-    },
-    quality: {
-      title: "품질 확인 플랜",
-      empty: "자동 품질 점검에서 보강이 필요한 플랜이 없습니다.",
-    },
-    "quality-regression": {
-      title: "품질 악화 플랜",
-      empty: "직전 버전보다 품질 확인 항목이 늘어난 플랜이 없습니다.",
-    },
-    "quality-improved": {
-      title: "품질 개선 플랜",
-      empty: "직전 버전보다 품질 확인 항목이 줄어든 플랜이 없습니다.",
-    },
-    "quality-ok": {
-      title: "품질 OK 플랜",
-      empty: "자동 품질 점검이 모두 OK인 플랜이 없습니다.",
-    },
-    "quality-unaudited": {
-      title: "품질 미점검 플랜",
-      empty: "자동 품질 점검이 아직 없는 플랜이 없습니다.",
-    },
-  }[filter] || null;
-}
-
-function qualityTodoFilterOptions(filter, options = {}) {
-  const config = qualityListConfig(filter);
-  const minPriority = Number.isFinite(Number(options.minPriority)) ? Math.max(0, Math.floor(Number(options.minPriority))) : 0;
-  const urgent = Boolean(options.urgent) || filter === "quality-urgent";
-  return {
-    ...options,
-    minPriority: urgent ? Math.max(80, minPriority) : minPriority,
-    filterLabel: String(options.filterLabel || (urgent ? "긴급 후보" : config?.title || "")).replace(/\s*플랜$/, ""),
-  };
-}
-
-function hasQualityTodoBundle(filter) {
-  return ["quality-action", "quality-urgent", "quality", "quality-regression", "quality-unaudited"].includes(filter);
-}
-
-function qualityButtonLabel(label, count) {
-  const value = Number(count);
-  return Number.isFinite(value) ? `${label} ${value}` : label;
-}
-
-function disableWhenEmpty(button, count) {
-  const value = Number(count);
-  return button.setDisabled(Number.isFinite(value) && value <= 0);
-}
-
-async function findTopQualityPlan(discordUserId, summary = {}) {
-  const filter = String(summary.qualityNextFilter || "").trim() || (Number(summary.qualityUrgent) > 0
-    ? "quality-urgent"
-    : Number(summary.qualityRegression) > 0
-    ? "quality-regression"
-    : Number(summary.quality) > 0
-    ? "quality"
-    : Number(summary.qualityUnaudited) > 0
-    ? "quality-unaudited"
-    : "");
-  if (!filter) return null;
-  const plans = await listPlansByDiscordUser(discordUserId, 1, DB_PATH, filter);
-  return plans[0] || null;
-}
-
-function qualityStatusComponents(summary = {}, topPlan = null, options = {}) {
-  const listButtons = [
-    disableWhenEmpty(
-      new ButtonBuilder()
-        .setCustomId("quality-list:quality-action")
-        .setLabel(qualityButtonLabel("고도화 후보", summary.qualityAction))
-        .setStyle(ButtonStyle.Primary),
-      summary.qualityAction
-    ),
-    disableWhenEmpty(
-      new ButtonBuilder()
-        .setCustomId("quality-list:quality-urgent")
-        .setLabel(qualityButtonLabel("긴급 후보", summary.qualityUrgent))
-        .setStyle(ButtonStyle.Danger),
-      summary.qualityUrgent
-    ),
-    disableWhenEmpty(
-      new ButtonBuilder()
-        .setCustomId("quality-list:quality")
-        .setLabel(qualityButtonLabel("품질 확인", summary.quality))
-        .setStyle(ButtonStyle.Secondary),
-      summary.quality
-    ),
-    disableWhenEmpty(
-      new ButtonBuilder()
-        .setCustomId("quality-list:quality-ok")
-        .setLabel(qualityButtonLabel("품질 OK", summary.qualityOk))
-        .setStyle(ButtonStyle.Secondary),
-      summary.qualityOk
-    ),
-    disableWhenEmpty(
-      new ButtonBuilder()
-        .setCustomId("quality-list:quality-unaudited")
-        .setLabel(qualityButtonLabel("품질 미점검", summary.qualityUnaudited))
-        .setStyle(ButtonStyle.Secondary),
-      summary.qualityUnaudited
-    ),
-  ];
-  const trendButtons = [
-    disableWhenEmpty(
-      new ButtonBuilder()
-        .setCustomId("quality-list:quality-regression")
-        .setLabel(qualityButtonLabel("품질 악화", summary.qualityRegression))
-        .setStyle(ButtonStyle.Secondary),
-      summary.qualityRegression
-    ),
-    disableWhenEmpty(
-      new ButtonBuilder()
-        .setCustomId("quality-list:quality-improved")
-        .setLabel(qualityButtonLabel("품질 개선", summary.qualityImproved))
-        .setStyle(ButtonStyle.Secondary),
-      summary.qualityImproved
-    ),
-  ];
-  const rows = [
-    new ActionRowBuilder().addComponents(...listButtons),
-    new ActionRowBuilder().addComponents(...trendButtons),
-  ];
-  const qualityFeedback = topPlan?.id ? buildQualityRefineFeedback(topPlan) : "";
-  const actionMode = options.actionMode || (!qualityFeedback && topPlan?.id ? "quality-audit" : "quality");
-  if (topPlan?.id && (qualityFeedback || actionMode === "quality-audit")) {
-    const planButtons = [
-      new ButtonBuilder()
-        .setCustomId(`plan-refine:${topPlan.id}:${actionMode}`)
-        .setLabel(actionMode === "quality-audit" ? "품질 점검 생성" : Number(summary.qualityUrgent) > 0 ? "최우선 긴급 보강" : Number(summary.qualityRegression) > 0 ? "최우선 악화 보강" : "최우선 품질 보강")
-        .setStyle(ButtonStyle.Primary),
-    ];
-    if (qualityFeedback) {
-      planButtons.push(
-        new ButtonBuilder()
-          .setCustomId(`quality-feedback:${topPlan.id}`)
-          .setLabel("보강 요청 보기")
-          .setStyle(ButtonStyle.Secondary)
-      );
-    }
-    const todoButtons = [
-      new ButtonBuilder()
-        .setCustomId("quality-brief:3")
-        .setLabel("TODO 3")
-        .setStyle(ButtonStyle.Secondary),
-      new ButtonBuilder()
-        .setCustomId("quality-brief:5")
-        .setLabel("TODO 5")
-        .setStyle(ButtonStyle.Secondary),
-      new ButtonBuilder()
-        .setCustomId("quality-brief:10")
-        .setLabel("TODO 10")
-        .setStyle(ButtonStyle.Secondary),
-      new ButtonBuilder()
-        .setCustomId("quality-brief:10:urgent")
-        .setLabel("긴급 TODO")
-        .setStyle(ButtonStyle.Secondary),
-      new ButtonBuilder()
-        .setCustomId("quality-brief:10:next")
-        .setLabel("다음 TODO")
-        .setStyle(ButtonStyle.Secondary)
-    ];
-    rows.push(new ActionRowBuilder().addComponents(...planButtons));
-    rows.push(new ActionRowBuilder().addComponents(...todoButtons));
-  }
-  if (options.showGateButtons !== false) {
-    const gateButtons = [
-      new ButtonBuilder()
-        .setCustomId("quality-gate:0")
-        .setLabel("게이트")
-        .setStyle(ButtonStyle.Secondary),
-      new ButtonBuilder()
-        .setCustomId("quality-gate:5")
-        .setLabel("완화 5")
-        .setStyle(ButtonStyle.Secondary),
-      new ButtonBuilder()
-        .setCustomId("quality-gate:0:urgent")
-        .setLabel("긴급 게이트")
-        .setStyle(ButtonStyle.Secondary),
-      new ButtonBuilder()
-        .setCustomId("quality-gate:5:urgent")
-        .setLabel("긴급 완화")
-        .setStyle(ButtonStyle.Secondary)
-    ];
-    if (summary.qualityNextFilter) {
-      gateButtons.push(
-        new ButtonBuilder()
-          .setCustomId("quality-gate:5:next")
-          .setLabel("다음 완화")
-          .setStyle(ButtonStyle.Secondary)
-      );
-    }
-    rows.push(new ActionRowBuilder().addComponents(...gateButtons));
-  }
-  return rows;
-}
-
-async function replyWithQualityList(interaction, filter, limit = 10, options = {}) {
-  const config = qualityListConfig(filter);
-  if (!config) {
-    await interaction.editReply("지원하지 않는 품질 목록입니다.");
-    return;
-  }
-  const minPriority = Number.isFinite(Number(options.minPriority)) ? Math.max(0, Math.min(100, Math.floor(Number(options.minPriority)))) : 0;
-  const plans = (await listPlansByDiscordUser(interaction.user.id, limit, DB_PATH, filter))
-    .filter((plan) => minPriority <= 0 || Number(plan.qualityActionPriority || 0) >= minPriority);
-  const summary = await getPlanQualitySummary(DB_PATH, { discordUserId: interaction.user.id });
-  if (plans.length === 0) {
-    await interaction.editReply({ content: minPriority > 0 ? `우선도 ${minPriority} 이상 품질 고도화 후보가 없습니다.` : config.empty, components: qualityStatusComponents(summary) });
-    return;
-  }
-  const lines = plans.map((plan) => qualityPlanListLine(plan, filter));
-  const topPlan = filter === "quality-action" || filter === "quality-urgent" || filter === "quality" || filter === "quality-regression" || filter === "quality-unaudited"
-    ? plans[0]
-    : await findTopQualityPlan(interaction.user.id, summary);
-  const candidateLimit = Math.min(10, Math.max(1, Number(limit) || 5));
-  const qualityTodo = hasQualityTodoBundle(filter) ? qualityTodoBriefText(summary, topPlan, plans.slice(0, candidateLimit), qualityTodoFilterOptions(filter, { minPriority })) : "";
-  const body = [`${config.title}`, qualityTodo, lines.join("\n")].filter(Boolean).join("\n\n");
-  await interaction.editReply({
-    content: truncateText(body),
-    components: [
-      ...mineComponents(plans, interaction.user.id),
-      ...qualityStatusComponents(summary, topPlan, { actionMode: filter === "quality-unaudited" || planNeedsQualityAudit(topPlan) ? "quality-audit" : "quality", showGateButtons: false }),
-    ],
-  });
-}
-
-async function handleQualityListButton(interaction) {
-  const [, filter = "quality"] = interaction.customId.split(":");
-  await interaction.deferUpdate();
-  await replyWithQualityList(interaction, filter);
-}
-
-async function handleQualityBriefButton(interaction) {
-  await interaction.deferUpdate();
-  const [, limitValue, mode = ""] = interaction.customId.split(":");
-  const limit = Number(limitValue || 5);
-  const safeLimit = Number.isFinite(limit) ? Math.max(1, Math.min(10, Math.floor(limit))) : 5;
-  const urgent = mode === "urgent";
-  const next = mode === "next";
-  const summary = await getPlanQualitySummary(DB_PATH, { discordUserId: interaction.user.id });
-  const topPlan = await findTopQualityPlan(interaction.user.id, summary);
-  const filter = next ? String(summary.qualityNextFilter || "quality-action").trim() || "quality-action" : "quality-action";
-  const candidatePlans = await listPlansByDiscordUser(interaction.user.id, urgent || next ? 10 : safeLimit, DB_PATH, urgent ? "quality-action" : filter);
-  const todoTopPlan = next ? candidatePlans[0] || topPlan : topPlan;
-  await interaction.editReply({
-    content: truncateText(qualityTodoBriefText(summary, todoTopPlan, candidatePlans, qualityTodoFilterOptions(filter, urgent || filter === "quality-urgent" ? { minPriority: 80, urgent } : { urgent }))),
-    components: qualityStatusComponents(summary, todoTopPlan),
-  });
-}
-
-async function handleQualityFeedbackButton(interaction) {
-  const planId = Number(interaction.customId.split(":")[1]);
-  const plan = await getPlan(planId, DB_PATH);
-  if (!plan) {
-    await interaction.reply({ content: `플랜 #${planId}을 찾지 못했습니다.`, ephemeral: true });
-    return;
-  }
-  if (
-    !(await ensurePlanOwner(
-      interaction,
-      plan,
-      "이 플랜은 다른 사용자가 만든 플랜이라 품질 보강 요청을 볼 수 없습니다."
-    ))
-  ) {
-    return;
-  }
-  const feedback = buildQualityRefineFeedback(plan);
-  if (!feedback) {
-    await interaction.reply({ content: "자동 품질 점검에서 보강이 필요한 항목이 없습니다.", ephemeral: true });
-    return;
-  }
-  await interaction.reply({
-    content: truncateText(`플랜 #${plan.id} ${plan.destination || "여행"} 품질 보강 요청\n${feedback}`),
-    ephemeral: true,
-    components: [
-      new ActionRowBuilder().addComponents(
-        new ButtonBuilder()
-          .setCustomId(`plan-refine:${plan.id}:quality`)
-          .setLabel("이 요청으로 보강")
-          .setStyle(ButtonStyle.Primary)
-      ),
-    ],
-  });
-}
 
 async function handleSearch(interaction) {
   await interaction.deferReply({ ephemeral: true });
@@ -6591,6 +5541,22 @@ async function handleInteraction(interaction) {
   try {
     if (!(await requireAllowedGuild(interaction))) return;
     if (!(await requireAllowedUser(interaction))) return;
+    if (interaction.isButton() && interaction.customId === "access-env") {
+      await handleAccessEnv(interaction);
+      return;
+    }
+    if (interaction.isButton() && interaction.customId === "access-whoami") {
+      await handleWhoami(interaction);
+      return;
+    }
+    if (interaction.isButton() && interaction.customId === "access-policy") {
+      await handlePolicy(interaction);
+      return;
+    }
+    if (interaction.isButton() && interaction.customId === "access-recover") {
+      await handleRecover(interaction);
+      return;
+    }
     if (interaction.isButton() && interaction.customId === "start-quick") {
       await handleStartQuickButton(interaction);
       return;
@@ -6601,10 +5567,6 @@ async function handleInteraction(interaction) {
     }
     if (interaction.isButton() && interaction.customId === "start-offline") {
       await handleOffline(interaction);
-      return;
-    }
-    if (interaction.isButton() && interaction.customId === "start-iphone") {
-      await handleIphone(interaction);
       return;
     }
     if (interaction.isButton() && interaction.customId === "mobile-dashboard") {
@@ -6645,30 +5607,6 @@ async function handleInteraction(interaction) {
     }
     if (interaction.isButton() && interaction.customId === "mobile-offline") {
       await handleOffline(interaction);
-      return;
-    }
-    if (interaction.isButton() && interaction.customId === "mobile-iphone") {
-      await handleIphone(interaction);
-      return;
-    }
-    if (interaction.isButton() && interaction.customId === "iphone-doctor") {
-      await handleDoctor(interaction);
-      return;
-    }
-    if (interaction.isButton() && interaction.customId === "iphone-whoami") {
-      await handleWhoami(interaction);
-      return;
-    }
-    if (interaction.isButton() && interaction.customId === "iphone-policy") {
-      await handlePolicy(interaction);
-      return;
-    }
-    if (interaction.isButton() && interaction.customId === "iphone-recover") {
-      await handleRecover(interaction);
-      return;
-    }
-    if (interaction.isButton() && interaction.customId === "iphone-env") {
-      await handleIphoneEnvButton(interaction);
       return;
     }
     if (interaction.isButton() && interaction.customId === "mobile-maps") {
@@ -6882,22 +5820,6 @@ async function handleInteraction(interaction) {
       await handleVersionSelect(interaction);
       return;
     }
-    if (interaction.isButton() && interaction.customId.startsWith("quality-list:")) {
-      await handleQualityListButton(interaction);
-      return;
-    }
-    if (interaction.isButton() && interaction.customId.startsWith("quality-gate:")) {
-      await handleQualityGateButton(interaction);
-      return;
-    }
-    if (interaction.isButton() && interaction.customId.startsWith("quality-brief")) {
-      await handleQualityBriefButton(interaction);
-      return;
-    }
-    if (interaction.isButton() && interaction.customId.startsWith("quality-feedback:")) {
-      await handleQualityFeedbackButton(interaction);
-      return;
-    }
     if (!interaction.isChatInputCommand()) return;
 
     if (interaction.commandName === "start") await handleStart(interaction);
@@ -6920,8 +5842,6 @@ async function handleInteraction(interaction) {
     if (interaction.commandName === "home") await handleDashboard(interaction);
     if (interaction.commandName === "dashboard") await handleDashboard(interaction);
     if (interaction.commandName === "mobile") await handleMobile(interaction);
-    if (interaction.commandName === "iphone") await handleIphone(interaction);
-    if (interaction.commandName === "iphoneenv") await handleIphoneEnvButton(interaction);
     if (interaction.commandName === "recover") await handleRecover(interaction);
     if (interaction.commandName === "whoami") await handleWhoami(interaction);
     if (interaction.commandName === "policy") await handlePolicy(interaction);
@@ -6940,18 +5860,6 @@ async function handleInteraction(interaction) {
     if (interaction.commandName === "mine") await handleMine(interaction);
     if (interaction.commandName === "pinned") await handlePinned(interaction);
     if (interaction.commandName === "upcoming") await handleUpcoming(interaction);
-    if (interaction.commandName === "quality") await handleQuality(interaction);
-    if (interaction.commandName === "qualitytodo") await handleQualityTodo(interaction);
-    if (interaction.commandName === "qualityurgent") await handleQualityUrgent(interaction);
-    if (interaction.commandName === "qualitybrief") await handleQualityBrief(interaction);
-    if (interaction.commandName === "qualityok") await handleQualityOk(interaction);
-    if (interaction.commandName === "qualityunaudited") await handleQualityUnaudited(interaction);
-    if (interaction.commandName === "qualitystatus") await handleQualityStatus(interaction);
-    if (interaction.commandName === "qualitygate") await handleQualityGate(interaction);
-    if (interaction.commandName === "qualitygates") await handleQualityGates(interaction);
-    if (interaction.commandName === "qualitycommands") await handleQualityCommands(interaction);
-    if (interaction.commandName === "qualityworse") await handleQualityWorse(interaction);
-    if (interaction.commandName === "qualitybetter") await handleQualityBetter(interaction);
     if (interaction.commandName === "backup") await handleBackup(interaction);
     if (interaction.commandName === "search") await handleSearch(interaction);
     if (interaction.commandName === "checklist") await handleChecklist(interaction);

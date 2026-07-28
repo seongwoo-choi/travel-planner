@@ -2,7 +2,6 @@ const ACCESS_KEY_STORAGE = "travelPlannerAccessKey";
 const ACCESS_KEY_SESSION_STORAGE = "travelPlannerSessionAccessKey";
 const ACCESS_KEY_URL_PARAMS = ["travelAccessKey", "travel_access_key", "accessKey", "access_key"];
 const LLM_OPTIONS_STORAGE = "travelPlannerLlmOptions";
-const OPERATOR_STATUS_MAX_RETRY_SECONDS = 300;
 let connectivityBanner = null;
 let refreshAccessKeyTools = () => {};
 
@@ -221,50 +220,6 @@ function bindLlmFormPreferences(form, onChange) {
   };
   if (providerSelect) providerSelect.addEventListener("change", remember);
   if (modelInput) modelInput.addEventListener("input", remember);
-}
-
-function createOperatorStatusRetryScheduler(loadStatusFn, getStatusFn = () => window.travelPlannerStatus) {
-  let retryTimer = null;
-
-  function clearRetry() {
-    if (retryTimer) {
-      window.clearTimeout(retryTimer);
-      retryTimer = null;
-    }
-  }
-
-  function retryWhenVisible() {
-    if (document.visibilityState === "hidden") return;
-    Promise.resolve(loadStatusFn()).catch((err) => {
-      console.debug("operator status retry failed", err);
-    });
-  }
-
-  window.addEventListener("pagehide", clearRetry);
-  window.addEventListener("visibilitychange", () => {
-    if (document.visibilityState !== "visible") return;
-    if (getStatusFn()?.operatorDetailsState === "rate-limited" && !retryTimer) {
-      retryWhenVisible();
-    }
-  });
-
-  return function schedule(status) {
-    const retryAfterValue = Number(status?.operatorRetryAfterSeconds || 0);
-    if (
-      status?.operatorDetailsState !== "rate-limited" ||
-      !Number.isFinite(retryAfterValue) ||
-      retryAfterValue <= 0
-    ) {
-      clearRetry();
-      return;
-    }
-    const retryAfter = Math.min(OPERATOR_STATUS_MAX_RETRY_SECONDS, Math.ceil(retryAfterValue));
-    clearRetry();
-    retryTimer = window.setTimeout(() => {
-      retryTimer = null;
-      retryWhenVisible();
-    }, retryAfter * 1000);
-  };
 }
 
 function updateAccessKeyToolLabels(changeButton, sessionButton) {

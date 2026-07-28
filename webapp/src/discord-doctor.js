@@ -202,7 +202,7 @@ function checkPublicBaseUrl() {
 
   const host = url.hostname;
   if (host === "localhost" || host === "127.0.0.1" || host === "::1") {
-    report("WARN", "web detail URL", `${rawUrl} opens on the Mac, not from iPhone`);
+    report("WARN", "web detail URL", `${rawUrl} opens on the Mac, not from another device`);
     return;
   }
 
@@ -282,15 +282,11 @@ function checkHealthApiConfig() {
 }
 
 function checkStorageBackupConfig() {
-  const opsWorkflowsPath = process.env.TRAVEL_OPS_WORKFLOWS_PATH || "reports/ops-workflows.json";
-  const preflightSummaryPath = process.env.TRAVEL_PREFLIGHT_SUMMARY_PATH || "reports/preflight.json";
   const backupFilePath = process.env.TRAVEL_BACKUP_FILE_PATH || "travel-planner-backup.json";
   const backupFileCheckPath = process.env.TRAVEL_BACKUP_FILE_CHECK_PATH || "reports/storage-backup-file-check.json";
   const manifestPath = process.env.TRAVEL_BACKUP_MANIFEST_PATH || "reports/storage-backup-manifest.json";
   const verifyPath = process.env.TRAVEL_BACKUP_MANIFEST_VERIFY_PATH || manifestPath;
   const verifyOutputPath = process.env.TRAVEL_BACKUP_VERIFY_PATH || "reports/storage-backup-verify.json";
-  report("OK", "workflow evidence", `index ${resolveWebappPath(opsWorkflowsPath)}`);
-  report("OK", "preflight evidence", `summary ${resolveWebappPath(preflightSummaryPath)}`);
   report(
     "OK",
     "storage backup evidence",
@@ -329,9 +325,8 @@ function checkLaunchdPlist() {
 function printAccessRecoveryHints() {
   console.log("\nAccess recovery:");
   console.log("- In Discord, use /whoami for user/server IDs and /policy for current allowlist status.");
-  console.log("- Use /iphoneenv to receive a ready-to-copy iPhone/Discord .env file.");
-  console.log("- /start, /iphone, /whoami, /policy, /iphoneenv, and /recover are setup/ID/env recovery commands and still answer before allowlists are ready.");
-  console.log("- Use /iphone or the External Use button in /start to check iPhone LTE/5G conditions before allowlists are ready.");
+  console.log("- Use the settings button to receive a ready-to-copy Discord .env snippet.");
+  console.log("- /start, /whoami, /policy, and /recover are setup/ID recovery commands and still answer before allowlists are ready.");
   console.log("- Blocked Discord responses include recovery buttons: 외부 사용, 설정, 내 ID, 정책.");
   console.log("- Admins can use /denied in Discord or npm run bot:denied on Mac to inspect recent access-denied logs.");
   console.log("\nStorage backup/restore:");

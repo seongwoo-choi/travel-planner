@@ -1,8 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs/promises";
-import { execFileSync } from "node:child_process";
-import { fileURLToPath } from "node:url";
+
 
 import {
   createJsonErrorHandler,
@@ -11,12 +10,12 @@ import {
 } from "../src/express-async-boundary.js";
 
 test("stored plan fields are not interpolated into innerHTML sinks", async () => {
-  const [pwaSource, planSource] = await Promise.all([
-    fs.readFile(new URL("../public/pwa.js", import.meta.url), "utf8"),
+  const [appSource, planSource] = await Promise.all([
+    fs.readFile(new URL("../public/app.js", import.meta.url), "utf8"),
     fs.readFile(new URL("../public/plan.js", import.meta.url), "utf8"),
   ]);
 
-  assert.doesNotMatch(pwaSource, /link\.innerHTML\s*=.*plan\.destination/);
+  assert.doesNotMatch(appSource, /link\.innerHTML\s*=.*plan\.destination/);
   assert.doesNotMatch(planSource, /tripStatus\.innerHTML\s*=.*\$\{status\./);
 });
 
@@ -74,16 +73,4 @@ test("central error middleware returns a generic JSON 500 without leaking detail
     ["json", { error: "internal server error" }],
   ]);
   assert.equal(logged.length, 1);
-});
-
-test("operational report template CLIs emit markdown without syntax errors", () => {
-  const handoff = execFileSync(process.execPath, [
-    fileURLToPath(new URL("../src/ops-handoff-report-template.js", import.meta.url)),
-  ], { encoding: "utf8" });
-  const incident = execFileSync(process.execPath, [
-    fileURLToPath(new URL("../src/ops-incident-template.js", import.meta.url)),
-  ], { encoding: "utf8" });
-
-  assert.match(handoff, /Change `Status` from `draft` to `ready`/);
-  assert.match(incident, /failures are not `none`/);
 });

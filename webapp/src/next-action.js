@@ -27,7 +27,7 @@ export function buildNextAction(plan, now = new Date()) {
       commandLine("/departure", "출발 브리핑", "출발 전 이동/예약/준비 흐름을 한 번에 확인"),
       commandLine("/checklist", "체크리스트", "빠뜨리기 쉬운 준비물과 예약 확인"),
       commandLine("/packing", "짐싸기", "날씨와 일정 기준 짐 목록 확인"),
-      commandLine("/calendar", "캘린더 다운로드", "일정을 iPhone/Google Calendar에 넣기"),
+      commandLine("/calendar", "캘린더 다운로드", "일정을 캘린더 앱 또는 Google Calendar에 넣기"),
       "",
       "작은 팁: 출발 전에는 새 기능보다 누락 방지가 이깁니다. 체크리스트를 먼저 닫고 세부 일정은 그 다음에 다듬는 편이 안전합니다."
     );

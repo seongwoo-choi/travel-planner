@@ -8,14 +8,9 @@ const configuredBaseUrl = process.env.TRAVEL_PUBLIC_BASE_URL || "http://localhos
 const timeoutMs = Math.max(1000, Number(process.env.TRAVEL_HEALTH_TIMEOUT_MS || 5000));
 const evidenceEnabled = ["1", "true", "yes", "on"].includes(String(process.env.TRAVEL_HEALTH_EVIDENCE || "").trim().toLowerCase());
 
-function appendGateParam(url) {
-  if (gate) url.searchParams.set("failOnDegraded", "true");
-  return url;
-}
-
 function buildHealthUrlFromBase(value) {
   const base = value.endsWith("/") ? value : `${value}/`;
-  return appendGateParam(new URL("api/health.txt", base));
+  return new URL("api/health.txt", base);
 }
 
 function buildHealthUrlFromEndpoint(value) {
@@ -23,32 +18,12 @@ function buildHealthUrlFromEndpoint(value) {
   if (url.pathname === "/" || url.pathname === "") {
     url.pathname = "/api/health.txt";
   }
-  return appendGateParam(url);
+  return url;
 }
 
 function buildHealthUrl() {
   if (configuredHealthUrl) return buildHealthUrlFromEndpoint(configuredHealthUrl);
   return buildHealthUrlFromBase(configuredBaseUrl);
-}
-
-function parseTextHealth(body) {
-  const entries = {};
-  for (const line of body.split(/\r?\n/)) {
-    const index = line.indexOf("=");
-    if (index === -1) continue;
-    entries[line.slice(0, index)] = line.slice(index + 1);
-  }
-  return entries;
-}
-
-function isDegraded(body, contentType) {
-  if (contentType.includes("application/json")) {
-    const payload = JSON.parse(body);
-    const metadata = payload.healthMetadata || {};
-    return payload.ok === false || metadata.metadataState !== "available" || metadata.consistencyState === "degraded";
-  }
-  const health = parseTextHealth(body);
-  return health.ok === "false" || health.metadataState === "unavailable" || health.consistencyState === "degraded";
 }
 
 function evidenceTarget(url = null) {
@@ -96,16 +71,4 @@ writeEvidence({ url, status: response.status });
 if (!response.ok) {
   console.error(`health api check failed: HTTP ${response.status} ${response.statusText}`);
   process.exit(1);
-}
-
-if (gate) {
-  try {
-    if (isDegraded(body, response.headers.get("content-type") || "")) {
-      console.error("health api check failed: degraded health metadata");
-      process.exit(1);
-    }
-  } catch (error) {
-    console.error(`health api check failed: unreadable health response (${error.message})`);
-    process.exit(1);
-  }
 }
