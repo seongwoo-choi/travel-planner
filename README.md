@@ -2,79 +2,37 @@
 
 # Travel Planner
 
-Evidence-grounded itinerary planning for Claude Code and Codex.
+**Evidence-grounded itinerary planning for Claude Code and Codex.**
 
-[English](README.md) | [한국어](README.ko.md)
+[English](README.md) | [한국어](README.ko.md) | [日本語](README.ja.md) | [简体中文](README.zh-CN.md)
 
+[![verify](https://github.com/seongwoo-choi/travel-planner/actions/workflows/verify.yml/badge.svg)](https://github.com/seongwoo-choi/travel-planner/actions/workflows/verify.yml)
 ![Node.js](https://img.shields.io/badge/Node.js-22%2B-339933?logo=node.js&logoColor=white)
 ![Claude Code](https://img.shields.io/badge/Claude_Code-compatible-D97757)
 ![Codex](https://img.shields.io/badge/Codex-compatible-111827)
-![Status](https://img.shields.io/badge/status-experimental-orange)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 </div>
 
-Travel Planner is a portable agent harness for building multi-day itineraries from explicit evidence. Claude Code and Codex share the same workflow, evidence contract, deterministic scheduler, validator, and report exporter.
+Travel Planner turns a natural-language trip request into an evidence-backed, multi-day itinerary. Claude Code and Codex share one workflow, one evidence contract, a deterministic scheduler, fail-closed validation, and portable reports.
 
-The planner does not use an LLM as the source of truth for places, opening hours, weather, or travel time. Agents collect evidence; the core validates and schedules it.
+> The LLM is not the source of truth for places, opening hours, weather, or travel time. Agents collect evidence; the core validates and schedules it.
 
-## Why this exists
+## Why Travel Planner
 
-Travel plans often look polished while hiding weak assumptions: missing travel time becomes zero, unknown opening hours become all-day access, and future weather is written as if it were known. This project keeps those unknowns visible.
+A polished itinerary can hide dangerous assumptions: a missing route becomes zero minutes, unknown opening hours become all-day access, or an unpublished forecast becomes a fact. Travel Planner keeps uncertainty visible and actionable.
 
-It provides:
+| Instead of | Travel Planner does |
+| --- | --- |
+| Inventing a fact | Requires sourced, dated, unexpired evidence |
+| Treating missing travel time as zero | Rejects the route as unschedulable |
+| Calling an unknown place “indoor” | Requires positive evidence for `indoor: true` |
+| Hiding uncertainty | Produces `needs_review` with confirmation tasks |
+| Letting an agent book autonomously | Requires explicit approval before any external mutation |
 
-- one canonical workflow for Claude Code and Codex
-- a provider-neutral JSON evidence contract
-- deterministic bounded itinerary search
-- fail-closed validation for missing, unknown, malformed, stale, or expired evidence
-- Markdown, self-contained HTML, and PDF reports
-- explicit approval boundaries before booking, payment, or any external mutation
+## Install
 
-## How it works
-
-```text
-Natural-language trip request
-            |
-            v
-skills/travel-planner/SKILL.md
-            |
-            v
-requirements.json + evidence.json
-            |
-            v
-validate -> deterministic plan -> Markdown
-            |
-            v
-travel_plan.md + travel_plan.html + travel_plan.pdf
-```
-
-Claude Code loads `.claude/skills/travel-planner/SKILL.md`. Codex loads `.agents/skills/travel-planner/SKILL.md`. Both adapters point to `skills/travel-planner/SKILL.md`, which is the only canonical workflow.
-
-## Safety model
-
-The core applies the following rules:
-
-- A place is schedulable only when its opening hours are verified for the assigned date.
-- Missing travel-time evidence never becomes a zero-minute route.
-- `outdoor: false` is not proof that a place is indoors.
-- Unavailable evidence cannot produce a `ready` plan.
-- Evidence snapshots need a recognized status, collection time, and expiry time.
-- Forecast horizon and provider failure are different states.
-- Bounded-search output is reported as approximate, not globally optimal.
-- Booking and payment require a separate, explicit user approval.
-
-See [the evidence contract](skills/travel-planner/references/evidence-contract.md) and [the report contract](skills/travel-planner/references/report-contract.md).
-
-## Requirements
-
-- Node.js 22 or later
-- Claude Code 2.x or Codex CLI
-- Google Chrome, Chromium, or `CHROME_BIN` for PDF export
-
-The core has no runtime npm dependencies. Provider credentials are optional because agents can collect evidence with the web or map tools available in their runtime.
-
-## Install as a plugin
+### As a plugin
 
 Install the same Git marketplace in either runtime, then start a new session.
 
@@ -88,19 +46,33 @@ codex plugin marketplace add seongwoo-choi/travel-planner
 codex plugin add travel-planner@travel-planner
 ```
 
-The plugin bundles the canonical skill and the JavaScript core. You do not need to copy skills, maintain runtime-specific planner code, or install a global npm package. Ask for a travel plan in natural language; the agent creates the trip workspace and runs the bundled validation, planning, and report commands.
+The plugin bundles the canonical skill and JavaScript core. No global planner package, skill copying, or runtime-specific implementation is required.
 
-## Run from source
+### Update an installed plugin
+
+```bash
+# Claude Code
+claude plugin update travel-planner@travel-planner
+
+# Codex
+codex plugin marketplace upgrade travel-planner
+codex plugin remove travel-planner@travel-planner
+codex plugin add travel-planner@travel-planner
+```
+
+### Run from source
 
 ```bash
 git clone https://github.com/seongwoo-choi/travel-planner.git
 cd travel-planner
-npm install
+npm ci
 ```
 
-## Quick start
+Requirements: Node.js 22+, Claude Code 2.x or Codex CLI. PDF export additionally needs Google Chrome, Chromium, or `CHROME_BIN`.
 
-Ask Claude Code or Codex for a trip plan in natural language:
+## Plan a trip
+
+Ask Claude Code or Codex in natural language:
 
 ```text
 Plan a 4-day trip to Da Nang for two people.
@@ -108,9 +80,9 @@ We are flying from Incheon, staying near My Khe Beach,
 and prefer a relaxed schedule with evening views.
 ```
 
-The agent follows the canonical skill, writes workspace artifacts, validates the evidence, generates the plan, and exports the reports.
+The agent collects evidence, writes a trip workspace, validates it, creates the itinerary, and generates reports. It does not book anything.
 
-To run the deterministic pipeline directly:
+## Run the deterministic pipeline directly
 
 ```bash
 npm run validate -- \
@@ -128,6 +100,24 @@ npm run report -- \
   --output-dir=_workspace/03_report
 ```
 
+`npm run report` writes Markdown and self-contained HTML before PDF export. If Chrome is unavailable, it reports the PDF failure instead of fabricating a file.
+
+## What the agent must prove
+
+```text
+Natural-language request
+        ↓
+requirements.json + evidence.json
+        ↓
+validate → deterministic plan → report
+        ↓
+plan.json + Markdown + HTML + PDF (when Chrome is available)
+```
+
+The canonical workflow is [`skills/travel-planner/SKILL.md`](skills/travel-planner/SKILL.md). Claude Code and Codex adapters point to that single source; there is no separate planner logic per runtime.
+
+See the [evidence contract](skills/travel-planner/references/evidence-contract.md) and [report contract](skills/travel-planner/references/report-contract.md).
+
 ## Workspace contract
 
 ```text
@@ -139,37 +129,52 @@ _workspace/
   02_plan/
     plan.json
     travel_plan.md
-
-trips/{country}/{destination}/
-  travel_plan.md
-  travel_plan.html
-  travel_plan.pdf
+  03_report/
+    travel_plan.md
+    travel_plan.html
+    travel_plan.pdf
 ```
 
-`plan.json` and the evidence snapshots are the source of truth. Markdown, HTML, and PDF are derived outputs.
+Evidence snapshots and `plan.json` are the source of truth. Markdown, HTML, and PDF are derived artifacts. Installed plugin caches are distribution-only and must never receive trip artifacts.
 
 ## Plan status
 
 | Status | Meaning |
 | --- | --- |
-| `ready` | The current evidence passed validation. This does not mean anything has been booked. |
-| `needs_review` | The plan is usable, but weather, transport, coverage, or another evidence item still needs confirmation. |
-| `conflict` | The itinerary violates a hard constraint and must not be treated as complete. |
+| `ready` | Current evidence passed validation. This does **not** mean anything is booked. |
+| `needs_review` | The itinerary is usable, but weather, transport, coverage, or another evidence item needs confirmation. |
+| `conflict` | A hard constraint is violated. Do not treat the itinerary as complete. |
+
+## Offline example
+
+[`examples/danang/`](examples/danang/) is a four-day fixture for exercising the pipeline. It is test data, not live travel advice. Its weather is `forecast_horizon` and flights are `unavailable`, so the expected result is `needs_review`.
+
+```bash
+npm run dogfood:offline
+```
 
 ## Commands
 
 | Command | Purpose |
 | --- | --- |
-| `npm test` | Run contract, regression, integration, and bounded-search tests |
-| `npm run validate` | Validate requirements and evidence without writing plan artifacts |
+| `npm test` | Contract, regression, integration, and bounded-search tests |
+| `npm run validate` | Validate requirements and evidence without writing a plan |
 | `npm run plan` | Generate structured JSON and Markdown from evidence |
-| `npm run report` | Export Markdown, self-contained HTML, and PDF |
-| `npm run bench` | Run the 50-place, 31-day bounded-search benchmark |
-| `npm run dogfood:offline` | Run the Da Nang fixture through plan and HTML report generation |
+| `npm run report` | Export Markdown, HTML, and PDF when Chrome is available |
+| `npm run bench` | Run the bounded 50-place, 31-day benchmark |
+| `npm run dogfood:offline` | Run the offline Da Nang acceptance fixture |
 
-## Offline dogfood
+## Safety and scope
 
-`examples/danang/` contains a four-day Da Nang fixture used to exercise the portable pipeline. It is test data, not live travel advice. Weather has `forecast_horizon` status and flights are `unavailable`, so the expected status is `needs_review`.
+- A place is schedulable only when opening hours are verified for its assigned date.
+- Missing route evidence never becomes a zero-minute route.
+- Evidence needs a recognized status, collection time, and expiry time.
+- Forecast horizon and provider failure are distinct states.
+- Search is bounded and approximate; it is not presented as globally optimal.
+- The core never books transport, stays, restaurants, or activities.
+- Before booking, payment, or another external mutation, an agent must present the exact target, terms, and action for explicit approval.
+
+Do not commit credentials, signed URLs, booking references, traveler data, or generated personal trip reports.
 
 ## Project layout
 
@@ -177,49 +182,36 @@ trips/{country}/{destination}/
 skills/travel-planner/          Canonical workflow and contracts
 .claude/skills/travel-planner/  Claude Code adapter
 .agents/skills/travel-planner/  Codex adapter
+.claude-plugin/                 Shared marketplace and plugin manifests
 scripts/                        Validate, plan, and report CLIs
 src/planner/                    Evidence lifecycle and scheduler
-src/harness-*.js                Input normalization and artifact runner
 src/report-exporter.js          Escaped HTML and PDF export
 test/                           Contract and regression tests
 examples/danang/                Offline acceptance fixture
 ```
 
-## Limitations
-
-- Evidence quality depends on the original sources and tools available to the agent.
-- Live flight schedules, inventory, prices, and cancellation rules need separate confirmation.
-- Forecasts outside the provider horizon remain `needs_review` until their refresh date.
-- The core does not book transport, accommodation, restaurants, or activities.
-- Search is bounded for predictable runtime, so the result is not guaranteed to be globally optimal.
-
 ## Development
 
 ```bash
+npm ci
 npm test
 npm run bench
 npm run dogfood:offline
 npm audit --audit-level=moderate
 ```
 
-Keep changes surgical. New behavior needs tests, and bug fixes need a regression guard. Do not commit credentials, generated trip reports, or personal workspace data.
+The GitHub Actions workflow verifies tests, the benchmark, audit, strict plugin validation, and marketplace installation for both Claude Code and Codex.
 
 ## Contributing
 
-Issues and focused pull requests are welcome. Include:
+Focused issues and pull requests are welcome. Include:
 
-- the user-visible problem
-- a minimal reproduction or fixture
-- tests for the changed behavior
-- the commands used to verify the change
+1. the user-visible problem;
+2. a minimal reproduction or fixture;
+3. a regression or behavior test; and
+4. the commands used to verify the change.
 
-Avoid broad cleanup in the same pull request as a functional change.
-
-## Security
-
-Do not report credentials or personal travel data in a public issue. Remove API keys, tokens, signed query parameters, booking references, and traveler details from reproductions.
-
-The project rejects credential-bearing `source` and `sourceUrl` values at the CLI boundary and escapes report content before generating HTML.
+Keep changes surgical. Do not mix unrelated cleanup into a behavior change.
 
 ## License
 

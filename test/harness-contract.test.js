@@ -79,13 +79,15 @@ test("project instructions route travel planning through the portable skill", ()
   assert.match(claude, /AGENTS\.md/);
 });
 
-test("open-source documentation keeps English primary and Korean translation in sync", () => {
+test("open-source documentation keeps English primary and translations in sync", () => {
   const english = read("README.md");
   const korean = read("README.ko.md");
+  const japanese = read("README.ja.md");
+  const chinese = read("README.zh-CN.md");
   const license = read("LICENSE");
 
-  for (const readme of [english, korean]) {
-    assert.match(readme, /\[English\]\(README\.md\) \| \[한국어\]\(README\.ko\.md\)/);
+  for (const readme of [english, korean, japanese, chinese]) {
+    assert.match(readme, /\[English\]\(README\.md\) \| \[한국어\]\(README\.ko\.md\) \| \[日本語\]\(README\.ja\.md\) \| \[简体中文\]\(README\.zh-CN\.md\)/);
     assert.match(readme, /\[MIT License\]\(LICENSE\)/);
     assert.match(readme, /npm run dogfood:offline/);
     assert.match(readme, /examples\/danang\/requirements\.json/);
@@ -94,9 +96,12 @@ test("open-source documentation keeps English primary and Korean translation in 
     assert.match(readme, /`unavailable`/);
     assert.match(readme, /plugin marketplace add seongwoo-choi\/travel-planner/);
     assert.match(readme, /travel-planner@travel-planner/);
+    assert.match(readme, /--output-dir=_workspace\/03_report/);
     assert.doesNotMatch(readme, /_workspace\/01_evidence\/evidence\.json/);
   }
   assert.match(english, /Evidence-grounded itinerary planning/);
   assert.match(korean, /evidence 기반 여행 일정 플래너/);
+  assert.match(japanese, /エビデンスに基づく旅行プラン/);
+  assert.match(chinese, /基于证据的旅行规划/);
   assert.match(license, /^MIT License\n/);
 });
