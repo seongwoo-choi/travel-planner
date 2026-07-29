@@ -1,7 +1,7 @@
-node_modules/
 .DS_Store
 **/.DS_Store
 .codegraph/
+webapp/node_modules/
 .agents/*
 !.agents/skills/
 .agents/skills/*
@@ -10,7 +10,7 @@ node_modules/
 .codex/
 .claude/settings.local.json
 .env
-npm-debug.log*
+
 
 PLAN.md
 EXPERIMENTS.md

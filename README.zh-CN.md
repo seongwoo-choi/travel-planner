@@ -79,6 +79,7 @@ plan.json + Markdown + HTML + PDF（仅在 renderer 成功时）
 
 - [证据数据契约](skills/travel-planner/references/evidence-contract.md)
 - [报告契约](skills/travel-planner/references/report-contract.md)
+- [需求契约](skills/travel-planner/references/requirements-contract.md)
 
 ## Workspace 结构
 

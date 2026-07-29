@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-01-01T00:00:00Z",
+  "evidence": {
+    "places": {
+      "source": "",
+      "fetchedAt": "",
+      "expiresAt": "",
+      "status": "unavailable",
+      "destinationLocation": null,
+      "items": [],
+      "searchCoverage": []
+    },
+    "weather": {
+      "source": "",
+      "fetchedAt": "",
+      "expiresAt": "",
+      "status": "unavailable",
+      "days": []
+    },
+    "timezone": {
+      "source": "",
+      "fetchedAt": "",
+      "expiresAt": "",
+      "status": "unavailable"
+    },
+    "travel": {
+      "source": "",
+      "fetchedAt": "",
+      "expiresAt": "",
+      "status": "unavailable",
+      "matrix": {}
+    }
+  }
+}

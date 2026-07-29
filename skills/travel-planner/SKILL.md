@@ -23,7 +23,7 @@ Claude Code와 Codex에서 동일하게 실행하는 여행 계획 workflow다. 
 
 이미 제공된 값은 다시 묻지 않는다. 최소 필수값은 목적지, 시작일, 종료일 또는 숙박 수, 인원이다. 출발지, 예산, 동행 유형, 선호, 숙소, 주요 교통, 도착·출발 시각은 제공된 범위만 기록한다.
 
-`templates/requirements.json`을 복사해 `_workspace/00_input/requirements.json`에 저장한다.
+[Requirements Contract](references/requirements-contract.md)를 확인하고 `templates/requirements.json`을 복사해 `_workspace/00_input/requirements.json`에 저장한다.
 
 ### 2. Evidence 수집
 
@@ -34,7 +34,7 @@ Claude Code와 Codex에서 동일하게 실행하는 여행 계획 workflow다. 
 - 이동: 기준지↔장소와 장소↔장소 matrix; 주요 교통은 현지 이동과 분리
 - 실내 여부: 양성 근거가 있을 때만 `indoor: true`; `outdoor: false`만으로 실내라고 단정하지 않는다.
 
-`references/evidence-contract.md`를 따르고 `_workspace/01_evidence/evidence.json`에 저장한다. `generatedAt`과 각 snapshot의 `fetchedAt`, `expiresAt`을 ISO timestamp로 기록한다. 출처 URL에 credential, token, signature를 넣지 않는다.
+[Evidence Contract](references/evidence-contract.md)를 따르고 `templates/evidence.json`을 바탕으로 `_workspace/01_evidence/evidence.json`에 저장한다. `generatedAt`과 각 snapshot의 `fetchedAt`, `expiresAt`을 ISO timestamp로 기록한다. 출처 URL에 credential, token, signature를 넣지 않는다.
 
 ### 3. 직접 검증 및 일정 생성
 
@@ -45,7 +45,7 @@ plugin cache는 read-only distribution이며 여행 artifact를 쓰는 위치가
 3. 장소는 해당 날짜의 `openingHoursStatus: verified`와 영업시간이 있고, 필요한 이동시간이 측정된 경우에만 배치한다. 누락된 이동시간을 0분으로 추정하지 않는다. `unavailable` snapshot의 payload는 사용하지 않는다.
 4. 각 날짜에 도착·출발 시각, 영업시간, 체류시간, 장소 간 이동시간, 식사·휴식 시간을 적용한다. 활동의 시간 겹침과 기준지 복귀 제약을 직접 점검한다.
 5. `_workspace/02_plan/plan.json`에 requirements, 사용한 evidence source와 fetchedAt, 상태, 일별 활동, 이동시간, 확인 작업을 구조화해 작성한다. `_workspace/02_plan/travel_plan.md`에는 같은 내용을 사람이 읽을 수 있게 작성한다.
-6. 작성한 두 artifact를 다시 읽어 JSON parse, 날짜·시간 일관성, evidence source, 상태와 확인 작업의 존재를 확인한다.
+6. 작성한 두 artifact를 다시 읽어 JSON parse, 날짜·시간 일관성, evidence source, 상태와 확인 작업의 존재를 확인한다. [Plan Review](templates/plan-review.md)를 완료 조건으로 사용한다.
 
 - `conflict`: hard constraint를 고치기 전 보고서를 확정하지 않는다.
 - `needs_review`: 일정과 미확인 항목을 함께 제공한다.

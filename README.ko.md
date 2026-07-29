@@ -79,6 +79,7 @@ plan.json + Markdown + HTML + PDF (renderer 성공 시만)
 
 - [근거 데이터 계약](skills/travel-planner/references/evidence-contract.md)
 - [보고서 계약](skills/travel-planner/references/report-contract.md)
+- [요구사항 계약](skills/travel-planner/references/requirements-contract.md)
 
 ## Workspace 구조
 

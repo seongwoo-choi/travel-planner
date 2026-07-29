@@ -8,6 +8,11 @@ for file in \
   .claude-plugin/marketplace.json \
   .claude-plugin/plugin.json \
   skills/travel-planner/SKILL.md \
+  skills/travel-planner/references/requirements-contract.md \
+  skills/travel-planner/references/evidence-contract.md \
+  skills/travel-planner/references/report-contract.md \
+  skills/travel-planner/templates/evidence.json \
+  skills/travel-planner/templates/plan-review.md \
   .claude/skills/travel-planner/SKILL.md \
   .agents/skills/travel-planner/SKILL.md; do
   test -f "$file"
@@ -21,6 +26,12 @@ grep -Fq 'skills/travel-planner/SKILL.md' .claude/skills/travel-planner/SKILL.md
 grep -Fq 'skills/travel-planner/SKILL.md' .agents/skills/travel-planner/SKILL.md
 grep -Fq '직접 검증' skills/travel-planner/SKILL.md
 grep -Fq '실제 파일' skills/travel-planner/SKILL.md
+grep -Fq 'requirements-contract.md' skills/travel-planner/SKILL.md
+
+python3 -m json.tool .claude-plugin/plugin.json >/dev/null
+python3 -m json.tool .claude-plugin/marketplace.json >/dev/null
+python3 -m json.tool skills/travel-planner/templates/requirements.json >/dev/null
+python3 -m json.tool skills/travel-planner/templates/evidence.json >/dev/null
 
 grep -Fq 'skill-first' README.md
 grep -Fq 'npm install' README.md && exit 1 || true

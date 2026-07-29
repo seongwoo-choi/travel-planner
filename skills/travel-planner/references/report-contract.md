@@ -23,8 +23,8 @@
 
 산출물:
 
-- `travel_plan.md`: source Markdown
-- `travel_plan.html`: self-contained UTF-8, A4 print CSS
-- `travel_plan.pdf`: HTML을 headless Chrome으로 변환한 실제 PDF
+- `travel_plan.md`: 기본 산출물인 source Markdown
+- `travel_plan.html`: 사용 가능한 도구로 실제 생성·재검증했을 때의 self-contained UTF-8 HTML
+- `travel_plan.pdf`: HTML을 실제 renderer로 변환하고 파일을 검사했을 때만 제공하는 PDF
 
-세 파일이 모두 생성되지 않으면 3종 산출 완료라고 보고하지 않는다.
+Markdown은 항상 실제 파일로 작성·재검증한다. HTML/PDF는 runtime에 renderer가 있고 실제 생성·검증했을 때만 추가한다. renderer 실패나 미설치는 PDF 완료로 표현하지 않는다.

@@ -79,6 +79,7 @@ plan.json + Markdown + HTML + PDF（renderer 成功時のみ）
 
 - [根拠データの契約](skills/travel-planner/references/evidence-contract.md)
 - [レポートの契約](skills/travel-planner/references/report-contract.md)
+- [要件の契約](skills/travel-planner/references/requirements-contract.md)
 
 ## Workspace の構成
 

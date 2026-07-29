@@ -81,6 +81,7 @@ The canonical workflow is [`skills/travel-planner/SKILL.md`](skills/travel-plann
 
 - [Evidence contract](skills/travel-planner/references/evidence-contract.md)
 - [Report contract](skills/travel-planner/references/report-contract.md)
+- [Requirements contract](skills/travel-planner/references/requirements-contract.md)
 
 ## Workspace contract
 
