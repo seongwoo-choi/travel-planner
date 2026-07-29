@@ -32,6 +32,8 @@ A polished itinerary can hide dangerous assumptions: a missing route becomes zer
 
 ## Install
 
+> **Current availability:** This repository is private. The commands below require GitHub authentication and repository access. Make the repository public before sharing these install instructions with users who do not already have access.
+
 ### As a plugin
 
 Install the same Git marketplace in either runtime, then start a new session.
