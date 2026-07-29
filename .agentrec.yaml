@@ -1,0 +1,5 @@
+version: 1
+verify:
+  - name: node-test
+    command: ["npm", "test"]
+    timeout: 5m
