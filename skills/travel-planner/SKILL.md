@@ -62,10 +62,11 @@ npm run plan -- \
 ```bash
 npm run report -- \
   --requirements=_workspace/00_input/requirements.json \
-  --markdown=_workspace/02_plan/travel_plan.md
+  --markdown=_workspace/02_plan/travel_plan.md \
+  --output-dir=_workspace/03_report
 ```
 
-`trips/{국가}/{도시}/travel_plan.md`, `.html`, `.pdf` 3종을 생성한다. Chrome을 찾지 못하면 PDF를 꾸며내지 말고 실패 원인을 보고한다. 구조는 `references/report-contract.md`를 따른다.
+`_workspace/03_report/travel_plan.md`, `.html`, `.pdf` 3종을 생성한다. Chrome을 찾지 못하면 PDF를 꾸며내지 말고 실패 원인을 보고한다. 구조는 `references/report-contract.md`를 따른다.
 
 ### 5. 부분 재실행
 

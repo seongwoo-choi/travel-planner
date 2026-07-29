@@ -14,6 +14,7 @@ test("portable harness has one canonical skill with thin Claude and Codex adapte
 
   assert.match(canonical, /^---\nname: travel-planner\n/m);
   assert.match(canonical, /scripts\/plan-from-evidence\.js/);
+  assert.match(canonical, /npm run report[\s\S]*--output-dir=_workspace\/03_report/);
   assert.doesNotMatch(canonical, /TeamCreate|TaskCreate|TaskGet|TeamDelete|SendMessage/);
 
   for (const adapter of [claude, codex]) {

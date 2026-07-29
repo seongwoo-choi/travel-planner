@@ -9,7 +9,7 @@
     {
       "name": "travel-planner",
       "description": "Plan evidence-grounded itineraries with deterministic validation and reports.",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "source": "./",
       "skills": [
         "./skills/travel-planner"

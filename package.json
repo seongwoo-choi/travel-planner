@@ -1,6 +1,6 @@
 {
   "name": "travel-planner-harness",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "license": "MIT",
   "description": "Evidence-grounded travel planning harness for Claude Code and Codex",
