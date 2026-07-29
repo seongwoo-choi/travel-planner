@@ -17,7 +17,7 @@
 
 top-level `generatedAt`은 필수 ISO-8601 timestamp다. freshness clock으로는 사용하지 않으며 artifact provenance만 나타낸다.
 
-모든 snapshot은 `source`, ISO-8601 `fetchedAt`, ISO-8601 `expiresAt`, `status`를 가진다. `expiresAt`은 `fetchedAt`보다 뒤여야 하며 해당 시각부터 만료다. 5분 clock skew를 넘는 미래 `fetchedAt`, 누락·malformed timestamp, 만료된 snapshot은 planner가 거부한다. 확인할 수 없는 값은 생략하거나 `unavailable`로 표시한다.
+모든 snapshot은 `source`, ISO-8601 `fetchedAt`, ISO-8601 `expiresAt`, `status`를 가진다. `expiresAt`은 `fetchedAt`보다 뒤여야 하며 해당 시각부터 만료다. 5분 clock skew를 넘는 미래 `fetchedAt`, 누락·malformed timestamp, 만료된 snapshot은 agent가 일정 입력으로 거부한다. 확인할 수 없는 값은 생략하거나 `unavailable`로 표시한다.
 
 ## places
 
@@ -63,6 +63,6 @@ matrix 누락 경로는 0분이 아니다. travel snapshot 자체가 `unavailabl
 ## Provenance
 
 - URL은 공개 source URL만 기록한다.
-- API key, token, credential, signature 등 인증 query parameter나 URL userinfo가 포함된 `sourceUrl`은 CLI가 거부한다.
+- API key, token, credential, signature 등 인증 query parameter나 URL userinfo가 포함된 `sourceUrl`은 agent가 artifact에 쓰기 전에 거부한다.
 - blog/LLM 요약만으로 영업시간·가격·교통시간을 verified로 만들지 않는다.
 - 서로 충돌하는 source는 최신성만으로 자동 선택하지 말고 확인 작업으로 남긴다.

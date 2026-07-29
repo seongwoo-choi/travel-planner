@@ -2,41 +2,34 @@
 
 # Travel Planner
 
-**Claude Code と Codex のための根拠に基づく旅行プラン**
+**Claude Code と Codex のための、根拠に基づく skill-first 旅行プランナー**
 
 [English](README.md) | [한국어](README.ko.md) | [日本語](README.ja.md) | [简体中文](README.zh-CN.md)
 
 [![verify](https://github.com/seongwoo-choi/travel-planner/actions/workflows/verify.yml/badge.svg)](https://github.com/seongwoo-choi/travel-planner/actions/workflows/verify.yml)
-![Node.js](https://img.shields.io/badge/Node.js-22%2B-339933?logo=node.js&logoColor=white)
 ![Claude Code](https://img.shields.io/badge/Claude_Code-compatible-D97757)
 ![Codex](https://img.shields.io/badge/Codex-compatible-111827)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 </div>
 
-Travel Planner は、自然言語の旅行依頼を確認可能な根拠に基づく複数日程に変換します。Claude Code と Codex は、同じ手順、根拠データの形式、日程計算、検証規則、レポート出力を共有します。
+Travel Planner は自然言語の旅行依頼を根拠付きの日程に変換します。本体は一つの基準 skill、根拠・レポートの契約、workspace template です。日程計算ライブラリや runtime 専用 application ではありません。
 
-> LLM は場所、営業時間、天気、移動時間を事実と判断する根拠ではありません。エージェントが根拠データを集め、コアが検証して日程を組みます。
+> LLM は場所、営業時間、天気、移動時間の事実を裏付けるものではありません。エージェントは出典を集め、根拠データを直接確認し、不確実な点を確認項目として残します。
 
-## Travel Planner が解決すること
+## 防ぐこと
 
-見栄えの良い日程でも、危険な仮定が紛れ込むことがあります。移動時間がないのに 0 分とする、営業時間が不明なのに終日営業とみなす、まだ発表されていない予報を事実として書く、といった問題です。Travel Planner は不確実な点を隠さず、確認が必要な項目として残します。
-
-| 代わりに | Travel Planner の動作 |
+| 代わりに | Travel Planner の基準 |
 | --- | --- |
-| 事実を推測する | 出典、収集日時、有効期限を持つ根拠データを要求 |
-| 未取得の移動時間を 0 分とする | その経路を配置不可として扱う |
-| 不明な場所を屋内と断定する | `indoor: true` を裏付ける根拠データを要求 |
-| 不確実性を隠す | 確認タスク付きの `needs_review` を返す |
-| エージェントが自動予約する | 外部変更の前に明示的な承認を要求 |
+| 事実を推測する | 出典、収集日時、有効期限を持つ根拠データ |
+| 未取得の移動時間を 0 分にする | その経路を配置不可とする |
+| 不明な営業時間を営業中とする | 配置日の確認済み営業時間 |
+| 不確実性を隠す | `needs_review` と具体的な確認項目 |
+| エージェントが自動予約する | すべての外部変更前に明示的な承認 |
 
 ## インストール
 
-> **現在の公開状態:** このリポジトリは private です。以下のコマンドを実行するには、GitHub への認証とリポジトリへのアクセス権が必要です。アクセス権のないユーザーにこの手順を共有する場合は、先にリポジトリを public にしてください。
-
-### plugin としてインストール
-
-両方の実行環境に同じ Git marketplace を追加し、新しいセッションを開始します。
+> **現在の公開状態:** このリポジトリは private です。インストールには GitHub 認証とリポジトリへのアクセス権が必要です。アクセス権のないユーザーに共有する前に public にしてください。
 
 ```bash
 # Claude Code
@@ -48,172 +41,103 @@ codex plugin marketplace add seongwoo-choi/travel-planner
 codex plugin add travel-planner@travel-planner
 ```
 
-plugin には基準となる skill と JavaScript core が含まれます。global planner package の導入、skill のコピー、実行環境ごとの実装は必要ありません。
+plugin には基準 skill、契約、template が含まれます。インストール後は新しいセッションを開始してください。
 
-### インストール済み plugin の更新
+### 更新
 
 ```bash
-# Claude Code
 claude plugin update travel-planner@travel-planner
 
-# Codex
 codex plugin marketplace upgrade travel-planner
 codex plugin remove travel-planner@travel-planner
 codex plugin add travel-planner@travel-planner
 ```
 
-### ソースコードから実行
-
-```bash
-git clone https://github.com/seongwoo-choi/travel-planner.git
-cd travel-planner
-npm ci
-```
-
-Node.js 22 以上と Claude Code 2.x または Codex CLI が必要です。PDF 出力には Google Chrome、Chromium、または `CHROME_BIN` も必要です。
-
 ## 旅行を計画する
 
-Claude Code または Codex に自然言語で依頼します。
-
 ```text
-ダナンを2人で4日間旅行する計画を作ってください。
-仁川から飛行機で行き、ミーケービーチ近くに滞在します。
+ダナンを2人で3泊4日旅行する計画を作ってください。
+仁川から出発し、ミーケービーチの近くに滞在します。
 ゆったりした日程と夜景を希望します。
 ```
 
-エージェントは根拠データを集め、旅行用の作業フォルダーを作成して検証を行い、日程とレポートを生成します。予約は実行しません。
+エージェントは workspace を作り、read-only の根拠を収集して直接検証します。日程とレポート artifact を書き、もう一度読んで確認します。予約は実行しません。
 
-## 日程計算を直接実行する
-
-```bash
-npm run validate -- \
-  --requirements=examples/danang/requirements.json \
-  --evidence=examples/danang/evidence.json
-
-npm run plan -- \
-  --requirements=examples/danang/requirements.json \
-  --evidence=examples/danang/evidence.json \
-  --output-dir=_workspace/02_plan
-
-npm run report -- \
-  --requirements=examples/danang/requirements.json \
-  --markdown=_workspace/02_plan/travel_plan.md \
-  --output-dir=_workspace/03_report
-```
-
-`npm run report` は PDF export 前に Markdown と自己完結 HTML を作成します。Chrome が見つからない場合は、PDF を捏造せず失敗理由を報告します。
-
-## 動作の流れ
+## 作業の流れ
 
 ```text
 自然言語の依頼
     ↓
 requirements.json + evidence.json
     ↓
-validate → deterministic plan → report
+根拠と日程の直接検証
     ↓
-plan.json + Markdown + HTML + PDF（Chrome 利用可能時）
+plan.json + Markdown + HTML + PDF（renderer 成功時のみ）
 ```
 
-基準となる手順は [`skills/travel-planner/SKILL.md`](skills/travel-planner/SKILL.md) にあります。Claude Code と Codex の adapter は同じファイルを参照しており、実行環境ごとに異なる日程計算の実装はありません。
+基準手順は [`skills/travel-planner/SKILL.md`](skills/travel-planner/SKILL.md) です。Claude Code と Codex の adapter は両方ともこのファイルを参照し、どちらの runtime も別の日程計算ロジックを持ちません。
 
-[根拠データの契約](skills/travel-planner/references/evidence-contract.md) と [レポートの契約](skills/travel-planner/references/report-contract.md) を参照してください。
+- [根拠データの契約](skills/travel-planner/references/evidence-contract.md)
+- [レポートの契約](skills/travel-planner/references/report-contract.md)
 
 ## Workspace の構成
 
 ```text
 _workspace/
-  00_input/
-    requirements.json
-  01_evidence/
-    evidence.json
-  02_plan/
-    plan.json
-    travel_plan.md
-  03_report/
-    travel_plan.md
-    travel_plan.html
-    travel_plan.pdf
+  00_input/requirements.json
+  01_evidence/evidence.json
+  02_plan/plan.json
+  02_plan/travel_plan.md
+  03_report/travel_plan.md
+  03_report/travel_plan.html
+  03_report/travel_plan.pdf
 ```
 
-収集した根拠データと `plan.json` が基準データです。Markdown、HTML、PDF はそこから作られる出力です。インストール済みのプラグインキャッシュは配布専用なので、旅行 artifact を書き込んではいけません。
+根拠データと `plan.json` が基準データです。Markdown、HTML、PDF は出力です。plugin cache は配布用であり、旅行 artifact を書き込んではいけません。
 
-## 行程の状態
+## 状態
 
 | 状態 | 意味 |
 | --- | --- |
-| `ready` | 現在の根拠データが検証を通過しました。予約完了を意味しません。 |
-| `needs_review` | 日程は使用できますが、天気、交通、収集範囲、その他の根拠データの確認が必要です。 |
+| `ready` | エージェントが現在の根拠と artifact を直接検証しました。予約完了ではありません。 |
+| `needs_review` | 日程は使えますが、指定した根拠の追加確認が必要です。 |
 | `conflict` | hard constraint に違反しています。完了した日程として扱ってはいけません。 |
 
 ## Offline 例
 
-[`examples/danang/`](examples/danang/) は4日間のダナン旅行を試すためのサンプルデータです。実際の旅行情報ではありません。天気は `forecast_horizon`、航空便は `unavailable` のため、想定される status は `needs_review` です。
-
-```bash
-npm run dogfood:offline
-```
-
-## コマンド
-
-| コマンド | 用途 |
-| --- | --- |
-| `npm test` | 契約、回帰、統合、bounded-search test |
-| `npm run validate` | plan を書かず requirements と根拠データを検証 |
-| `npm run plan` | 根拠データから structured JSON と Markdown を生成 |
-| `npm run report` | Chrome 利用可能時に Markdown、HTML、PDF を出力 |
-| `npm run bench` | 50 places、31 days の bounded benchmark |
-| `npm run dogfood:offline` | offline ダナン acceptance サンプルを実行 |
+[`examples/danang/`](examples/danang/) は skill を確認するための3泊4日のサンプルです。実際の旅行情報ではありません。天気は `forecast_horizon`、航空便は `unavailable` のため、正しい結果は `needs_review` です。
 
 ## 安全性と範囲
 
-- 配置日の営業時間が確認された場所だけが候補になります。
-- 未取得の経路根拠データを 0 分の経路として扱うことはありません。
-- 根拠データには認識可能な status、収集日時、有効期限が必要です。
-- forecast horizon と provider failure は別の状態です。
-- search は bounded・approximate であり、全体最適とは主張しません。
-- コアは交通、宿泊、飲食店、活動を予約しません。
-- 予約、支払い、その他の外部変更の前には、対象、条件、操作を示して明示的な承認を得る必要があります。
-
-認証情報、署名付き URL、予約番号、旅行者情報、生成済みの個人旅行レポートを commit しないでください。
+- 入力 JSON、timestamp、status、source URL、営業時間、移動時間、日程を直接検証します。
+- 欠けている根拠を推測や事実に変えません。
+- 実際の renderer が成功したときだけ PDF を提供します。失敗時は検証済み HTML と理由を提供します。
+- 予約、支払い、その他の外部変更前に、対象、条件、操作を示して明示的な承認を得ます。
+- 認証情報、署名付き URL、予約番号、旅行者データ、生成した個人レポートを commit しないでください。
 
 ## プロジェクト構成
 
 ```text
-skills/travel-planner/          基準となる手順と契約
+.claude-plugin/                 marketplace と plugin manifest
+skills/travel-planner/          基準 skill、契約、template
 .claude/skills/travel-planner/  Claude Code adapter
 .agents/skills/travel-planner/  Codex adapter
-.claude-plugin/                 共通 marketplace と plugin manifest
-scripts/                        Validate、plan、report CLI
-src/planner/                    根拠データの有効期間と日程計算
-src/report-exporter.js          HTML escaping と PDF export
-test/                           契約と回帰 test
-examples/danang/                Offline acceptance サンプル
+examples/danang/                Offline サンプル
+test/skill-only-contract.sh     package と adapter の contract check
 ```
 
 ## 開発
 
 ```bash
-npm ci
-npm test
-npm run bench
-npm run dogfood:offline
-npm audit --audit-level=moderate
+bash test/skill-only-contract.sh
+claude plugin validate . --strict
 ```
 
-GitHub Actions は test、benchmark、audit、strict plugin validation、Claude Code/Codex marketplace install を検証します。
+GitHub Actions は skill-only package contract、strict plugin validation、Claude Code/Codex marketplace のインストールを確認します。
 
-## Contributing
+## 貢献
 
-焦点の明確な issue と pull request を歓迎します。以下を含めてください。
-
-1. ユーザーに見える問題
-2. 最小の再現例またはサンプルデータ
-3. 回帰または動作 test
-4. 実際に実行した検証コマンド
-
-変更は必要な範囲にとどめ、機能変更と無関係な cleanup を同じ pull request に混ぜないでください。
+変更は必要な範囲にとどめてください。ユーザーの問題、最小の例または再現、実行した検証、関連する文書変更を含めてください。
 
 ## ライセンス
 

@@ -8,8 +8,8 @@
   "plugins": [
     {
       "name": "travel-planner",
-      "description": "Plan evidence-grounded itineraries with deterministic validation and reports.",
-      "version": "1.0.1",
+      "description": "Plan evidence-grounded itineraries with direct agent verification and reports.",
+      "version": "2.0.0",
       "source": "./",
       "skills": [
         "./skills/travel-planner"

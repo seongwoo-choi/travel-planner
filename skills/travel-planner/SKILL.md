@@ -36,37 +36,26 @@ Claude Code와 Codex에서 동일하게 실행하는 여행 계획 workflow다. 
 
 `references/evidence-contract.md`를 따르고 `_workspace/01_evidence/evidence.json`에 저장한다. `generatedAt`과 각 snapshot의 `fetchedAt`, `expiresAt`을 ISO timestamp로 기록한다. 출처 URL에 credential, token, signature를 넣지 않는다.
 
-### 3. 검증 및 일정 생성
+### 3. 직접 검증 및 일정 생성
 
-공통 진입점은 `scripts/plan-from-evidence.js`와 `scripts/validate-workspace.js`다.
+plugin cache는 read-only distribution이며 여행 artifact를 쓰는 위치가 아니다. 사용자가 선택한 workspace에 아래 파일을 직접 읽고 작성한다.
 
-Marketplace plugin으로 로드된 경우에는 이 skill 파일에서 두 단계 위인 plugin root의 script를 실행한다. plugin cache는 read-only distribution이며 여행 artifact를 쓰는 위치가 아니다. 사용자가 선택한 workspace의 absolute requirements/evidence/output path를 script에 전달한다.
-
-```bash
-npm run validate -- \
-  --requirements=_workspace/00_input/requirements.json \
-  --evidence=_workspace/01_evidence/evidence.json
-
-npm run plan -- \
-  --requirements=_workspace/00_input/requirements.json \
-  --evidence=_workspace/01_evidence/evidence.json \
-  --output-dir=_workspace/02_plan
-```
+1. `_workspace/00_input/requirements.json`과 `_workspace/01_evidence/evidence.json`을 실제로 읽고 JSON parse 오류를 먼저 확인한다.
+2. [Evidence Contract](references/evidence-contract.md)의 필수 field, timestamp 순서·만료, snapshot status, 공개 source URL 조건을 현재 시각 기준으로 직접 검증한다. `generatedAt`은 provenance일 뿐 freshness clock으로 사용하지 않는다.
+3. 장소는 해당 날짜의 `openingHoursStatus: verified`와 영업시간이 있고, 필요한 이동시간이 측정된 경우에만 배치한다. 누락된 이동시간을 0분으로 추정하지 않는다. `unavailable` snapshot의 payload는 사용하지 않는다.
+4. 각 날짜에 도착·출발 시각, 영업시간, 체류시간, 장소 간 이동시간, 식사·휴식 시간을 적용한다. 활동의 시간 겹침과 기준지 복귀 제약을 직접 점검한다.
+5. `_workspace/02_plan/plan.json`에 requirements, 사용한 evidence source와 fetchedAt, 상태, 일별 활동, 이동시간, 확인 작업을 구조화해 작성한다. `_workspace/02_plan/travel_plan.md`에는 같은 내용을 사람이 읽을 수 있게 작성한다.
+6. 작성한 두 artifact를 다시 읽어 JSON parse, 날짜·시간 일관성, evidence source, 상태와 확인 작업의 존재를 확인한다.
 
 - `conflict`: hard constraint를 고치기 전 보고서를 확정하지 않는다.
 - `needs_review`: 일정과 미확인 항목을 함께 제공한다.
-- `ready`: 현재 evidence 기준으로 자동 검증을 통과했다는 뜻이며 예약 완료를 의미하지 않는다.
+- `ready`: 위 직접 검증을 통과한 현재 evidence 기준 상태일 뿐 예약 완료를 의미하지 않는다.
 
 ### 4. 보고서 생성
 
-```bash
-npm run report -- \
-  --requirements=_workspace/00_input/requirements.json \
-  --markdown=_workspace/02_plan/travel_plan.md \
-  --output-dir=_workspace/03_report
-```
+[Report Contract](references/report-contract.md)를 따라 `_workspace/03_report/travel_plan.md`와 `.html`을 실제 파일로 작성하고, 파일을 다시 읽어 내용이 비어 있지 않은지 확인한다. HTML에는 evidence나 사용자 입력을 raw HTML로 삽입하지 말고 escape한다.
 
-`_workspace/03_report/travel_plan.md`, `.html`, `.pdf` 3종을 생성한다. Chrome을 찾지 못하면 PDF를 꾸며내지 말고 실패 원인을 보고한다. 구조는 `references/report-contract.md`를 따른다.
+PDF가 필요하면 headless Chrome 등 실제 renderer를 실행해 `_workspace/03_report/travel_plan.pdf`를 생성한 뒤, 파일 존재·크기·`%PDF` header를 확인한다. renderer가 없거나 실패하면 PDF를 꾸며내지 말고 HTML까지의 결과와 실패 원인을 보고한다. 세 파일이 모두 실제로 검증된 경우에만 3종 산출 완료라고 말한다.
 
 ### 5. 부분 재실행
 
