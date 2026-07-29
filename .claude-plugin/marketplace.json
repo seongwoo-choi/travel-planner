@@ -1,0 +1,19 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "travel-planner",
+  "description": "Evidence-grounded travel planning for Claude Code and Codex",
+  "owner": {
+    "name": "Travel Planner maintainers"
+  },
+  "plugins": [
+    {
+      "name": "travel-planner",
+      "description": "Plan evidence-grounded itineraries with deterministic validation and reports.",
+      "version": "1.0.0",
+      "source": "./",
+      "skills": [
+        "./skills/travel-planner"
+      ]
+    }
+  ]
+}

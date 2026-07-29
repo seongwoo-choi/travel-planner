@@ -22,6 +22,21 @@ test("portable harness has one canonical skill with thin Claude and Codex adapte
   }
 });
 
+test("Git marketplace exposes the canonical travel-planner skill to Claude and Codex", () => {
+  const plugin = JSON.parse(read(".claude-plugin/plugin.json"));
+  const marketplace = JSON.parse(read(".claude-plugin/marketplace.json"));
+
+  assert.equal(plugin.name, "travel-planner");
+  assert.equal(plugin.version, "1.0.0");
+  assert.deepEqual(plugin.skills, ["./skills/travel-planner"]);
+
+  assert.equal(marketplace.name, "travel-planner");
+  assert.equal(marketplace.plugins.length, 1);
+  assert.equal(marketplace.plugins[0].name, "travel-planner");
+  assert.equal(marketplace.plugins[0].source, "./");
+  assert.deepEqual(marketplace.plugins[0].skills, ["./skills/travel-planner"]);
+});
+
 test("portable harness exposes evidence-in planning without Discord or a web server", () => {
   const pkg = JSON.parse(read("package.json"));
 
@@ -62,6 +77,8 @@ test("open-source documentation keeps English primary and Korean translation in 
     assert.match(readme, /examples\/danang\/evidence\.json/);
     assert.match(readme, /`forecast_horizon`/);
     assert.match(readme, /`unavailable`/);
+    assert.match(readme, /plugin marketplace add seongwoo-choi\/travel-planner/);
+    assert.match(readme, /travel-planner@travel-planner/);
     assert.doesNotMatch(readme, /_workspace\/01_evidence\/evidence\.json/);
   }
   assert.match(english, /Evidence-grounded itinerary planning/);

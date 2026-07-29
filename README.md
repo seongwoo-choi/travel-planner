@@ -74,7 +74,23 @@ See [the evidence contract](skills/travel-planner/references/evidence-contract.m
 
 The core has no runtime npm dependencies. Provider credentials are optional because agents can collect evidence with the web or map tools available in their runtime.
 
-## Installation
+## Install as a plugin
+
+Install the same Git marketplace in either runtime, then start a new session.
+
+```bash
+# Claude Code
+claude plugin marketplace add seongwoo-choi/travel-planner
+claude plugin install travel-planner@travel-planner
+
+# Codex
+codex plugin marketplace add seongwoo-choi/travel-planner
+codex plugin add travel-planner@travel-planner
+```
+
+The plugin bundles the canonical skill and the JavaScript core. You do not need to copy skills, maintain runtime-specific planner code, or install a global npm package. Ask for a travel plan in natural language; the agent creates the trip workspace and runs the bundled validation, planning, and report commands.
+
+## Run from source
 
 ```bash
 git clone https://github.com/seongwoo-choi/travel-planner.git

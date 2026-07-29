@@ -40,6 +40,8 @@ Claude Code와 Codex에서 동일하게 실행하는 여행 계획 workflow다. 
 
 공통 진입점은 `scripts/plan-from-evidence.js`와 `scripts/validate-workspace.js`다.
 
+Marketplace plugin으로 로드된 경우에는 이 skill 파일에서 두 단계 위인 plugin root의 script를 실행한다. plugin cache는 read-only distribution이며 여행 artifact를 쓰는 위치가 아니다. 사용자가 선택한 workspace의 absolute requirements/evidence/output path를 script에 전달한다.
+
 ```bash
 npm run validate -- \
   --requirements=_workspace/00_input/requirements.json \

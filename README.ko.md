@@ -74,7 +74,23 @@ core는 다음 규칙을 적용합니다.
 
 core에는 runtime npm dependency가 없습니다. provider credential도 필수가 아닙니다. agent runtime에서 사용할 수 있는 web 또는 map 도구로 evidence를 수집할 수 있습니다.
 
-## 설치
+## plugin으로 설치
+
+두 runtime에서 같은 Git marketplace를 설치한 뒤 새 세션을 시작합니다.
+
+```bash
+# Claude Code
+claude plugin marketplace add seongwoo-choi/travel-planner
+claude plugin install travel-planner@travel-planner
+
+# Codex
+codex plugin marketplace add seongwoo-choi/travel-planner
+codex plugin add travel-planner@travel-planner
+```
+
+plugin에는 canonical skill과 JavaScript core가 함께 포함됩니다. skill을 복사하거나 runtime별 planner를 유지하거나 global npm package를 설치할 필요가 없습니다. 자연어로 여행을 요청하면 agent가 trip workspace를 만들고 bundled validation, planning, report command를 실행합니다.
+
+## source에서 실행
 
 ```bash
 git clone https://github.com/seongwoo-choi/travel-planner.git

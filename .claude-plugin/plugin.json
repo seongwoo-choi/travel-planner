@@ -1,0 +1,12 @@
+{
+  "$schema": "https://anthropic.com/claude-code/plugin.schema.json",
+  "name": "travel-planner",
+  "version": "1.0.0",
+  "description": "Evidence-grounded itinerary planning with deterministic validation",
+  "author": {
+    "name": "Travel Planner maintainers"
+  },
+  "skills": [
+    "./skills/travel-planner"
+  ]
+}
