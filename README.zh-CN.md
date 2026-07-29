@@ -16,7 +16,7 @@
 
 Travel Planner 将自然语言旅行请求转换为有可靠依据的多日行程。Claude Code 和 Codex 共用同一套工作流程、证据数据格式、行程计算器、验证规则和报告生成器。
 
-> LLM 不是地点、营业时间、天气或交通时间的事实依据。智能体负责收集证据数据，core 再进行验证和排程。
+> LLM 不是地点、营业时间、天气或交通时间的事实依据。智能体负责收集证据数据，核心程序再进行验证和排程。
 
 ## Travel Planner 解决的问题
 
@@ -80,7 +80,7 @@ npm ci
 偏好轻松的节奏和夜景。
 ```
 
-智能体会收集证据数据、创建并验证旅行 workspace，然后生成行程和报告。它不会执行预订。
+智能体会收集证据数据，创建旅行工作目录并完成验证，然后生成行程和报告。它不会执行预订。
 
 ## 直接运行行程计算
 
@@ -114,7 +114,7 @@ validate → deterministic plan → report
 plan.json + Markdown + HTML + PDF（Chrome 可用时）
 ```
 
-标准工作流程位于 [`skills/travel-planner/SKILL.md`](skills/travel-planner/SKILL.md)。Claude Code 和 Codex adapter 都指向这一个文件，没有针对不同运行环境的 planner logic。
+标准工作流程位于 [`skills/travel-planner/SKILL.md`](skills/travel-planner/SKILL.md)。Claude Code 和 Codex adapter 都指向这一个文件，没有针对不同运行环境的独立行程计算实现。
 
 请参阅 [证据数据契约](skills/travel-planner/references/evidence-contract.md) 和 [报告契约](skills/travel-planner/references/report-contract.md)。
 
@@ -135,7 +135,7 @@ _workspace/
     travel_plan.pdf
 ```
 
-证据数据 snapshot 和 `plan.json` 是基准数据。Markdown、HTML 和 PDF 都是由它们生成的结果。已安装的 plugin cache 只用于分发，不能写入旅行 artifact。
+收集到的证据数据和 `plan.json` 是基准数据。Markdown、HTML 和 PDF 都是由它们生成的结果。已安装的插件缓存只用于分发，不能写入旅行 artifact。
 
 ## 行程状态
 
@@ -171,10 +171,10 @@ npm run dogfood:offline
 - 证据数据必须有可识别的 status、收集时间和过期时间。
 - forecast horizon 和 provider failure 是不同状态。
 - search 是 bounded 且 approximate 的；不会宣称全局最优。
-- core 不会预订交通、住宿、餐厅或活动。
+- 核心程序不会预订交通、住宿、餐厅或活动。
 - 在预订、付款或其他外部变更前，必须展示目标、条件和操作并获得明确批准。
 
-不要 commit credential、signed URL、预订编号、旅行者数据或生成的个人旅行 report。
+不要 commit 凭据、带签名的 URL、预订编号、旅行者数据或生成的个人旅行报告。
 
 ## 项目结构
 

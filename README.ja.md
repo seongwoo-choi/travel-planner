@@ -16,7 +16,7 @@
 
 Travel Planner は、自然言語の旅行依頼を確認可能な根拠に基づく複数日程に変換します。Claude Code と Codex は、同じ手順、根拠データの形式、日程計算、検証規則、レポート出力を共有します。
 
-> LLM は場所、営業時間、天気、移動時間を事実と判断する根拠ではありません。エージェントが根拠データを集め、core が検証して日程を組みます。
+> LLM は場所、営業時間、天気、移動時間を事実と判断する根拠ではありません。エージェントが根拠データを集め、コアが検証して日程を組みます。
 
 ## Travel Planner が解決すること
 
@@ -80,7 +80,7 @@ Claude Code または Codex に自然言語で依頼します。
 ゆったりした日程と夜景を希望します。
 ```
 
-エージェントは根拠データを集め、旅行用 workspace を作成・検証し、日程とレポートを生成します。予約は実行しません。
+エージェントは根拠データを集め、旅行用の作業フォルダーを作成して検証を行い、日程とレポートを生成します。予約は実行しません。
 
 ## 日程計算を直接実行する
 
@@ -114,7 +114,7 @@ validate → deterministic plan → report
 plan.json + Markdown + HTML + PDF（Chrome 利用可能時）
 ```
 
-基準となる手順は [`skills/travel-planner/SKILL.md`](skills/travel-planner/SKILL.md) にあります。Claude Code と Codex の adapter は同じファイルを参照しており、実行環境ごとの別 planner logic はありません。
+基準となる手順は [`skills/travel-planner/SKILL.md`](skills/travel-planner/SKILL.md) にあります。Claude Code と Codex の adapter は同じファイルを参照しており、実行環境ごとに異なる日程計算の実装はありません。
 
 [根拠データの契約](skills/travel-planner/references/evidence-contract.md) と [レポートの契約](skills/travel-planner/references/report-contract.md) を参照してください。
 
@@ -135,7 +135,7 @@ _workspace/
     travel_plan.pdf
 ```
 
-根拠データの snapshot と `plan.json` が基準データです。Markdown、HTML、PDF はそこから作られる出力です。インストール済み plugin cache は配布専用なので、旅行 artifact を書き込んではいけません。
+収集した根拠データと `plan.json` が基準データです。Markdown、HTML、PDF はそこから作られる出力です。インストール済みのプラグインキャッシュは配布専用なので、旅行 artifact を書き込んではいけません。
 
 ## 行程の状態
 
@@ -171,10 +171,10 @@ npm run dogfood:offline
 - 根拠データには認識可能な status、収集日時、有効期限が必要です。
 - forecast horizon と provider failure は別の状態です。
 - search は bounded・approximate であり、全体最適とは主張しません。
-- core は交通、宿泊、飲食店、活動を予約しません。
+- コアは交通、宿泊、飲食店、活動を予約しません。
 - 予約、支払い、その他の外部変更の前には、対象、条件、操作を示して明示的な承認を得る必要があります。
 
-credential、signed URL、予約番号、旅行者 data、生成済みの個人旅行 report を commit しないでください。
+認証情報、署名付き URL、予約番号、旅行者情報、生成済みの個人旅行レポートを commit しないでください。
 
 ## プロジェクト構成
 

@@ -16,7 +16,7 @@
 
 Travel Planner는 자연어 여행 요청을 확인 가능한 근거에 바탕을 둔 여러 날의 일정으로 바꿉니다. Claude Code와 Codex는 같은 작업 절차, 근거 데이터 형식, 일정 계산기, 검증 규칙, 보고서 생성기를 사용합니다.
 
-> LLM은 장소, 영업시간, 날씨, 이동시간을 사실로 판단하는 근거가 아닙니다. 에이전트가 근거 데이터를 모으고, core가 이를 검증해 일정에 반영합니다.
+> LLM은 장소, 영업시간, 날씨, 이동시간을 사실로 판단하는 근거가 아닙니다. 에이전트가 근거 데이터를 모으고, 핵심 엔진이 이를 검증해 일정에 반영합니다.
 
 ## 왜 Travel Planner인가
 
@@ -80,7 +80,7 @@ Claude Code나 Codex에 자연어로 요청합니다.
 여유로운 일정과 야경을 선호해.
 ```
 
-에이전트는 근거 데이터를 수집하고 여행 workspace를 만들고 검증한 뒤 일정과 보고서를 생성합니다. 예약은 수행하지 않습니다.
+에이전트는 근거 데이터를 수집하고 여행 작업 폴더를 만든 뒤 검증을 거쳐 일정과 보고서를 생성합니다. 예약은 수행하지 않습니다.
 
 ## 일정 계산을 직접 실행하기
 
@@ -114,7 +114,7 @@ validate → deterministic plan → report
 plan.json + Markdown + HTML + PDF (Chrome 사용 가능 시)
 ```
 
-기준 작업 절차는 [`skills/travel-planner/SKILL.md`](skills/travel-planner/SKILL.md)에 있습니다. Claude Code와 Codex adapter는 모두 이 파일을 가리키며, 실행 환경별로 다른 planner logic은 없습니다.
+기준 작업 절차는 [`skills/travel-planner/SKILL.md`](skills/travel-planner/SKILL.md)에 있습니다. Claude Code와 Codex adapter는 모두 이 파일을 참조하며, 실행 환경에 따라 달라지는 별도 일정 계산 구현은 없습니다.
 
 [근거 데이터 계약](skills/travel-planner/references/evidence-contract.md)과 [보고서 계약](skills/travel-planner/references/report-contract.md)을 참고하세요.
 
@@ -135,7 +135,7 @@ _workspace/
     travel_plan.pdf
 ```
 
-근거 데이터 snapshot과 `plan.json`이 기준 데이터입니다. Markdown, HTML, PDF는 여기서 만들어지는 결과물입니다. 설치된 plugin cache는 배포용이므로 여행 artifact를 기록하면 안 됩니다.
+수집한 근거 데이터와 `plan.json`이 기준 데이터입니다. Markdown, HTML, PDF는 여기서 만들어지는 결과물입니다. 설치된 플러그인 캐시는 배포용이므로 여행 artifact를 기록하면 안 됩니다.
 
 ## 일정 상태
 
@@ -171,10 +171,10 @@ npm run dogfood:offline
 - 근거 데이터에는 허용된 status, 수집 시각, 만료 시각이 필요합니다.
 - forecast horizon과 provider 실패는 서로 다른 상태입니다.
 - search는 bounded·approximate이며 전역 최적해라고 주장하지 않습니다.
-- core는 교통, 숙소, 식당, 활동을 예약하지 않습니다.
+- 핵심 엔진은 교통, 숙소, 식당, 활동을 예약하지 않습니다.
 - 예약·결제·외부 변경 전에는 대상·조건·행위를 보여주고 명시적 승인을 받아야 합니다.
 
-credential, signed URL, 예약번호, 여행자 데이터, 생성된 개인 여행 report를 commit하지 마세요.
+인증 정보, 서명 URL, 예약번호, 여행자 데이터, 생성된 개인 여행 보고서는 commit하지 마세요.
 
 ## 프로젝트 구조
 
