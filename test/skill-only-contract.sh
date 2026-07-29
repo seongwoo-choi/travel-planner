@@ -32,6 +32,9 @@ grep -Fq '실제 파일' skills/travel-planner/SKILL.md
 grep -Fq 'requirements-contract.md' skills/travel-planner/SKILL.md
 grep -Fq 'replan-contract.md' skills/travel-planner/SKILL.md
 grep -Fq '기존 일정 artifact는 사실 근거가 아니다' skills/travel-planner/SKILL.md
+grep -Fq 'requirements의 도착·출발 가용 시간' skills/travel-planner/SKILL.md
+grep -Fq '현재 evidence를 통과했을 때만' skills/travel-planner/references/replan-contract.md
+grep -Fq '예약·결제·외부 변경을 실행하지 않는다' skills/travel-planner/references/replan-contract.md
 
 python3 -m json.tool .claude-plugin/plugin.json >/dev/null
 python3 -m json.tool .claude-plugin/marketplace.json >/dev/null

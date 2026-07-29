@@ -109,7 +109,7 @@ _workspace/
   04_replan/replan.md
 ```
 
-根拠データと `plan.json` が基準データです。Markdown、HTML、PDF は出力です。plugin cache は配布用であり、旅行 artifact を書き込んではいけません。
+旅行の事実に対する基準データは根拠データであり、`plan.json` は現在の日程です。replan では以前の `plan.json` を比較とユーザー意図の記録としてのみ使い、事実の根拠には使いません。Markdown、HTML、PDF は出力です。plugin cache は配布用であり、旅行 artifact を書き込んではいけません。
 
 ## 状態
 

@@ -61,7 +61,7 @@ PDF가 필요하면 headless Chrome 등 실제 renderer를 실행해 `_workspace
 
 비, 지연, 휴무, 피로, 선호 변경으로 사용자가 오늘 또는 특정 날짜 일정을 바꿔 달라고 하면 [Replan Contract](references/replan-contract.md)를 읽고 `templates/replan-request.json`을 `_workspace/04_replan/replan-request.json`에 저장한다.
 
-1. target date, timezone, trigger, 사용자 확정 예약·약속만 읽는다. 기존 일정 artifact는 사실 근거가 아니다. 기존 `plan.json`과 report는 비교와 사용자가 유지하고 싶은 활동 후보로만 읽는다.
+1. target date, timezone, trigger, requirements의 도착·출발 가용 시간, 사용자 확정 예약·약속만 읽는다. 기존 일정 artifact는 사실 근거가 아니다. 기존 `plan.json`과 report는 비교와 사용자가 유지하고 싶은 활동 후보로만 읽는다.
 2. 날씨·장소·이동 evidence 중 trigger와 target date에 영향을 받는 snapshot을 현재 source로 갱신하고 직접 검증한다. 기존 artifact의 영업시간, 이동시간, 예약 상태를 복사하지 않는다.
 3. locked commitment를 먼저 고정하고, 새 evidence를 통과하는 활동만 다시 배치한다. 비·휴무 대안은 검증된 장소가 있을 때만 사용한다.
 4. `_workspace/04_replan/replan.json`과 `replan.md`에 trigger, 적용한 evidence, 유지·교체·삭제한 활동, 시간대별 새 일정, 확인 작업을 작성한다.

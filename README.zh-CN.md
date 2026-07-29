@@ -109,7 +109,7 @@ _workspace/
   04_replan/replan.md
 ```
 
-证据数据和 `plan.json` 是基准数据。Markdown、HTML、PDF 是输出。plugin cache 仅用于分发，不能写入旅行 artifact。
+旅行事实的基准数据是证据数据，`plan.json` 是当前行程。重新规划时，旧的 `plan.json` 仅用于比较和记录用户意图，不能作为事实证据。Markdown、HTML、PDF 是输出。plugin cache 仅用于分发，不能写入旅行 artifact。
 
 ## 状态
 

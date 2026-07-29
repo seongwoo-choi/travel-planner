@@ -111,7 +111,7 @@ _workspace/
   04_replan/replan.md
 ```
 
-Evidence snapshots and `plan.json` are the source of truth. Markdown, HTML, and PDF are derived artifacts. Plugin caches are distribution-only and must never receive trip artifacts.
+Evidence snapshots are the source of truth for travel facts; `plan.json` is the current itinerary. During replan, an earlier `plan.json` is only a comparison and user-intent record, never factual evidence. Markdown, HTML, and PDF are derived artifacts. Plugin caches are distribution-only and must never receive trip artifacts.
 
 ## Status
 

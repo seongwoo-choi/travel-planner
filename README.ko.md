@@ -109,7 +109,7 @@ _workspace/
   04_replan/replan.md
 ```
 
-근거 데이터와 `plan.json`이 기준 데이터입니다. Markdown, HTML, PDF는 결과물입니다. plugin cache는 배포용이므로 여행 artifact를 쓰면 안 됩니다.
+여행 사실의 기준 데이터는 근거 데이터이며, `plan.json`은 현재 일정입니다. replan에서는 이전 `plan.json`을 비교와 사용자 의도 기록으로만 쓰며 사실 근거로 사용하지 않습니다. Markdown, HTML, PDF는 결과물입니다. plugin cache는 배포용이므로 여행 artifact를 쓰면 안 됩니다.
 
 ## 상태
 
