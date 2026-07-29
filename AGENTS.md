@@ -1,12 +1,16 @@
 # Travel Planner
 
-## 하네스: 여행 플래너
+Claude Code와 Codex에서 동일하게 동작하는 portable 여행 계획 하네스다.
 
-**목표:** 여행 요구사항 수집 → 날씨/교통/현지 정보 수집 → 일정 최적화 → 예약 실행 → 여행 플랜 보고서 생성
+## Routing
 
-**트리거:** 여행 계획, 여행지 추천, 교통 예약, 일정 만들어줘, 여행 플랜, 국내 여행, 여행 정보, 맛집 일정, 여행 루트, 코스 짜줘 요청 시 `travel-orchestrator` 스킬을 사용하라. 단순 질문(KTX가 뭔가요 등)은 직접 응답 가능.
+- 여행 계획, 여행지 추천, 일정, 맛집 동선, 교통 연결, 여행 보고서 요청에는 `skills/travel-planner/SKILL.md`를 읽고 따른다.
+- 단순 지식 질문은 skill workflow를 실행하지 않고 직접 답한다.
+- `.claude/skills/travel-planner/SKILL.md`와 `.agents/skills/travel-planner/SKILL.md`는 adapter이며 canonical 규칙은 `skills/travel-planner/SKILL.md` 한 곳에만 둔다.
 
-**변경 이력:**
-| 날짜 | 변경 내용 | 대상 | 사유 |
-|------|----------|------|------|
-| 2026-04-22 | 초기 구성 | 전체 | - |
+## Invariants
+
+- 장소·영업시간·날씨·이동시간은 provenance가 있는 evidence만 사용한다.
+- `npm run validate`와 `npm run plan`을 거치지 않은 보고서를 완료로 간주하지 않는다.
+- 예약·결제·외부 mutation은 사용자 승인 전에 실행하지 않는다.
+- `_workspace/**`는 실행 artifact이며 다른 여행의 파일을 사실 source로 재사용하지 않는다.

@@ -1,0 +1,262 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-07-28T00:00:00Z",
+  "fixture": true,
+  "note": "Offline dogfood only. This file does not prove current opening hours, weather, routes, or availability.",
+  "evidence": {
+    "places": {
+      "source": "offline-dogfood-fixture",
+      "fetchedAt": "2026-07-28T00:00:00Z",
+      "expiresAt": "2026-12-31T23:59:59Z",
+      "status": "verified",
+      "destinationLocation": {
+        "latitude": 16.0544,
+        "longitude": 108.2022
+      },
+      "baseLocation": {
+        "latitude": 16.0592,
+        "longitude": 108.2467
+      },
+      "searchCoverage": [
+        {
+          "key": "highlight-1",
+          "status": "verified"
+        },
+        {
+          "key": "highlight-2",
+          "status": "verified"
+        },
+        {
+          "key": "highlight-3",
+          "status": "verified"
+        },
+        {
+          "key": "meal",
+          "status": "verified"
+        }
+      ],
+      "items": [
+        {
+          "id": "my-khe",
+          "name": "미케 비치",
+          "category": "nature",
+          "required": true,
+          "outdoor": true,
+          "score": 95,
+          "durationMinutes": 120,
+          "openingHoursStatus": "verified",
+          "openingHours": {
+            "2026-09-12": {
+              "open": "06:00",
+              "close": "21:00"
+            },
+            "2026-09-13": {
+              "open": "06:00",
+              "close": "21:00"
+            },
+            "2026-09-14": {
+              "open": "06:00",
+              "close": "21:00"
+            },
+            "2026-09-15": {
+              "open": "06:00",
+              "close": "21:00"
+            }
+          }
+        },
+        {
+          "id": "ba-na",
+          "name": "바나힐",
+          "category": "attraction",
+          "required": true,
+          "outdoor": true,
+          "score": 92,
+          "durationMinutes": 240,
+          "openingHoursStatus": "verified",
+          "openingHours": {
+            "2026-09-12": {
+              "open": "08:00",
+              "close": "17:00"
+            },
+            "2026-09-13": {
+              "open": "08:00",
+              "close": "17:00"
+            },
+            "2026-09-14": {
+              "open": "08:00",
+              "close": "17:00"
+            },
+            "2026-09-15": {
+              "open": "08:00",
+              "close": "17:00"
+            }
+          }
+        },
+        {
+          "id": "hoi-an",
+          "name": "호이안 올드타운",
+          "category": "culture",
+          "required": true,
+          "outdoor": true,
+          "score": 90,
+          "durationMinutes": 180,
+          "preferredWindows": [
+            {
+              "start": "15:00",
+              "end": "21:00"
+            }
+          ],
+          "openingHoursStatus": "verified",
+          "openingHours": {
+            "2026-09-12": {
+              "open": "15:00",
+              "close": "22:00"
+            },
+            "2026-09-13": {
+              "open": "15:00",
+              "close": "22:00"
+            },
+            "2026-09-14": {
+              "open": "15:00",
+              "close": "22:00"
+            },
+            "2026-09-15": {
+              "open": "15:00",
+              "close": "22:00"
+            }
+          }
+        },
+        {
+          "id": "marble",
+          "name": "오행산",
+          "category": "nature",
+          "outdoor": true,
+          "score": 78,
+          "durationMinutes": 150,
+          "openingHoursStatus": "verified",
+          "openingHours": {
+            "2026-09-12": {
+              "open": "07:00",
+              "close": "17:30"
+            },
+            "2026-09-13": {
+              "open": "07:00",
+              "close": "17:30"
+            },
+            "2026-09-14": {
+              "open": "07:00",
+              "close": "17:30"
+            },
+            "2026-09-15": {
+              "open": "07:00",
+              "close": "17:30"
+            }
+          }
+        },
+        {
+          "id": "museum",
+          "name": "다낭 박물관 후보",
+          "category": "culture",
+          "indoor": true,
+          "score": 65,
+          "durationMinutes": 90,
+          "openingHoursStatus": "verified",
+          "openingHours": {
+            "2026-09-12": {
+              "open": "09:00",
+              "close": "17:00"
+            },
+            "2026-09-13": {
+              "open": "09:00",
+              "close": "17:00"
+            },
+            "2026-09-14": {
+              "open": "09:00",
+              "close": "17:00"
+            },
+            "2026-09-15": {
+              "open": "09:00",
+              "close": "17:00"
+            }
+          }
+        }
+      ]
+    },
+    "weather": {
+      "source": "offline-dogfood-fixture",
+      "fetchedAt": "2026-07-28T00:00:00Z",
+      "expiresAt": "2026-12-31T23:59:59Z",
+      "status": "forecast_horizon",
+      "timezone": "Asia/Ho_Chi_Minh",
+      "refreshAfter": "2026-08-28",
+      "days": []
+    },
+    "timezone": {
+      "source": "offline-dogfood-fixture",
+      "fetchedAt": "2026-07-28T00:00:00Z",
+      "expiresAt": "2026-12-31T23:59:59Z",
+      "status": "verified",
+      "timezone": "Asia/Ho_Chi_Minh"
+    },
+    "travel": {
+      "source": "offline-dogfood-fixture",
+      "fetchedAt": "2026-07-28T00:00:00Z",
+      "expiresAt": "2026-12-31T23:59:59Z",
+      "status": "degraded",
+      "localTransport": {
+        "mode": "driving",
+        "status": "verified"
+      },
+      "majorTransport": {
+        "outbound": {
+          "direction": "outbound",
+          "origin": "인천",
+          "destination": "다낭",
+          "mode": "flight",
+          "status": "unavailable",
+          "reason": "offline fixture has no live flight evidence"
+        },
+        "inbound": {
+          "direction": "inbound",
+          "origin": "다낭",
+          "destination": "인천",
+          "mode": "flight",
+          "status": "unavailable",
+          "reason": "offline fixture has no live flight evidence"
+        }
+      },
+      "matrix": {
+        "base|my-khe": 10,
+        "my-khe|base": 10,
+        "base|ba-na": 35,
+        "ba-na|base": 35,
+        "base|hoi-an": 35,
+        "hoi-an|base": 35,
+        "base|marble": 20,
+        "marble|base": 20,
+        "base|museum": 15,
+        "museum|base": 15,
+        "my-khe|ba-na": 35,
+        "ba-na|my-khe": 35,
+        "my-khe|hoi-an": 35,
+        "hoi-an|my-khe": 35,
+        "my-khe|marble": 20,
+        "marble|my-khe": 20,
+        "my-khe|museum": 15,
+        "museum|my-khe": 15,
+        "ba-na|hoi-an": 60,
+        "hoi-an|ba-na": 60,
+        "ba-na|marble": 50,
+        "marble|ba-na": 50,
+        "ba-na|museum": 40,
+        "museum|ba-na": 40,
+        "hoi-an|marble": 25,
+        "marble|hoi-an": 25,
+        "hoi-an|museum": 40,
+        "museum|hoi-an": 40,
+        "marble|museum": 25,
+        "museum|marble": 25
+      }
+    }
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "country": "베트남",
+  "destination": "다낭",
+  "origin": "인천",
+  "startDate": "2026-09-12",
+  "nights": 3,
+  "travelers": 2,
+  "companions": "커플",
+  "tripType": "휴양, 관광, 야경",
+  "budgetPerPerson": null,
+  "accommodation": null,
+  "transportPref": "flight",
+  "arrivalTime": null,
+  "departureTime": null,
+  "highlights": []
+}

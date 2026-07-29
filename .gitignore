@@ -1,17 +1,15 @@
 node_modules/
-webapp/node_modules/
 .DS_Store
 **/.DS_Store
 .codegraph/
-.agents/
+.agents/*
+!.agents/skills/
+.agents/skills/*
+!.agents/skills/travel-planner/
+!.agents/skills/travel-planner/SKILL.md
 .codex/
 .claude/settings.local.json
 .env
-webapp/.env
-webapp/data/*.json
-webapp/data/*.sqlite
-webapp/data/*.sqlite-shm
-webapp/data/*.sqlite-wal
 npm-debug.log*
 
 PLAN.md
@@ -24,22 +22,11 @@ _workspace/01_local/
 _workspace/01_transport/
 _workspace/01_weather/
 _workspace/02_itinerary/
+_workspace/01_evidence/
+_workspace/02_plan/
 trips/**/travel_plan.md
 trips/**/travel_plan.html
 trips/**/travel_plan.pdf
 
-webapp/*.json.tmp-*
-webapp/reports/*.json.tmp-*
-webapp/storage-backup-manifest*.json
-webapp/reports/storage-backup-manifest*.json
-webapp/storage-backup-file-check*.json
-webapp/reports/storage-backup-file-check*.json
-webapp/storage-backup-verify*.json
-webapp/reports/storage-backup-verify*.json
-webapp/travel-planner-backup*.json
-webapp/reports/travel-planner-backup*.json
-webapp/health-api-gate*.txt
-webapp/reports/health-api-gate*.txt
-webapp/**/*.json.tmp-*
-webapp/**/*.md.tmp-*
-webapp/**/*.txt.tmp-*
+# Local data left behind by the removed web application.
+webapp/data/
