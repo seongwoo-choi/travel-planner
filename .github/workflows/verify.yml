@@ -1,0 +1,36 @@
+name: verify
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+      - run: npm test
+      - run: npm run bench
+      - run: npm audit --audit-level=moderate
+      - run: npx --yes @anthropic-ai/claude-code plugin validate . --strict
+      - run: |
+          export HOME="$RUNNER_TEMP/claude-home"
+          npx --yes @anthropic-ai/claude-code plugin marketplace add "$GITHUB_WORKSPACE"
+          npx --yes @anthropic-ai/claude-code plugin install travel-planner@travel-planner
+      - run: |
+          export CODEX_HOME="$RUNNER_TEMP/codex-home"
+          mkdir -p "$CODEX_HOME"
+          npx --yes @openai/codex plugin marketplace add "$GITHUB_WORKSPACE"
+          npx --yes @openai/codex plugin add travel-planner@travel-planner

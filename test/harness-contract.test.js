@@ -23,18 +23,32 @@ test("portable harness has one canonical skill with thin Claude and Codex adapte
 });
 
 test("Git marketplace exposes the canonical travel-planner skill to Claude and Codex", () => {
+  const pkg = JSON.parse(read("package.json"));
   const plugin = JSON.parse(read(".claude-plugin/plugin.json"));
   const marketplace = JSON.parse(read(".claude-plugin/marketplace.json"));
 
   assert.equal(plugin.name, "travel-planner");
-  assert.equal(plugin.version, "1.0.0");
+  assert.equal(plugin.version, pkg.version);
   assert.deepEqual(plugin.skills, ["./skills/travel-planner"]);
 
   assert.equal(marketplace.name, "travel-planner");
   assert.equal(marketplace.plugins.length, 1);
   assert.equal(marketplace.plugins[0].name, "travel-planner");
+  assert.equal(marketplace.plugins[0].version, pkg.version);
   assert.equal(marketplace.plugins[0].source, "./");
   assert.deepEqual(marketplace.plugins[0].skills, ["./skills/travel-planner"]);
+});
+
+test("CI verifies the shared marketplace package on Node 22", () => {
+  const workflow = read(".github/workflows/verify.yml");
+
+  assert.match(workflow, /node-version: 22/);
+  assert.match(workflow, /npm test/);
+  assert.match(workflow, /npm run bench/);
+  assert.match(workflow, /npm audit --audit-level=moderate/);
+  assert.match(workflow, /claude-code plugin validate \. --strict/);
+  assert.match(workflow, /claude-code plugin install travel-planner@travel-planner/);
+  assert.match(workflow, /@openai\/codex plugin add travel-planner@travel-planner/);
 });
 
 test("portable harness exposes evidence-in planning without Discord or a web server", () => {
