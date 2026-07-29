@@ -100,8 +100,8 @@ test("open-source documentation keeps English primary and translations in sync",
     assert.doesNotMatch(readme, /_workspace\/01_evidence\/evidence\.json/);
   }
   assert.match(english, /Evidence-grounded itinerary planning/);
-  assert.match(korean, /evidence 기반 여행 일정 플래너/);
-  assert.match(japanese, /エビデンスに基づく旅行プラン/);
-  assert.match(chinese, /基于证据的旅行规划/);
+  assert.match(korean, /근거 기반 여행 일정 플래너/);
+  assert.match(japanese, /根拠に基づく旅行プラン/);
+  assert.match(chinese, /证据驱动旅行规划/);
   assert.match(license, /^MIT License\n/);
 });

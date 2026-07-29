@@ -2,7 +2,7 @@
 
 # Travel Planner
 
-**Claude Code와 Codex를 위한 evidence 기반 여행 일정 플래너**
+**Claude Code와 Codex를 위한 근거 기반 여행 일정 플래너**
 
 [English](README.md) | [한국어](README.ko.md) | [日本語](README.ja.md) | [简体中文](README.zh-CN.md)
 
@@ -14,27 +14,27 @@
 
 </div>
 
-Travel Planner는 자연어 여행 요청을 evidence 기반의 여러 날 일정으로 바꿉니다. Claude Code와 Codex가 하나의 workflow, evidence 계약, deterministic scheduler, fail-closed 검증, portable report를 공유합니다.
+Travel Planner는 자연어 여행 요청을 확인 가능한 근거에 바탕을 둔 여러 날의 일정으로 바꿉니다. Claude Code와 Codex는 같은 작업 절차, 근거 데이터 형식, 일정 계산기, 검증 규칙, 보고서 생성기를 사용합니다.
 
-> LLM은 장소, 영업시간, 날씨, 이동시간의 사실 source가 아닙니다. agent가 evidence를 수집하고 core가 검증·일정 배치를 수행합니다.
+> LLM은 장소, 영업시간, 날씨, 이동시간을 사실로 판단하는 근거가 아닙니다. 에이전트가 근거 데이터를 모으고, core가 이를 검증해 일정에 반영합니다.
 
 ## 왜 Travel Planner인가
 
-그럴듯한 여행 일정은 위험한 가정을 숨기기 쉽습니다. 누락된 이동시간을 0분으로 처리하거나, 모르는 영업시간을 종일 영업으로 바꾸거나, 아직 발표되지 않은 예보를 사실처럼 쓰는 문제입니다. Travel Planner는 불확실성을 숨기지 않고 확인 작업으로 남깁니다.
+보기 좋은 여행 일정표도 위험한 가정을 숨기기 쉽습니다. 이동시간이 없으면 0분으로 처리하고, 영업시간을 모르면 종일 영업으로 간주하고, 아직 나온 적 없는 예보를 사실처럼 적는 식입니다. Travel Planner는 이런 불확실성을 감추지 않고 확인할 항목으로 남깁니다.
 
 | 대신 | Travel Planner가 하는 일 |
 | --- | --- |
-| 사실을 추정 | 출처·수집시각·만료시각이 있는 evidence 요구 |
+| 사실을 추정 | 출처·수집 시각·만료 시각이 있는 근거 데이터 요구 |
 | 누락된 이동시간을 0분 처리 | 해당 경로를 배치 불가로 처리 |
-| 알 수 없는 장소를 실내로 단정 | `indoor: true`의 양성 evidence 요구 |
-| 불확실성을 숨김 | 확인 작업이 있는 `needs_review` 생성 |
-| agent가 자율 예약 | 외부 변경 전 명시적 승인 요구 |
+| 알 수 없는 장소를 실내로 단정 | `indoor: true`를 뒷받침하는 근거 데이터 요구 |
+| 불확실성을 숨김 | 확인할 항목이 담긴 `needs_review` 생성 |
+| 에이전트가 자율 예약 | 외부 변경 전 명시적 승인 요구 |
 
 ## 설치
 
 ### plugin으로 설치
 
-두 runtime에 같은 Git marketplace를 설치한 뒤 새 세션을 시작합니다.
+두 실행 환경에 같은 Git marketplace를 설치한 뒤 새 세션을 시작합니다.
 
 ```bash
 # Claude Code
@@ -46,7 +46,7 @@ codex plugin marketplace add seongwoo-choi/travel-planner
 codex plugin add travel-planner@travel-planner
 ```
 
-plugin에는 canonical skill과 JavaScript core가 포함됩니다. global planner package, skill 복사, runtime별 구현이 필요하지 않습니다.
+plugin에는 기준이 되는 skill과 JavaScript core가 함께 들어 있습니다. 전역 planner package를 설치하거나 skill을 복사하거나 실행 환경별 구현을 따로 유지할 필요가 없습니다.
 
 ### 설치된 plugin 갱신
 
@@ -68,7 +68,7 @@ cd travel-planner
 npm ci
 ```
 
-Node.js 22 이상과 Claude Code 2.x 또는 Codex CLI가 필요합니다. PDF 산출에는 Google Chrome, Chromium 또는 `CHROME_BIN`도 필요합니다.
+Node.js 22 이상과 Claude Code 2.x 또는 Codex CLI가 필요합니다. PDF를 만들려면 Google Chrome, Chromium 또는 `CHROME_BIN`도 필요합니다.
 
 ## 여행 계획 만들기
 
@@ -80,9 +80,9 @@ Claude Code나 Codex에 자연어로 요청합니다.
 여유로운 일정과 야경을 선호해.
 ```
 
-agent는 evidence를 수집하고 trip workspace를 작성·검증한 뒤 일정과 report를 만듭니다. 예약은 수행하지 않습니다.
+에이전트는 근거 데이터를 수집하고 여행 workspace를 만들고 검증한 뒤 일정과 보고서를 생성합니다. 예약은 수행하지 않습니다.
 
-## deterministic pipeline 직접 실행
+## 일정 계산을 직접 실행하기
 
 ```bash
 npm run validate -- \
@@ -102,7 +102,7 @@ npm run report -- \
 
 `npm run report`는 PDF export 전에 Markdown과 자체완결 HTML을 작성합니다. Chrome을 찾지 못하면 PDF를 꾸며내지 않고 실패 원인을 보고합니다.
 
-## agent가 증명해야 하는 흐름
+## 동작 흐름
 
 ```text
 자연어 요청
@@ -114,11 +114,11 @@ validate → deterministic plan → report
 plan.json + Markdown + HTML + PDF (Chrome 사용 가능 시)
 ```
 
-canonical workflow는 [`skills/travel-planner/SKILL.md`](skills/travel-planner/SKILL.md)입니다. Claude Code와 Codex adapter는 이 단일 source를 가리키며 runtime별 별도 planner logic은 없습니다.
+기준 작업 절차는 [`skills/travel-planner/SKILL.md`](skills/travel-planner/SKILL.md)에 있습니다. Claude Code와 Codex adapter는 모두 이 파일을 가리키며, 실행 환경별로 다른 planner logic은 없습니다.
 
-[evidence 계약](skills/travel-planner/references/evidence-contract.md)과 [report 계약](skills/travel-planner/references/report-contract.md)을 참고하세요.
+[근거 데이터 계약](skills/travel-planner/references/evidence-contract.md)과 [보고서 계약](skills/travel-planner/references/report-contract.md)을 참고하세요.
 
-## Workspace 계약
+## Workspace 구조
 
 ```text
 _workspace/
@@ -135,19 +135,19 @@ _workspace/
     travel_plan.pdf
 ```
 
-Evidence snapshot과 `plan.json`이 source of truth입니다. Markdown, HTML, PDF는 파생 산출물입니다. 설치된 plugin cache는 distribution 전용이며 여행 artifact를 작성하면 안 됩니다.
+근거 데이터 snapshot과 `plan.json`이 기준 데이터입니다. Markdown, HTML, PDF는 여기서 만들어지는 결과물입니다. 설치된 plugin cache는 배포용이므로 여행 artifact를 기록하면 안 됩니다.
 
-## Plan 상태
+## 일정 상태
 
 | 상태 | 의미 |
 | --- | --- |
-| `ready` | 현재 evidence가 검증을 통과했습니다. 예약 완료를 의미하지 않습니다. |
-| `needs_review` | 일정은 쓸 수 있지만 날씨, 교통, coverage 또는 다른 evidence를 확인해야 합니다. |
+| `ready` | 현재 근거 데이터가 검증을 통과했습니다. 예약 완료를 의미하지 않습니다. |
+| `needs_review` | 일정은 사용할 수 있지만 날씨, 교통, 수집 범위 또는 다른 근거 데이터를 확인해야 합니다. |
 | `conflict` | hard constraint를 위반했습니다. 완료된 일정으로 취급하면 안 됩니다. |
 
 ## Offline 예제
 
-[`examples/danang/`](examples/danang/)은 pipeline 실행용 3박 4일 fixture입니다. 실제 여행 정보가 아닌 test data입니다. 날씨는 `forecast_horizon`, 항공편은 `unavailable`이므로 기대 상태는 `needs_review`입니다.
+[`examples/danang/`](examples/danang/)은 3박 4일 다낭 일정을 실행해 볼 수 있는 예제 데이터입니다. 실제 여행 정보가 아닙니다. 날씨는 `forecast_horizon`, 항공편은 `unavailable` 상태이므로 결과는 `needs_review`가 정상입니다.
 
 ```bash
 npm run dogfood:offline
@@ -157,18 +157,18 @@ npm run dogfood:offline
 
 | 명령 | 용도 |
 | --- | --- |
-| `npm test` | contract, regression, integration, bounded-search 테스트 |
-| `npm run validate` | plan을 쓰지 않고 requirements와 evidence 검증 |
-| `npm run plan` | evidence에서 structured JSON과 Markdown 생성 |
-| `npm run report` | Chrome 사용 가능 시 Markdown, HTML, PDF 산출 |
+| `npm test` | 계약, 회귀, 통합, bounded-search 테스트 |
+| `npm run validate` | plan을 쓰지 않고 requirements와 근거 데이터를 검증 |
+| `npm run plan` | 근거 데이터에서 structured JSON과 Markdown 생성 |
+| `npm run report` | Chrome 사용 가능 시 Markdown, HTML, PDF 생성 |
 | `npm run bench` | 50개 장소, 31일 bounded benchmark 실행 |
-| `npm run dogfood:offline` | offline 다낭 acceptance fixture 실행 |
+| `npm run dogfood:offline` | offline 다낭 acceptance 예제 실행 |
 
 ## 안전 범위
 
-- 배치 날짜의 영업시간이 검증된 장소만 일정 후보가 됩니다.
-- 누락된 경로 evidence는 0분 경로가 되지 않습니다.
-- evidence에는 허용된 status, 수집 시각, 만료 시각이 필요합니다.
+- 배치 날짜의 영업시간이 확인된 장소만 일정 후보가 됩니다.
+- 누락된 경로 근거 데이터는 0분 경로로 처리하지 않습니다.
+- 근거 데이터에는 허용된 status, 수집 시각, 만료 시각이 필요합니다.
 - forecast horizon과 provider 실패는 서로 다른 상태입니다.
 - search는 bounded·approximate이며 전역 최적해라고 주장하지 않습니다.
 - core는 교통, 숙소, 식당, 활동을 예약하지 않습니다.
@@ -179,15 +179,15 @@ credential, signed URL, 예약번호, 여행자 데이터, 생성된 개인 여�
 ## 프로젝트 구조
 
 ```text
-skills/travel-planner/          Canonical workflow와 계약
+skills/travel-planner/          기준 작업 절차와 계약
 .claude/skills/travel-planner/  Claude Code adapter
 .agents/skills/travel-planner/  Codex adapter
 .claude-plugin/                 공통 marketplace와 plugin manifest
 scripts/                        Validate, plan, report CLI
-src/planner/                    Evidence lifecycle과 scheduler
-src/report-exporter.js          Escaped HTML과 PDF export
-test/                           Contract와 regression test
-examples/danang/                Offline acceptance fixture
+src/planner/                    근거 데이터 수명주기와 일정 계산기
+src/report-exporter.js          HTML escaping과 PDF export
+test/                           계약과 회귀 테스트
+examples/danang/                Offline acceptance 예제
 ```
 
 ## 개발
@@ -206,12 +206,12 @@ GitHub Actions는 test, benchmark, audit, strict plugin validation, Claude Code/
 
 범위가 분명한 issue와 pull request를 환영합니다. 다음을 포함해 주세요.
 
-1. 사용자가 보는 문제
-2. 최소 재현 또는 fixture
-3. regression 또는 behavior test
-4. 실행한 검증 명령
+1. 사용자가 겪는 문제
+2. 최소 재현 사례 또는 예제 데이터
+3. 회귀 또는 동작 테스트
+4. 실제로 실행한 검증 명령
 
-변경은 surgical하게 유지하고, 무관한 cleanup을 behavior change에 섞지 마세요.
+변경 범위는 필요한 부분으로 제한하고, 기능 변경과 무관한 정리는 같은 pull request에 섞지 마세요.
 
 ## 라이선스
 

@@ -2,7 +2,7 @@
 
 # Travel Planner
 
-**Claude Code と Codex のためのエビデンスに基づく旅行プラン**
+**Claude Code と Codex のための根拠に基づく旅行プラン**
 
 [English](README.md) | [한국어](README.ko.md) | [日本語](README.ja.md) | [简体中文](README.zh-CN.md)
 
@@ -14,27 +14,27 @@
 
 </div>
 
-Travel Planner は、自然言語の旅行依頼を根拠付きの複数日程に変換します。Claude Code と Codex は、単一の workflow、evidence 契約、deterministic scheduler、fail-closed 検証、portable report を共有します。
+Travel Planner は、自然言語の旅行依頼を確認可能な根拠に基づく複数日程に変換します。Claude Code と Codex は、同じ手順、根拠データの形式、日程計算、検証規則、レポート出力を共有します。
 
-> LLM は場所、営業時間、天気、移動時間の事実 source ではありません。agent が evidence を集め、core が検証して日程を組みます。
+> LLM は場所、営業時間、天気、移動時間を事実と判断する根拠ではありません。エージェントが根拠データを集め、core が検証して日程を組みます。
 
 ## Travel Planner が解決すること
 
-見栄えの良い日程でも危険な仮定を隠しがちです。移動時間が未取得なら 0 分にする、営業時間が不明でも終日営業とみなす、未発表の予報を事実として書く、といった問題です。Travel Planner は不確実性を隠さず、確認作業として残します。
+見栄えの良い日程でも、危険な仮定が紛れ込むことがあります。移動時間がないのに 0 分とする、営業時間が不明なのに終日営業とみなす、まだ発表されていない予報を事実として書く、といった問題です。Travel Planner は不確実な点を隠さず、確認が必要な項目として残します。
 
 | 代わりに | Travel Planner の動作 |
 | --- | --- |
-| 事実を推測する | source、収集日時、有効期限を持つ evidence を要求 |
+| 事実を推測する | 出典、収集日時、有効期限を持つ根拠データを要求 |
 | 未取得の移動時間を 0 分とする | その経路を配置不可として扱う |
-| 不明な場所を屋内と断定する | `indoor: true` の肯定的 evidence を要求 |
+| 不明な場所を屋内と断定する | `indoor: true` を裏付ける根拠データを要求 |
 | 不確実性を隠す | 確認タスク付きの `needs_review` を返す |
-| agent が自動予約する | 外部変更の前に明示的な承認を要求 |
+| エージェントが自動予約する | 外部変更の前に明示的な承認を要求 |
 
 ## インストール
 
 ### plugin としてインストール
 
-両 runtime に同じ Git marketplace を追加し、新しい session を開始します。
+両方の実行環境に同じ Git marketplace を追加し、新しいセッションを開始します。
 
 ```bash
 # Claude Code
@@ -46,7 +46,7 @@ codex plugin marketplace add seongwoo-choi/travel-planner
 codex plugin add travel-planner@travel-planner
 ```
 
-plugin には canonical skill と JavaScript core が含まれます。global planner package、skill のコピー、runtime 別実装は不要です。
+plugin には基準となる skill と JavaScript core が含まれます。global planner package の導入、skill のコピー、実行環境ごとの実装は必要ありません。
 
 ### インストール済み plugin の更新
 
@@ -60,7 +60,7 @@ codex plugin remove travel-planner@travel-planner
 codex plugin add travel-planner@travel-planner
 ```
 
-### source から実行
+### ソースコードから実行
 
 ```bash
 git clone https://github.com/seongwoo-choi/travel-planner.git
@@ -80,9 +80,9 @@ Claude Code または Codex に自然言語で依頼します。
 ゆったりした日程と夜景を希望します。
 ```
 
-agent は evidence を集め、trip workspace を作成・検証し、日程と report を生成します。予約は実行しません。
+エージェントは根拠データを集め、旅行用 workspace を作成・検証し、日程とレポートを生成します。予約は実行しません。
 
-## deterministic pipeline を直接実行
+## 日程計算を直接実行する
 
 ```bash
 npm run validate -- \
@@ -102,7 +102,7 @@ npm run report -- \
 
 `npm run report` は PDF export 前に Markdown と自己完結 HTML を作成します。Chrome が見つからない場合は、PDF を捏造せず失敗理由を報告します。
 
-## agent が証明するフロー
+## 動作の流れ
 
 ```text
 自然言語の依頼
@@ -114,11 +114,11 @@ validate → deterministic plan → report
 plan.json + Markdown + HTML + PDF（Chrome 利用可能時）
 ```
 
-canonical workflow は [`skills/travel-planner/SKILL.md`](skills/travel-planner/SKILL.md) です。Claude Code と Codex の adapter はこの単一 source を指し、runtime ごとの別 planner logic はありません。
+基準となる手順は [`skills/travel-planner/SKILL.md`](skills/travel-planner/SKILL.md) にあります。Claude Code と Codex の adapter は同じファイルを参照しており、実行環境ごとの別 planner logic はありません。
 
-[evidence 契約](skills/travel-planner/references/evidence-contract.md) と [report 契約](skills/travel-planner/references/report-contract.md) を参照してください。
+[根拠データの契約](skills/travel-planner/references/evidence-contract.md) と [レポートの契約](skills/travel-planner/references/report-contract.md) を参照してください。
 
-## Workspace 契約
+## Workspace の構成
 
 ```text
 _workspace/
@@ -135,19 +135,19 @@ _workspace/
     travel_plan.pdf
 ```
 
-Evidence snapshot と `plan.json` が source of truth です。Markdown、HTML、PDF は派生 artifact です。インストール済み plugin cache は distribution 専用であり、旅行 artifact を書き込んではいけません。
+根拠データの snapshot と `plan.json` が基準データです。Markdown、HTML、PDF はそこから作られる出力です。インストール済み plugin cache は配布専用なので、旅行 artifact を書き込んではいけません。
 
-## Plan 状態
+## 行程の状態
 
 | 状態 | 意味 |
 | --- | --- |
-| `ready` | 現在の evidence が検証を通過しました。予約完了を意味しません。 |
-| `needs_review` | 日程は使用できますが、天気、交通、coverage、その他の evidence の確認が必要です。 |
+| `ready` | 現在の根拠データが検証を通過しました。予約完了を意味しません。 |
+| `needs_review` | 日程は使用できますが、天気、交通、収集範囲、その他の根拠データの確認が必要です。 |
 | `conflict` | hard constraint に違反しています。完了した日程として扱ってはいけません。 |
 
 ## Offline 例
 
-[`examples/danang/`](examples/danang/) は pipeline 実行用の4日間 fixture です。実際の旅行情報ではなく test data です。天気は `forecast_horizon`、航空便は `unavailable` のため、期待 status は `needs_review` です。
+[`examples/danang/`](examples/danang/) は4日間のダナン旅行を試すためのサンプルデータです。実際の旅行情報ではありません。天気は `forecast_horizon`、航空便は `unavailable` のため、想定される status は `needs_review` です。
 
 ```bash
 npm run dogfood:offline
@@ -157,18 +157,18 @@ npm run dogfood:offline
 
 | コマンド | 用途 |
 | --- | --- |
-| `npm test` | contract、regression、integration、bounded-search test |
-| `npm run validate` | plan を書かず requirements と evidence を検証 |
-| `npm run plan` | evidence から structured JSON と Markdown を生成 |
+| `npm test` | 契約、回帰、統合、bounded-search test |
+| `npm run validate` | plan を書かず requirements と根拠データを検証 |
+| `npm run plan` | 根拠データから structured JSON と Markdown を生成 |
 | `npm run report` | Chrome 利用可能時に Markdown、HTML、PDF を出力 |
 | `npm run bench` | 50 places、31 days の bounded benchmark |
-| `npm run dogfood:offline` | offline ダナン acceptance fixture を実行 |
+| `npm run dogfood:offline` | offline ダナン acceptance サンプルを実行 |
 
 ## 安全性と範囲
 
-- 配置日の営業時間が検証された場所だけが候補になります。
-- 未取得の経路 evidence は 0 分の経路になりません。
-- evidence には認識可能な status、収集日時、有効期限が必要です。
+- 配置日の営業時間が確認された場所だけが候補になります。
+- 未取得の経路根拠データを 0 分の経路として扱うことはありません。
+- 根拠データには認識可能な status、収集日時、有効期限が必要です。
 - forecast horizon と provider failure は別の状態です。
 - search は bounded・approximate であり、全体最適とは主張しません。
 - core は交通、宿泊、飲食店、活動を予約しません。
@@ -176,18 +176,18 @@ npm run dogfood:offline
 
 credential、signed URL、予約番号、旅行者 data、生成済みの個人旅行 report を commit しないでください。
 
-## Project layout
+## プロジェクト構成
 
 ```text
-skills/travel-planner/          Canonical workflow と契約
+skills/travel-planner/          基準となる手順と契約
 .claude/skills/travel-planner/  Claude Code adapter
 .agents/skills/travel-planner/  Codex adapter
 .claude-plugin/                 共通 marketplace と plugin manifest
 scripts/                        Validate、plan、report CLI
-src/planner/                    Evidence lifecycle と scheduler
-src/report-exporter.js          Escaped HTML と PDF export
-test/                           Contract と regression test
-examples/danang/                Offline acceptance fixture
+src/planner/                    根拠データの有効期間と日程計算
+src/report-exporter.js          HTML escaping と PDF export
+test/                           契約と回帰 test
+examples/danang/                Offline acceptance サンプル
 ```
 
 ## 開発
@@ -207,12 +207,12 @@ GitHub Actions は test、benchmark、audit、strict plugin validation、Claude 
 焦点の明確な issue と pull request を歓迎します。以下を含めてください。
 
 1. ユーザーに見える問題
-2. 最小の再現または fixture
-3. regression または behavior test
-4. 実行した検証コマンド
+2. 最小の再現例またはサンプルデータ
+3. 回帰または動作 test
+4. 実際に実行した検証コマンド
 
-変更は surgical に保ち、無関係な cleanup を behavior change に混ぜないでください。
+変更は必要な範囲にとどめ、機能変更と無関係な cleanup を同じ pull request に混ぜないでください。
 
-## License
+## ライセンス
 
 [MIT License](LICENSE) の下で提供されます。
