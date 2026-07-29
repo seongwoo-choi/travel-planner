@@ -63,6 +63,17 @@ codex plugin add travel-planner@travel-planner
 
 エージェントは workspace を作り、read-only の根拠を収集して直接検証します。日程とレポート artifact を書き、もう一度読んで確認します。予約は実行しません。
 
+## 一日の予定を組み直す
+
+雨、遅延、休業、疲労、希望の変更で今日または特定の日を変更したい場合は、自然言語で依頼します。
+
+```text
+午後から雨です。2日目を屋内中心に組み直してください。
+ただし19時の夕食予約は維持してください。
+```
+
+エージェントは既存の日程を比較とユーザー意図の記録としてのみ扱います。影響を受ける根拠を再収集し、ユーザーが明示的に確認した予定だけを維持して、維持・変更・未確認の活動を表示します。検証済みの代案がなければ、もっともらしい日程を作りません。
+
 ## 作業の流れ
 
 ```text
@@ -80,6 +91,7 @@ plan.json + Markdown + HTML + PDF（renderer 成功時のみ）
 - [根拠データの契約](skills/travel-planner/references/evidence-contract.md)
 - [レポートの契約](skills/travel-planner/references/report-contract.md)
 - [要件の契約](skills/travel-planner/references/requirements-contract.md)
+- [再計画の契約](skills/travel-planner/references/replan-contract.md)
 
 ## Workspace の構成
 
@@ -92,6 +104,9 @@ _workspace/
   03_report/travel_plan.md
   03_report/travel_plan.html
   03_report/travel_plan.pdf
+  04_replan/replan-request.json
+  04_replan/replan.json
+  04_replan/replan.md
 ```
 
 根拠データと `plan.json` が基準データです。Markdown、HTML、PDF は出力です。plugin cache は配布用であり、旅行 artifact を書き込んではいけません。

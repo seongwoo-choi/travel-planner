@@ -63,6 +63,17 @@ codex plugin add travel-planner@travel-planner
 
 에이전트는 workspace를 만들고 read-only 근거를 수집한 뒤 직접 검증합니다. 일정·보고서 artifact를 작성하고 다시 읽어 확인합니다. 예약은 수행하지 않습니다.
 
+## 하루 일정 다시 짜기
+
+비, 지연, 휴무, 피로, 선호 변경으로 오늘 또는 특정 날짜를 바꾸고 싶다면 자연어로 요청합니다.
+
+```text
+오후부터 비가 와. 2일차를 실내 중심으로 다시 짜되
+19시 저녁 예약은 유지해줘.
+```
+
+에이전트는 기존 일정을 비교와 사용자 의도 기록으로만 취급합니다. 영향을 받는 근거를 다시 수집하고, 사용자가 명시적으로 확인한 약속만 유지하며, 유지·교체·미확인 활동을 표시합니다. 검증된 대안이 없으면 그럴듯한 일정을 꾸며내지 않습니다.
+
 ## 작업 흐름
 
 ```text
@@ -80,6 +91,7 @@ plan.json + Markdown + HTML + PDF (renderer 성공 시만)
 - [근거 데이터 계약](skills/travel-planner/references/evidence-contract.md)
 - [보고서 계약](skills/travel-planner/references/report-contract.md)
 - [요구사항 계약](skills/travel-planner/references/requirements-contract.md)
+- [일정 재조정 계약](skills/travel-planner/references/replan-contract.md)
 
 ## Workspace 구조
 
@@ -92,6 +104,9 @@ _workspace/
   03_report/travel_plan.md
   03_report/travel_plan.html
   03_report/travel_plan.pdf
+  04_replan/replan-request.json
+  04_replan/replan.json
+  04_replan/replan.md
 ```
 
 근거 데이터와 `plan.json`이 기준 데이터입니다. Markdown, HTML, PDF는 결과물입니다. plugin cache는 배포용이므로 여행 artifact를 쓰면 안 됩니다.

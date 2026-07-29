@@ -63,6 +63,17 @@ codex plugin add travel-planner@travel-planner
 
 智能体会创建 workspace，收集只读证据并直接验证。它会写入行程和报告 artifact，再读取确认；不会执行预订。
 
+## 重新规划某一天
+
+当遇到下雨、延误、闭馆、疲劳或偏好变化，需要调整今天或某一天时，直接自然语言提出请求。
+
+```text
+下午开始下雨。请把第 2 天改成室内为主，
+但保留晚上 7 点的晚餐预订。
+```
+
+智能体仅把旧行程作为比较和用户意图记录。它会重新收集受影响的证据，只保留用户明确确认的承诺，并说明保留、替换和待确认的活动。没有经过验证的替代方案时，它不会编造看似合理的行程。
+
 ## 工作流程
 
 ```text
@@ -80,6 +91,7 @@ plan.json + Markdown + HTML + PDF（仅在 renderer 成功时）
 - [证据数据契约](skills/travel-planner/references/evidence-contract.md)
 - [报告契约](skills/travel-planner/references/report-contract.md)
 - [需求契约](skills/travel-planner/references/requirements-contract.md)
+- [重新规划契约](skills/travel-planner/references/replan-contract.md)
 
 ## Workspace 结构
 
@@ -92,6 +104,9 @@ _workspace/
   03_report/travel_plan.md
   03_report/travel_plan.html
   03_report/travel_plan.pdf
+  04_replan/replan-request.json
+  04_replan/replan.json
+  04_replan/replan.md
 ```
 
 证据数据和 `plan.json` 是基准数据。Markdown、HTML、PDF 是输出。plugin cache 仅用于分发，不能写入旅行 artifact。

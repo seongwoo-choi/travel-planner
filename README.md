@@ -65,6 +65,17 @@ and prefer a relaxed schedule with evening views.
 
 The agent creates a workspace, collects read-only evidence, validates it directly, writes the itinerary and report artifacts, and reads them back to verify them. It never books anything.
 
+## Replan a day
+
+Ask to change today or a specific day when weather, delay, closure, fatigue, or preferences change:
+
+```text
+Rain starts this afternoon. Replan day 2 around indoor places,
+but keep our 19:00 dinner reservation.
+```
+
+The agent treats the previous itinerary only as a comparison and intent record. It refreshes affected evidence, preserves only commitments you explicitly confirm, and reports the kept, replaced, and unresolved activities. It never invents a replacement when no verified option fits.
+
 ## Workflow
 
 ```text
@@ -82,6 +93,7 @@ The canonical workflow is [`skills/travel-planner/SKILL.md`](skills/travel-plann
 - [Evidence contract](skills/travel-planner/references/evidence-contract.md)
 - [Report contract](skills/travel-planner/references/report-contract.md)
 - [Requirements contract](skills/travel-planner/references/requirements-contract.md)
+- [Replan contract](skills/travel-planner/references/replan-contract.md)
 
 ## Workspace contract
 
@@ -94,6 +106,9 @@ _workspace/
   03_report/travel_plan.md
   03_report/travel_plan.html
   03_report/travel_plan.pdf
+  04_replan/replan-request.json
+  04_replan/replan.json
+  04_replan/replan.md
 ```
 
 Evidence snapshots and `plan.json` are the source of truth. Markdown, HTML, and PDF are derived artifacts. Plugin caches are distribution-only and must never receive trip artifacts.

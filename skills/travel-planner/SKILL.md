@@ -1,6 +1,6 @@
 ---
 name: travel-planner
-description: "실제 장소·영업시간·날씨·이동시간 근거로 국내외 여행 일정을 만들고 검증하는 portable harness. 여행 계획, 일정, 코스, 맛집 동선, 교통 연결, 여행 보고서 요청에 사용."
+description: "실제 장소·영업시간·날씨·이동시간 근거로 국내외 여행 일정을 만들고, 비·지연·휴무 때 특정 날짜를 다시 계획하는 portable harness. 여행 계획, 일정, 코스, 맛집 동선, 교통 연결, 여행 보고서 요청에 사용."
 ---
 
 # Travel Planner
@@ -57,11 +57,23 @@ plugin cache는 read-only distribution이며 여행 artifact를 쓰는 위치가
 
 PDF가 필요하면 headless Chrome 등 실제 renderer를 실행해 `_workspace/03_report/travel_plan.pdf`를 생성한 뒤, 파일 존재·크기·`%PDF` header를 확인한다. renderer가 없거나 실패하면 PDF를 꾸며내지 말고 HTML까지의 결과와 실패 원인을 보고한다. 세 파일이 모두 실제로 검증된 경우에만 3종 산출 완료라고 말한다.
 
-### 5. 부분 재실행
+### 5. 일정 재조정 (Replan)
+
+비, 지연, 휴무, 피로, 선호 변경으로 사용자가 오늘 또는 특정 날짜 일정을 바꿔 달라고 하면 [Replan Contract](references/replan-contract.md)를 읽고 `templates/replan-request.json`을 `_workspace/04_replan/replan-request.json`에 저장한다.
+
+1. target date, timezone, trigger, 사용자 확정 예약·약속만 읽는다. 기존 일정 artifact는 사실 근거가 아니다. 기존 `plan.json`과 report는 비교와 사용자가 유지하고 싶은 활동 후보로만 읽는다.
+2. 날씨·장소·이동 evidence 중 trigger와 target date에 영향을 받는 snapshot을 현재 source로 갱신하고 직접 검증한다. 기존 artifact의 영업시간, 이동시간, 예약 상태를 복사하지 않는다.
+3. locked commitment를 먼저 고정하고, 새 evidence를 통과하는 활동만 다시 배치한다. 비·휴무 대안은 검증된 장소가 있을 때만 사용한다.
+4. `_workspace/04_replan/replan.json`과 `replan.md`에 trigger, 적용한 evidence, 유지·교체·삭제한 활동, 시간대별 새 일정, 확인 작업을 작성한다.
+5. [Replan Review](templates/replan-review.md)를 완료한 뒤, 사용자에게 기존 일정 대비 바뀐 항목과 유지해야 할 예약을 표시한다.
+
+대체할 수 없거나 locked commitment와 충돌하면 빈 시간을 그럴듯한 활동으로 채우지 않는다. `needs_review` 또는 `conflict`로 끝내고 필요한 확인 작업을 남긴다.
+
+### 6. 부분 재실행
 
 사용자가 날씨·장소·교통 중 일부만 갱신해 달라고 하면 해당 evidence snapshot만 교체하고 검증·계획·보고서 단계를 다시 실행한다. 기존 artifact를 사실 source로 삼지 않는다.
 
-### 6. 예약
+### 7. 예약
 
 조사와 실행을 분리한다. 예약 실행 직전에 편명/시설, 날짜·시각, 인원, 가격, 취소 조건, 수행할 외부 변경을 제시하고 승인을 받는다. 결제정보나 credential은 파일에 저장하지 않는다.
 
